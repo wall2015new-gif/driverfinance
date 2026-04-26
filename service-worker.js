@@ -1,9 +1,9 @@
-const CACHE_NAME = 'driver-finance-v2';
+const CACHE_NAME = 'driver-finance-v3';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/app-new.js',
-  '/manifest.json',
+  './',
+  './index.html',
+  './app-new.js',
+  './manifest.json',
   'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'

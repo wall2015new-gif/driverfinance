@@ -4,6 +4,8 @@
 
 🎉 SEU APP ESTÁ PUBLICADO E FUNCIONANDO!
 
+✨ NOVIDADE: Agora o app sugere instalação automaticamente no celular!
+
 
 ═══════════════════════════════════════════════════════════════
   📱 COMO ACESSAR AMANHÃ
@@ -12,11 +14,16 @@
 1️⃣ ACESSE O LINK:
    https://wall2015new-gif.github.io/driverfinance
 
-2️⃣ INSTALE COMO APP:
-   - No celular: Toque no menu → "Adicionar à tela inicial"
-   - No computador: Clique no ícone ⊕ na barra de endereço
+2️⃣ INSTALAÇÃO AUTOMÁTICA (NOVO!):
+   - No celular: Um modal aparece após 3 segundos
+   - Clique em "📲 Instalar Agora"
+   - Pronto! App na tela inicial
 
-3️⃣ USE COMO APP NATIVO:
+3️⃣ OU INSTALE MANUALMENTE:
+   - Clique no botão "📲 Instalar App" no topo
+   - Ou use o menu do navegador
+
+4️⃣ USE COMO APP NATIVO:
    - Funciona offline
    - Ícone na tela inicial
    - Abre em tela cheia
@@ -133,6 +140,8 @@ Para usar em múltiplos dispositivos:
 ✅ Tema claro/escuro
 ✅ Funciona offline
 ✅ Totalmente responsivo
+✨ Prompt de instalação automático (NOVO!)
+✨ Botão de instalação no header (NOVO!)
 
 
 ═══════════════════════════════════════════════════════════════

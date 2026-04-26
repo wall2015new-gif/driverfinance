@@ -2605,6 +2605,31 @@
                     </label>
                 </div>
             </div>
+            
+            <!-- Modo Motorista -->
+            <div style="background: var(--bg-tertiary); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                <div style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    🚗 Modo Motorista
+                </div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
+                    Ative para adicionar corridas pela notificação, mesmo com o app fechado!
+                </div>
+                <button id="driverModeButton" class="btn" onclick="toggleDriverMode()" style="
+                    width: 100%;
+                    background: var(--accent-green);
+                    color: white;
+                    border: none;
+                    padding: 14px;
+                    font-size: 15px;
+                    font-weight: 700;
+                ">
+                    🚗 Ativar Modo Motorista
+                </button>
+                <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 12px; text-align: center;">
+                    💡 Aparecerá uma notificação com botões [+R$ 15] [+R$ 25] [+R$ 30]
+                </div>
+            </div>
+            
             <div class="danger-zone">
                 <div class="danger-zone-header">⚠️ Zona de Perigo</div>
                 <button class="btn-danger-action" onclick="resetAllData()">

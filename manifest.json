@@ -25,25 +25,49 @@
   "screenshots": [],
   "shortcuts": [
     {
-      "name": "Registrar Ganho",
-      "short_name": "Ganho",
-      "description": "Registrar novo ganho rapidamente",
-      "url": "./?action=earning",
+      "name": "Adicionar R$ 15",
+      "short_name": "+R$ 15",
+      "description": "Adicionar corrida de R$ 15",
+      "url": "./?quick=15",
       "icons": [
         {
-          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='64'%3E💰%3C/text%3E%3C/svg%3E",
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%2300c853'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='48' fill='white' font-weight='bold'%3E15%3C/text%3E%3C/svg%3E",
           "sizes": "96x96"
         }
       ]
     },
     {
-      "name": "Registrar Gasto",
-      "short_name": "Gasto",
-      "description": "Registrar novo gasto rapidamente",
-      "url": "./?action=expense",
+      "name": "Adicionar R$ 25",
+      "short_name": "+R$ 25",
+      "description": "Adicionar corrida de R$ 25",
+      "url": "./?quick=25",
       "icons": [
         {
-          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='64'%3E📉%3C/text%3E%3C/svg%3E",
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%2300c853'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='48' fill='white' font-weight='bold'%3E25%3C/text%3E%3C/svg%3E",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Adicionar R$ 30",
+      "short_name": "+R$ 30",
+      "description": "Adicionar corrida de R$ 30",
+      "url": "./?quick=30",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%2300c853'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='48' fill='white' font-weight='bold'%3E30%3C/text%3E%3C/svg%3E",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Adicionar Corrida",
+      "short_name": "Corrida",
+      "description": "Adicionar corrida personalizada",
+      "url": "./?action=quick",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='64'%3E💰%3C/text%3E%3C/svg%3E",
           "sizes": "96x96"
         }
       ]

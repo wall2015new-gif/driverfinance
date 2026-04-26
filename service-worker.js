@@ -109,3 +109,99 @@ self.addEventListener('message', event => {
     self.skipWaiting();
   }
 });
+
+
+// ========== PROCESSAR AÇÕES DA NOTIFICAÇÃO ==========
+
+// Quando o usuário clica nos botões da notificação
+self.addEventListener('notificationclick', event => {
+  console.log('🔔 Clique na notificação:', event.action);
+  
+  event.notification.close();
+  
+  // Processar ação
+  if (event.action === 'add-15') {
+    handleQuickAdd(15);
+  } else if (event.action === 'add-25') {
+    handleQuickAdd(25);
+  } else if (event.action === 'add-30') {
+    handleQuickAdd(30);
+  } else {
+    // Clique no corpo da notificação - abrir app
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
+});
+
+// Adicionar receita rápida via notificação
+async function handleQuickAdd(amount) {
+  console.log(`💰 Adicionando R$ ${amount} via notificação`);
+  
+  try {
+    // Abrir ou focar na janela do app
+    const windowClients = await clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true
+    });
+    
+    let appClient = null;
+    
+    // Procurar janela já aberta
+    for (const client of windowClients) {
+      if (client.url.includes(self.location.origin)) {
+        appClient = client;
+        break;
+      }
+    }
+    
+    if (appClient) {
+      // App já está aberto - enviar mensagem
+      appClient.focus();
+      appClient.postMessage({
+        type: 'QUICK_ADD',
+        amount: amount
+      });
+    } else {
+      // App não está aberto - abrir com parâmetro
+      await clients.openWindow(`/?quick=${amount}`);
+    }
+    
+    // Mostrar notificação de confirmação
+    await self.registration.showNotification('✅ Receita Adicionada!', {
+      body: `+ R$ ${amount.toFixed(2)}`,
+      icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="100" fill="%2300c853"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="280"%3E✅%3C/text%3E%3C/svg%3E',
+      tag: 'quick-add-confirmation',
+      requireInteraction: false,
+      silent: false,
+      vibrate: [100, 50, 100]
+    });
+    
+    // Fechar notificação de confirmação após 2 segundos
+    setTimeout(async () => {
+      const notifications = await self.registration.getNotifications({ tag: 'quick-add-confirmation' });
+      notifications.forEach(n => n.close());
+    }, 2000);
+    
+    // Recriar notificação do Modo Motorista
+    setTimeout(async () => {
+      await self.registration.showNotification('🚗 Modo Motorista Ativo', {
+        body: 'Toque nos botões para adicionar corridas rapidamente',
+        icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="100" fill="%2300c853"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="280"%3E🚗%3C/text%3E%3C/svg%3E',
+        tag: 'driver-mode',
+        requireInteraction: true,
+        silent: true,
+        actions: [
+          { action: 'add-15', title: '+ R$ 15' },
+          { action: 'add-25', title: '+ R$ 25' },
+          { action: 'add-30', title: '+ R$ 30' }
+        ]
+      });
+    }, 2500);
+    
+  } catch (error) {
+    console.error('❌ Erro ao processar adição rápida:', error);
+  }
+}
+
+console.log('🔔 Handler de notificações carregado');

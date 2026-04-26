@@ -2012,3 +2012,193 @@ document.addEventListener('keydown', (e) => {
 });
 
 console.log('⌨️ Atalho: Ctrl+Shift+A para adição rápida');
+
+
+// ========== NOTIFICAÇÃO PERSISTENTE COM BOTÕES DE AÇÃO ==========
+
+let persistentNotificationEnabled = localStorage.getItem('persistent_notification') === 'true';
+let driverModeActive = false;
+
+// Ativar/Desativar Modo Motorista
+function toggleDriverMode() {
+    driverModeActive = !driverModeActive;
+    
+    if (driverModeActive) {
+        activateDriverMode();
+    } else {
+        deactivateDriverMode();
+    }
+}
+
+// Ativar Modo Motorista
+async function activateDriverMode() {
+    console.log('🚗 Ativando Modo Motorista...');
+    
+    // Verificar permissão de notificações
+    if (Notification.permission !== 'granted') {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+            showNotification('❌ Permissão de notificação negada', 'error');
+            driverModeActive = false;
+            return;
+        }
+    }
+    
+    // Verificar se o Service Worker suporta notificações persistentes
+    if (!('serviceWorker' in navigator) || !('showNotification' in ServiceWorkerRegistration.prototype)) {
+        showNotification('❌ Notificações persistentes não suportadas', 'error');
+        driverModeActive = false;
+        return;
+    }
+    
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        
+        // Criar notificação persistente com botões de ação
+        await registration.showNotification('🚗 Modo Motorista Ativo', {
+            body: 'Toque nos botões para adicionar corridas rapidamente',
+            icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="100" fill="%2300c853"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="280"%3E🚗%3C/text%3E%3C/svg%3E',
+            badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="64"%3E💰%3C/text%3E%3C/svg%3E',
+            tag: 'driver-mode',
+            requireInteraction: true,
+            silent: true,
+            vibrate: [200, 100, 200],
+            actions: [
+                {
+                    action: 'add-15',
+                    title: '+ R$ 15',
+                    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="48"%3E15%3C/text%3E%3C/svg%3E'
+                },
+                {
+                    action: 'add-25',
+                    title: '+ R$ 25',
+                    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="48"%3E25%3C/text%3E%3C/svg%3E'
+                },
+                {
+                    action: 'add-30',
+                    title: '+ R$ 30',
+                    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="48"%3E30%3C/text%3E%3C/svg%3E'
+                }
+            ]
+        });
+        
+        localStorage.setItem('persistent_notification', 'true');
+        persistentNotificationEnabled = true;
+        
+        showNotification('✅ Modo Motorista ativado! Use os botões na notificação', 'success');
+        
+        // Atualizar botão na interface
+        updateDriverModeButton();
+        
+        console.log('✅ Modo Motorista ativado com sucesso!');
+        
+    } catch (error) {
+        console.error('❌ Erro ao ativar Modo Motorista:', error);
+        showNotification('❌ Erro ao ativar Modo Motorista', 'error');
+        driverModeActive = false;
+    }
+}
+
+// Desativar Modo Motorista
+async function deactivateDriverMode() {
+    console.log('🛑 Desativando Modo Motorista...');
+    
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const notifications = await registration.getNotifications({ tag: 'driver-mode' });
+        
+        notifications.forEach(notification => notification.close());
+        
+        localStorage.setItem('persistent_notification', 'false');
+        persistentNotificationEnabled = false;
+        
+        showNotification('🛑 Modo Motorista desativado', 'info');
+        
+        // Atualizar botão na interface
+        updateDriverModeButton();
+        
+        console.log('✅ Modo Motorista desativado');
+        
+    } catch (error) {
+        console.error('❌ Erro ao desativar Modo Motorista:', error);
+    }
+}
+
+// Atualizar botão de Modo Motorista na interface
+function updateDriverModeButton() {
+    const button = document.getElementById('driverModeButton');
+    if (button) {
+        if (driverModeActive) {
+            button.textContent = '🛑 Desativar Modo Motorista';
+            button.style.background = 'var(--accent-red)';
+        } else {
+            button.textContent = '🚗 Ativar Modo Motorista';
+            button.style.background = 'var(--accent-green)';
+        }
+    }
+}
+
+// Processar ações da notificação (no service worker)
+// Esta função será chamada quando o usuário clicar nos botões da notificação
+
+console.log('🚗 Sistema de Modo Motorista carregado!');
+console.log('💡 Ative o Modo Motorista para adicionar corridas pela notificação');
+
+// ========== ATALHOS RÁPIDOS DA URL ==========
+
+// Detectar se foi aberto por um atalho rápido
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Atalho de valor rápido (?quick=25)
+    const quickValue = urlParams.get('quick');
+    if (quickValue) {
+        const amount = parseFloat(quickValue);
+        if (amount && amount > 0) {
+            console.log(`⚡ Atalho rápido detectado: R$ ${amount}`);
+            
+            // Aguardar 500ms para garantir que tudo carregou
+            setTimeout(() => {
+                addQuickRevenue(amount);
+            }, 500);
+        }
+    }
+    
+    // Atalho para abrir modal de adição (?action=quick)
+    const action = urlParams.get('action');
+    if (action === 'quick') {
+        console.log('⚡ Atalho de adição rápida detectado');
+        
+        setTimeout(() => {
+            openQuickAddModal();
+        }, 500);
+    }
+    
+    // Limpar URL após processar
+    if (quickValue || action === 'quick') {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+});
+
+console.log('⚡ Sistema de atalhos rápidos ativado!');
+console.log('💡 Pressione e segure o ícone do app para ver os atalhos');
+
+
+// ========== RECEBER MENSAGENS DO SERVICE WORKER ==========
+
+// Listener para mensagens do service worker (adição via notificação)
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', event => {
+        console.log('📨 Mensagem recebida do Service Worker:', event.data);
+        
+        if (event.data && event.data.type === 'QUICK_ADD') {
+            const amount = event.data.amount;
+            console.log(`💰 Processando adição rápida: R$ ${amount}`);
+            
+            // Adicionar receita
+            addQuickRevenue(amount);
+        }
+    });
+}
+
+console.log('📨 Listener de mensagens do Service Worker ativado');

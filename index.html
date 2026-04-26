@@ -1,0 +1,2507 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Driver Finance - Gestão Financeira</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Driver Finance">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230a0e27'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='280' fill='%2300ff88'%3E🚗%3C/text%3E%3C/svg%3E">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #f0f2f5;
+            --bg-card: #ffffff;
+            --border: #e4e6eb;
+            --border-light: #d0d3d9;
+            --text-primary: #1c1e21;
+            --text-secondary: #65676b;
+            --text-tertiary: #8a8d91;
+            --accent-blue: #4267f5;
+            --accent-blue-light: #5a7aff;
+            --accent-green: #00c853;
+            --accent-red: #f44336;
+            --accent-yellow: #ffc107;
+            --accent-purple: #9c27b0;
+            --accent-orange: #ff6b35;
+            --accent-pink: #ff006e;
+            --accent-cyan: #00bcd4;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-hover: rgba(0, 0, 0, 0.12);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #151515;
+            --border: #222222;
+            --border-light: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-tertiary: #666666;
+            --shadow: rgba(0, 0, 0, 0.5);
+            --shadow-hover: rgba(0, 0, 0, 0.7);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 80px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Grid background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glow effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(66, 103, 245, 0.03) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Card principal destacado */
+        .featured-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .featured-card::before {
+            display: none;
+        }
+
+        .featured-card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .featured-card-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .featured-card-value {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -2px;
+        }
+
+        .featured-card-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .featured-card-icon {
+            display: none;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: var(--bg-card);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .period-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .period-btn.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(66, 103, 245, 0.3);
+        }
+
+        .period-btn:hover:not(.active) {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        /* Cards circulares de progresso */
+        .circular-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .circular-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInScale 0.5s ease-out;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .circular-card::before {
+            display: none;
+        }
+
+        .circular-card:hover {
+            border-color: var(--border-light);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px var(--shadow-hover);
+        }
+
+        .circular-card:nth-child(1) { animation-delay: 0.1s; }
+        .circular-card:nth-child(2) { animation-delay: 0.2s; }
+        .circular-card:nth-child(3) { animation-delay: 0.3s; }
+        .circular-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .circular-card:nth-child(1):hover {
+            box-shadow: 0 4px 16px rgba(66, 103, 245, 0.2);
+        }
+
+        .circular-card:nth-child(2):hover {
+            box-shadow: 0 4px 16px rgba(244, 67, 54, 0.2);
+        }
+
+        .circular-card:nth-child(3):hover {
+            box-shadow: 0 4px 16px rgba(0, 200, 83, 0.2);
+        }
+
+        .circular-card:nth-child(4):hover {
+            box-shadow: 0 4px 16px rgba(255, 193, 7, 0.2);
+        }
+
+        .circular-progress {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 16px;
+        }
+
+        .circular-progress svg {
+            transform: rotate(-90deg);
+        }
+
+        .circular-progress-bg {
+            fill: none;
+            stroke: var(--bg-tertiary);
+            stroke-width: 8;
+        }
+
+        .circular-progress-fill {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .circular-progress-fill.green {
+            stroke: var(--accent-blue);
+            filter: drop-shadow(0 0 4px rgba(66, 103, 245, 0.3));
+        }
+
+        .circular-progress-fill.red {
+            stroke: var(--accent-red);
+            filter: drop-shadow(0 0 4px rgba(244, 67, 54, 0.3));
+        }
+
+        .circular-progress-fill.blue {
+            stroke: var(--accent-green);
+            filter: drop-shadow(0 0 4px rgba(0, 200, 83, 0.3));
+        }
+
+        .circular-progress-fill.yellow {
+            stroke: var(--accent-yellow);
+            filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.3));
+        }
+
+        .circular-progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .circular-progress-percent {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .circular-progress-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .circular-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .circular-card-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        /* Mini Stats Grid */
+        .mini-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .mini-stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .mini-stat-card:hover {
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-hover);
+        }
+
+        .mini-stat-card:nth-child(1) {
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .mini-stat-card:nth-child(1):hover {
+            border-color: var(--accent-blue);
+        }
+
+        .mini-stat-card:nth-child(2) {
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .mini-stat-card:nth-child(2):hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .mini-stat-card:nth-child(3) {
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .mini-stat-card:nth-child(3):hover {
+            border-color: var(--accent-purple);
+        }
+
+        .mini-stat-card:nth-child(4) {
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .mini-stat-card:nth-child(4):hover {
+            border-color: var(--accent-orange);
+        }
+
+        .mini-stat-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .mini-stat-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .mini-stat-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Ações */
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-blue);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(66, 103, 245, 0.3);
+        }
+
+        .btn-danger {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .btn-danger:hover {
+            background: var(--accent-red);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn-secondary {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-green);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3);
+        }
+
+        .btn-info {
+            border-color: var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+
+        .btn-info:hover {
+            background: var(--accent-yellow);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .nav-item.active {
+            color: var(--accent-blue);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+
+        .nav-item.active .nav-icon {
+            filter: drop-shadow(0 0 4px var(--accent-blue));
+        }
+
+        /* Gráficos */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .chart-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+        }
+
+        /* Seções */
+        .stats-section, .detail-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .section-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .stat-detail-card {
+            text-align: center;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .stat-detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .stat-detail-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+
+        .detail-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .detail-item-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .detail-item-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Páginas */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Filtros */
+        .filter-section {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .filter-select {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(66, 103, 245, 0.1);
+        }
+
+        /* Transações */
+        .transactions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .transaction-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .transaction-item:hover {
+            border-color: var(--border-light);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px var(--shadow-hover);
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .transaction-desc {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .transaction-category {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        .transaction-value {
+            font-size: 18px;
+            font-weight: 900;
+            text-align: right;
+        }
+
+        .transaction-value.revenue {
+            color: var(--accent-green);
+        }
+
+        .transaction-value.expense {
+            color: var(--accent-red);
+        }
+
+        .transaction-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 16px;
+        }
+
+        .btn-icon {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUpModal 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUpModal {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(66, 103, 245, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-tertiary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Metas */
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .goal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .goal-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px var(--shadow-hover);
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .goal-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .goal-target {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-green);
+            border-radius: 20px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(0, 200, 83, 0.5);
+        }
+
+        .progress-fill.blue {
+            background: var(--accent-blue);
+            box-shadow: 0 0 10px rgba(66, 103, 245, 0.5);
+        }
+
+        .goal-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .btn-edit {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 700;
+        }
+
+        .btn-edit:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        /* Conquistas */
+        .achievements-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+        }
+
+        .achievement-badge {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .achievement-badge.unlocked {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 20px rgba(0, 200, 83, 0.2);
+        }
+
+        .achievement-badge.locked {
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        .achievement-badge:hover.unlocked {
+            transform: scale(1.05);
+        }
+
+        .achievement-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .achievement-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .achievement-desc {
+            font-size: 9px;
+            color: var(--text-secondary);
+        }
+
+        /* Relatórios */
+        .report-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-hover);
+        }
+
+        .summary-icon {
+            font-size: 32px;
+        }
+
+        .summary-info {
+            flex: 1;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        .summary-value.green {
+            color: var(--accent-green);
+        }
+
+        .summary-value.red {
+            color: var(--accent-red);
+        }
+
+        .summary-value.blue {
+            color: var(--accent-blue);
+        }
+
+        /* Análise */
+        .analysis-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .analysis-card {
+            background: var(--bg-tertiary);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .analysis-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .analysis-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+
+        /* Calendário */
+        .calendar-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-calendar {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-calendar:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .calendar-month {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            padding: 8px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            border-color: var(--accent-blue);
+            transform: scale(1.05);
+        }
+
+        .calendar-day.today {
+            border-color: var(--accent-blue);
+            background: rgba(66, 103, 245, 0.1);
+        }
+
+        .calendar-day.has-revenue {
+            background: rgba(0, 200, 83, 0.1);
+            border-color: var(--accent-green);
+        }
+
+        .calendar-day.has-expense {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--accent-red);
+        }
+
+        .calendar-day.has-both {
+            background: linear-gradient(135deg, rgba(0, 200, 83, 0.1) 0%, rgba(244, 67, 54, 0.1) 100%);
+            border-color: var(--accent-blue);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
+        .calendar-day-number {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .calendar-day-value {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        @media (max-width: 768px) {
+            .calendar-day {
+                font-size: 12px;
+            }
+            
+            .calendar-day-value {
+                font-size: 8px;
+            }
+        }
+
+        /* Exportação */
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .export-option-btn {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .export-option-btn:hover {
+            border-color: var(--accent-blue);
+            background: var(--bg-card);
+            transform: translateX(4px);
+        }
+
+        .export-icon {
+            font-size: 32px;
+        }
+
+        .export-info {
+            flex: 1;
+        }
+
+        .export-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .export-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Notificações */
+        .notification-settings {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .notification-info {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .notification-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Switch Toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            transition: 0.4s;
+            border-radius: 28px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 3px;
+            background-color: var(--text-secondary);
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+            background-color: white;
+        }
+
+        /* Botão Flutuante */
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(66, 103, 245, 0.4);
+            transition: all 0.3s;
+            z-index: 99;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(66, 103, 245, 0.6);
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 768px) {
+            .fab {
+                bottom: 80px;
+                right: 16px;
+            }
+        }
+
+        /* Zona de Perigo */
+        .danger-zone {
+            margin-top: 32px;
+            padding: 20px;
+            background: rgba(244, 67, 54, 0.1);
+            border: 2px solid var(--accent-red);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .danger-zone-header {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-red);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-danger-action {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-danger-action:hover {
+            background: var(--accent-red);
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .btn-danger-action:active {
+            transform: scale(0.98);
+        }
+
+        /* ========== RESPONSIVIDADE MOBILE ========== */
+        
+        /* Mobile Portrait (até 480px) */
+        @media (max-width: 480px) {
+            body {
+                padding-bottom: 70px;
+            }
+
+            .container {
+                padding: 12px;
+            }
+
+            .header {
+                padding: 16px 12px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .header p {
+                font-size: 12px;
+            }
+
+            .featured-card {
+                padding: 24px 16px;
+                margin-bottom: 16px;
+            }
+
+            .featured-card-label {
+                font-size: 11px;
+            }
+
+            .featured-card-value {
+                font-size: 32px;
+            }
+
+            .featured-card-subtitle {
+                font-size: 12px;
+            }
+
+            .period-selector {
+                gap: 4px;
+                padding: 4px;
+                margin-bottom: 16px;
+            }
+
+            .period-btn {
+                padding: 8px 4px;
+                font-size: 10px;
+            }
+
+            .circular-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .circular-card {
+                padding: 16px 12px;
+            }
+
+            .circular-progress {
+                width: 90px;
+                height: 90px;
+                margin-bottom: 12px;
+            }
+
+            .circular-progress svg {
+                width: 90px;
+                height: 90px;
+            }
+
+            .circular-progress-percent {
+                font-size: 22px;
+            }
+
+            .circular-progress-label {
+                font-size: 9px;
+            }
+
+            .circular-card-title {
+                font-size: 11px;
+            }
+
+            .circular-card-value {
+                font-size: 16px;
+            }
+
+            .mini-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+
+            .mini-stat-card {
+                padding: 12px 8px;
+            }
+
+            .mini-stat-icon {
+                font-size: 20px;
+            }
+
+            .mini-stat-value {
+                font-size: 16px;
+            }
+
+            .mini-stat-label {
+                font-size: 9px;
+            }
+
+            .actions {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+
+            .btn {
+                padding: 12px 8px;
+                font-size: 12px;
+            }
+
+            .chart-container, .stats-section, .detail-section {
+                padding: 16px 12px;
+                margin-bottom: 16px;
+            }
+
+            .chart-wrapper {
+                height: 200px;
+            }
+
+            .stats-detail-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .stat-detail-card {
+                padding: 12px 8px;
+            }
+
+            .stat-detail-value {
+                font-size: 16px;
+            }
+
+            .page-header h2 {
+                font-size: 20px;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .transaction-item {
+                padding: 12px;
+                flex-wrap: wrap;
+            }
+
+            .transaction-value {
+                font-size: 16px;
+            }
+
+            .goals-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .goal-card {
+                padding: 16px;
+            }
+
+            .goal-target {
+                font-size: 24px;
+            }
+
+            .achievements-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .achievement-badge {
+                padding: 12px 8px;
+            }
+
+            .report-summary {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .analysis-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .calendar-section {
+                padding: 16px 12px;
+            }
+
+            .calendar-grid {
+                gap: 4px;
+            }
+
+            .calendar-day {
+                font-size: 11px;
+            }
+
+            .calendar-day-value {
+                font-size: 7px;
+            }
+
+            .modal {
+                padding: 12px;
+            }
+
+            .modal-content {
+                padding: 24px 16px;
+            }
+
+            .modal-header {
+                font-size: 18px;
+            }
+
+            .form-input, .form-select {
+                font-size: 16px !important;
+            }
+
+            .export-option-btn {
+                padding: 16px;
+            }
+
+            .notification-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .switch {
+                align-self: flex-end;
+            }
+
+            .bottom-nav {
+                padding: 8px 0;
+            }
+
+            .nav-item {
+                padding: 8px 4px;
+                font-size: 9px;
+            }
+
+            .nav-icon {
+                font-size: 20px;
+            }
+
+            .fab {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                bottom: 75px;
+                right: 12px;
+            }
+        }
+
+        /* Tablets (481px - 768px) */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .circular-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .mini-stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .actions {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .goals-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .achievements-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .analysis-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .fab {
+                bottom: 80px;
+                right: 16px;
+            }
+        }
+
+        /* Landscape Mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .circular-cards {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .mini-stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .actions {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .goals-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Telas muito pequenas (até 360px) */
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .featured-card-value {
+                font-size: 28px;
+            }
+
+            .circular-progress {
+                width: 80px;
+                height: 80px;
+            }
+
+            .circular-progress svg {
+                width: 80px;
+                height: 80px;
+            }
+
+            .circular-progress-percent {
+                font-size: 18px;
+            }
+
+            .circular-card-value {
+                font-size: 14px;
+            }
+
+            .btn {
+                font-size: 11px;
+                padding: 10px 6px;
+            }
+
+            .nav-item {
+                font-size: 8px;
+            }
+
+            .nav-icon {
+                font-size: 18px;
+            }
+        }
+
+        /* Otimizações para touch */
+        @media (hover: none) and (pointer: coarse) {
+            .btn, .nav-item, .calendar-day, .transaction-item,
+            .export-option-btn, .achievement-badge, .goal-card,
+            .mini-stat-card, .circular-card {
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+            }
+
+            .btn:active, .nav-item:active {
+                transform: scale(0.95);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚗 DRIVER FINANCE</h1>
+        <p>Gestão Financeira Inteligente</p>
+    </div>
+
+    <div class="container">
+        <!-- Página Dashboard -->
+        <div id="page-dashboard" class="page active">
+            <!-- Card Principal Destacado -->
+            <div class="featured-card">
+                <div class="featured-card-content">
+                    <div class="featured-card-label">💰 FATURAMENTO</div>
+                    <div class="featured-card-value">R$ 0,00</div>
+                    <div class="featured-card-subtitle">Atualizado em tempo real</div>
+                </div>
+                <div class="featured-card-icon">💎</div>
+            </div>
+
+        <!-- Seletor de Período -->
+        <div class="period-selector">
+            <button class="period-btn active">HOJE</button>
+            <button class="period-btn">SEMANA</button>
+            <button class="period-btn">MÊS</button>
+        </div>
+
+        <!-- Cards Circulares de Progresso -->
+        <div class="circular-cards">
+            <div class="circular-card">
+                <div class="circular-progress">
+                    <svg width="120" height="120">
+                        <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
+                        <circle class="circular-progress-fill green" cx="60" cy="60" r="52" 
+                                stroke-dasharray="326.73" stroke-dashoffset="245"></circle>
+                    </svg>
+                    <div class="circular-progress-text">
+                        <div class="circular-progress-percent">25%</div>
+                        <div class="circular-progress-label">Meta</div>
+                    </div>
+                </div>
+                <div class="circular-card-title">💵 RECEITAS</div>
+                <div class="circular-card-value">R$ 0,00</div>
+            </div>
+
+            <div class="circular-card">
+                <div class="circular-progress">
+                    <svg width="120" height="120">
+                        <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
+                        <circle class="circular-progress-fill red" cx="60" cy="60" r="52" 
+                                stroke-dasharray="326.73" stroke-dashoffset="163"></circle>
+                    </svg>
+                    <div class="circular-progress-text">
+                        <div class="circular-progress-percent">50%</div>
+                        <div class="circular-progress-label">Gastos</div>
+                    </div>
+                </div>
+                <div class="circular-card-title">💸 GASTOS</div>
+                <div class="circular-card-value">R$ 0,00</div>
+            </div>
+
+            <div class="circular-card">
+                <div class="circular-progress">
+                    <svg width="120" height="120">
+                        <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
+                        <circle class="circular-progress-fill blue" cx="60" cy="60" r="52" 
+                                stroke-dasharray="326.73" stroke-dashoffset="180"></circle>
+                    </svg>
+                    <div class="circular-progress-text">
+                        <div class="circular-progress-percent">45%</div>
+                        <div class="circular-progress-label">Lucro</div>
+                    </div>
+                </div>
+                <div class="circular-card-title">📈 LUCRO LÍQUIDO</div>
+                <div class="circular-card-value">R$ 0,00</div>
+            </div>
+
+            <div class="circular-card">
+                <div class="circular-progress">
+                    <svg width="120" height="120">
+                        <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
+                        <circle class="circular-progress-fill yellow" cx="60" cy="60" r="52" 
+                                stroke-dasharray="326.73" stroke-dashoffset="196"></circle>
+                    </svg>
+                    <div class="circular-progress-text">
+                        <div class="circular-progress-percent">40%</div>
+                        <div class="circular-progress-label">Meta</div>
+                    </div>
+                </div>
+                <div class="circular-card-title">🚕 CORRIDAS</div>
+                <div class="circular-card-value">0</div>
+            </div>
+        </div>
+
+        <!-- Mini Stats Grid -->
+        <div class="mini-stats-grid">
+            <div class="mini-stat-card">
+                <div class="mini-stat-icon">⛽</div>
+                <div class="mini-stat-value">R$ 0</div>
+                <div class="mini-stat-label">Combustível</div>
+            </div>
+            <div class="mini-stat-card">
+                <div class="mini-stat-icon">🔧</div>
+                <div class="mini-stat-value">R$ 0</div>
+                <div class="mini-stat-label">Manutenção</div>
+            </div>
+            <div class="mini-stat-card">
+                <div class="mini-stat-icon">📱</div>
+                <div class="mini-stat-value">R$ 0</div>
+                <div class="mini-stat-label">App</div>
+            </div>
+            <div class="mini-stat-card">
+                <div class="mini-stat-icon">🍔</div>
+                <div class="mini-stat-value">R$ 0</div>
+                <div class="mini-stat-label">Alimentação</div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="actions">
+            <button class="btn btn-primary" onclick="openModal('revenue')">
+                <span>💵</span> Receita
+            </button>
+            <button class="btn btn-danger" onclick="openModal('expense')">
+                <span>💸</span> Despesa
+            </button>
+            <button class="btn btn-secondary" onclick="openExportMenu()">
+                <span>📄</span> Exportar
+            </button>
+            <button class="btn btn-info" onclick="toggleTheme()">
+                <span>🌓</span> Tema
+            </button>
+        </div>
+
+        <!-- Gráfico de Barras -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <span>📊</span> Evolução Semanal
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="weeklyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Estatísticas Detalhadas -->
+        <div class="stats-section">
+            <div class="section-header">
+                <span>📈</span> Estatísticas
+            </div>
+            <div class="stats-detail-grid">
+                <div class="stat-detail-card">
+                    <div class="stat-detail-label">Online</div>
+                    <div class="stat-detail-value">87h 6m</div>
+                </div>
+                <div class="stat-detail-card">
+                    <div class="stat-detail-label">Viagens</div>
+                    <div class="stat-detail-value">170</div>
+                </div>
+                <div class="stat-detail-card">
+                    <div class="stat-detail-label">Pontos</div>
+                    <div class="stat-detail-value">214</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalhamento -->
+        <div class="detail-section">
+            <div class="section-header">
+                <span>💰</span> Detalhamento
+            </div>
+            <div class="detail-list">
+                <div class="detail-item">
+                    <div class="detail-item-label">Valor líquido</div>
+                    <div class="detail-item-value">R$ 4.450,12</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-item-label">Promoções</div>
+                    <div class="detail-item-value">R$ 494,00</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-item-label">Outros ganhos</div>
+                    <div class="detail-item-value">R$ 4,17</div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <!-- Fim da Página Dashboard -->
+
+        <!-- Página de Histórico -->
+        <div id="page-history" class="page">
+            <div class="page-header">
+                <h2>📜 Histórico de Transações</h2>
+                <p>Todas as suas receitas e despesas</p>
+            </div>
+
+        <!-- Filtros -->
+        <div class="filter-section">
+            <select class="filter-select" id="filterType" onchange="filterTransactions()">
+                <option value="all">Todas</option>
+                <option value="revenue">Receitas</option>
+                <option value="expense">Despesas</option>
+            </select>
+            <select class="filter-select" id="filterPeriod" onchange="filterTransactions()">
+                <option value="week">Esta Semana</option>
+                <option value="month">Este Mês</option>
+                <option value="year">Este Ano</option>
+                <option value="all">Tudo</option>
+            </select>
+        </div>
+
+        <!-- Lista de Transações -->
+        <div class="transactions-list" id="transactionsList">
+            <!-- Exemplo de transações -->
+            <div class="transaction-item">
+                <div class="transaction-info">
+                    <div class="transaction-date">12/05/2024</div>
+                    <div class="transaction-desc">Corrida Uber</div>
+                    <div class="transaction-category">Receita</div>
+                </div>
+                <div class="transaction-value revenue">+ R$ 45,80</div>
+                <div class="transaction-actions">
+                    <button class="btn-icon" onclick="deleteTransaction(1)">🗑️</button>
+                </div>
+            </div>
+
+            <div class="transaction-item">
+                <div class="transaction-info">
+                    <div class="transaction-date">12/05/2024</div>
+                    <div class="transaction-desc">Gasolina</div>
+                    <div class="transaction-category">Combustível</div>
+                </div>
+                <div class="transaction-value expense">- R$ 150,00</div>
+                <div class="transaction-actions">
+                    <button class="btn-icon" onclick="deleteTransaction(2)">🗑️</button>
+                </div>
+            </div>
+
+            <div class="transaction-item">
+                <div class="transaction-info">
+                    <div class="transaction-date">11/05/2024</div>
+                    <div class="transaction-desc">Corrida 99</div>
+                    <div class="transaction-category">Receita</div>
+                </div>
+                <div class="transaction-value revenue">+ R$ 38,50</div>
+                <div class="transaction-actions">
+                    <button class="btn-icon" onclick="deleteTransaction(3)">🗑️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Página de Metas -->
+    <div id="page-goals" class="page">
+        <div class="page-header">
+            <h2>🎯 Metas</h2>
+            <p>Defina e acompanhe seus objetivos</p>
+        </div>
+
+        <!-- Cards de Metas -->
+        <div class="goals-grid">
+            <!-- Meta Diária -->
+            <div class="goal-card">
+                <div class="goal-header">
+                    <div class="goal-title">💰 Meta Diária</div>
+                    <button class="btn-edit" onclick="editGoal('daily')">✏️ Editar</button>
+                </div>
+                <div class="goal-target" id="goalDailyTarget">R$ 200,00</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressDaily" style="width: 0%"></div>
+                </div>
+                <div class="goal-stats">
+                    <span id="goalDailyCurrent">R$ 0,00</span>
+                    <span id="goalDailyPercent">0%</span>
+                </div>
+            </div>
+
+            <!-- Meta Semanal -->
+            <div class="goal-card">
+                <div class="goal-header">
+                    <div class="goal-title">📅 Meta Semanal</div>
+                    <button class="btn-edit" onclick="editGoal('weekly')">✏️ Editar</button>
+                </div>
+                <div class="goal-target" id="goalWeeklyTarget">R$ 1.400,00</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressWeekly" style="width: 0%"></div>
+                </div>
+                <div class="goal-stats">
+                    <span id="goalWeeklyCurrent">R$ 0,00</span>
+                    <span id="goalWeeklyPercent">0%</span>
+                </div>
+            </div>
+
+            <!-- Meta Mensal -->
+            <div class="goal-card">
+                <div class="goal-header">
+                    <div class="goal-title">📆 Meta Mensal</div>
+                    <button class="btn-edit" onclick="editGoal('monthly')">✏️ Editar</button>
+                </div>
+                <div class="goal-target" id="goalMonthlyTarget">R$ 6.000,00</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressMonthly" style="width: 0%"></div>
+                </div>
+                <div class="goal-stats">
+                    <span id="goalMonthlyCurrent">R$ 0,00</span>
+                    <span id="goalMonthlyPercent">0%</span>
+                </div>
+            </div>
+
+            <!-- Meta de Viagens -->
+            <div class="goal-card">
+                <div class="goal-header">
+                    <div class="goal-title">� Meta de Viagens</div>
+                    <button class="btn-edit" onclick="editGoal('trips')">✏️ Editar</button>
+                </div>
+                <div class="goal-target" id="goalTripsTarget">200 viagens</div>
+                <div class="progress-bar">
+                    <div class="progress-fill blue" id="progressTrips" style="width: 0%"></div>
+                </div>
+                <div class="goal-stats">
+                    <span id="goalTripsCurrent">0 viagens</span>
+                    <span id="goalTripsPercent">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conquistas -->
+        <div class="achievements-section">
+            <div class="section-header">
+                <span>🏆</span> Conquistas
+            </div>
+            <div class="achievements-grid" id="achievementsList">
+                <!-- Conquistas serão inseridas aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Página de Relatórios -->
+    <div id="page-reports" class="page">
+        <div class="page-header">
+            <h2>📈 Relatórios</h2>
+            <p>Análises detalhadas do seu desempenho</p>
+        </div>
+
+        <!-- Resumo do Período -->
+        <div class="report-summary">
+            <div class="summary-card">
+                <div class="summary-icon">💰</div>
+                <div class="summary-info">
+                    <div class="summary-label">Receita Total</div>
+                    <div class="summary-value green" id="reportRevenue">R$ 0,00</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">💸</div>
+                <div class="summary-info">
+                    <div class="summary-label">Despesa Total</div>
+                    <div class="summary-value red" id="reportExpense">R$ 0,00</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">📊</div>
+                <div class="summary-info">
+                    <div class="summary-label">Lucro Líquido</div>
+                    <div class="summary-value blue" id="reportProfit">R$ 0,00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Pizza - Despesas por Categoria -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <span>🥧</span> Despesas por Categoria
+            </div>
+            <div class="chart-wrapper" style="height: 300px;">
+                <canvas id="expensePieChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Gráfico de Linha - Evolução Mensal -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <span>�</span> Evolução Mensal
+            </div>
+            <div class="chart-wrapper" style="height: 300px;">
+                <canvas id="monthlyLineChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Análise Detalhada -->
+        <div class="analysis-section">
+            <div class="section-header">
+                <span>🔍</span> Análise Detalhada
+            </div>
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <div class="analysis-label">Média Diária</div>
+                    <div class="analysis-value" id="avgDaily">R$ 0,00</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-label">Melhor Dia</div>
+                    <div class="analysis-value" id="bestDay">-</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-label">Total de Viagens</div>
+                    <div class="analysis-value" id="totalTrips">0</div>
+                </div>
+                <div class="analysis-card">
+                    <div class="analysis-label">Ticket Médio</div>
+                    <div class="analysis-value" id="avgTicket">R$ 0,00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendário -->
+        <div class="calendar-section">
+            <div class="section-header">
+                <span>📅</span> Calendário de Atividades
+            </div>
+            <div class="calendar-controls">
+                <button class="btn-calendar" onclick="previousMonth()">◀</button>
+                <div class="calendar-month" id="calendarMonth">Janeiro 2024</div>
+                <button class="btn-calendar" onclick="nextMonth()">▶</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Calendário será inserido aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchPage('dashboard')">
+            <div class="nav-icon">📊</div>
+            Dashboard
+        </div>
+        <div class="nav-item" onclick="switchPage('history')">
+            <div class="nav-icon">📜</div>
+            Histórico
+        </div>
+        <div class="nav-item" onclick="switchPage('goals')">
+            <div class="nav-icon">🎯</div>
+            Metas
+        </div>
+        <div class="nav-item" onclick="switchPage('reports')">
+            <div class="nav-icon">📈</div>
+            Relatórios
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="revenueModal" class="modal" onclick="closeModalOnOutsideClick(event, 'revenue')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>💵</span> Nova Receita
+            </div>
+            <form onsubmit="addRevenue(event)">
+                <div class="form-group">
+                    <label class="form-label">Valor</label>
+                    <input type="number" class="form-input" id="revenueValue" step="0.01" required placeholder="0,00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <input type="text" class="form-input" id="revenueDesc" required placeholder="Ex: Corrida Uber">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data</label>
+                    <input type="date" class="form-input" id="revenueDate" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('revenue')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="expenseModal" class="modal" onclick="closeModalOnOutsideClick(event, 'expense')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>💸</span> Nova Despesa
+            </div>
+            <form onsubmit="addExpense(event)">
+                <div class="form-group">
+                    <label class="form-label">Valor</label>
+                    <input type="number" class="form-input" id="expenseValue" step="0.01" required placeholder="0,00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Categoria</label>
+                    <select class="form-select" id="expenseCategory" required>
+                        <option value="">Selecione...</option>
+                        <option value="gas">⛽ Combustível</option>
+                        <option value="maintenance">🔧 Manutenção</option>
+                        <option value="app">📱 Taxas de App</option>
+                        <option value="food">🍔 Alimentação</option>
+                        <option value="other">📦 Outros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <input type="text" class="form-input" id="expenseDesc" placeholder="Ex: Gasolina posto Shell">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data</label>
+                    <input type="date" class="form-input" id="expenseDate" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('expense')">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Meta -->
+    <div id="goalModal" class="modal" onclick="closeModalOnOutsideClick(event, 'goal')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🎯</span> <span id="goalModalTitle">Definir Meta</span>
+            </div>
+            <form onsubmit="saveGoal(event)">
+                <input type="hidden" id="goalType">
+                <div class="form-group">
+                    <label class="form-label" id="goalLabel">Valor da Meta</label>
+                    <input type="number" class="form-input" id="goalValue" step="0.01" required placeholder="0,00">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('goal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Exportação -->
+    <div id="exportModal" class="modal" onclick="closeModalOnOutsideClick(event, 'export')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📤</span> Exportar Dados
+            </div>
+            <div class="export-options">
+                <button class="export-option-btn" onclick="exportToPDF()">
+                    <div class="export-icon">📄</div>
+                    <div class="export-info">
+                        <div class="export-title">Exportar PDF</div>
+                        <div class="export-desc">Relatório completo em PDF</div>
+                    </div>
+                </button>
+                <button class="export-option-btn" onclick="exportToExcel()">
+                    <div class="export-icon">📊</div>
+                    <div class="export-info">
+                        <div class="export-title">Exportar Excel</div>
+                        <div class="export-desc">Planilha com todas as transações</div>
+                    </div>
+                </button>
+                <button class="export-option-btn" onclick="exportBackup()">
+                    <div class="export-icon">💾</div>
+                    <div class="export-info">
+                        <div class="export-title">Backup Completo</div>
+                        <div class="export-desc">Arquivo JSON com todos os dados</div>
+                    </div>
+                </button>
+                <button class="export-option-btn" onclick="document.getElementById('importFile').click()">
+                    <div class="export-icon">📥</div>
+                    <div class="export-info">
+                        <div class="export-title">Importar Backup</div>
+                        <div class="export-desc">Restaurar dados de um backup</div>
+                    </div>
+                </button>
+            </div>
+            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importBackup(event)">
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('export')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Notificações -->
+    <div id="notificationsModal" class="modal" onclick="closeModalOnOutsideClick(event, 'notifications')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🔔</span> Configurar Notificações
+            </div>
+            <div class="notification-settings">
+                <div class="notification-item">
+                    <div class="notification-info">
+                        <div class="notification-title">Lembrete Diário</div>
+                        <div class="notification-desc">Receba um lembrete para registrar suas corridas</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="dailyReminder" onchange="toggleNotification('daily')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-info">
+                        <div class="notification-title">Meta Atingida</div>
+                        <div class="notification-desc">Notificação quando atingir suas metas</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="goalNotification" onchange="toggleNotification('goal')" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-info">
+                        <div class="notification-title">Resumo Semanal</div>
+                        <div class="notification-desc">Receba um resumo toda segunda-feira</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="weeklyReport" onchange="toggleNotification('weekly')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="danger-zone">
+                <div class="danger-zone-header">⚠️ Zona de Perigo</div>
+                <button class="btn-danger-action" onclick="resetAllData()">
+                    🗑️ Zerar Todos os Dados
+                </button>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="requestNotificationPermission()">Ativar Notificações</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('notifications')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão Flutuante de Notificações -->
+    <button class="fab" onclick="openModal('notifications')" title="Notificações">
+        🔔
+    </button>
+
+    <script src="app-new.js"></script>
+</body>
+</html>

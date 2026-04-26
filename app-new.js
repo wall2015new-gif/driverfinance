@@ -1858,3 +1858,157 @@ window.addEventListener('appinstalled', () => {
 });
 
 console.log('🔘 Botão de instalação no header configurado!');
+
+
+// ========== ADIÇÃO RÁPIDA DE RECEITAS ==========
+
+// Abrir modal de adição rápida
+function openQuickAddModal() {
+    const modal = document.getElementById('quickAddModal');
+    if (modal) {
+        modal.classList.add('active');
+        
+        // Focar no input
+        setTimeout(() => {
+            const input = document.getElementById('quickRevenueValue');
+            if (input) {
+                input.focus();
+            }
+        }, 300);
+    }
+}
+
+// Adicionar receita com valor rápido (botões)
+function addQuickRevenue(amount) {
+    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    
+    const transaction = {
+        id: Date.now(),
+        type: 'revenue',
+        amount: amount,
+        description: `Corrida ${time}`,
+        date: today,
+        category: 'revenue'
+    };
+    
+    // Adicionar transação
+    transactions.push(transaction);
+    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+    
+    // Fechar modal
+    closeModal('quickAdd');
+    
+    // Atualizar interface
+    updateCircularProgress();
+    createWeeklyChart();
+    renderTransactions();
+    
+    // Verificar metas
+    setTimeout(checkGoalsAndNotify, 500);
+    
+    // Feedback visual com animação
+    showQuickAddFeedback(amount);
+    
+    console.log(`💰 Receita rápida adicionada: R$ ${amount}`);
+}
+
+// Adicionar receita com valor personalizado
+function addCustomQuickRevenue(event) {
+    event.preventDefault();
+    
+    const amount = parseFloat(document.getElementById('quickRevenueValue').value);
+    
+    if (amount && amount > 0) {
+        addQuickRevenue(amount);
+        
+        // Limpar input
+        document.getElementById('quickRevenueValue').value = '';
+    }
+}
+
+// Feedback visual animado
+function showQuickAddFeedback(amount) {
+    // Criar elemento de feedback
+    const feedback = document.createElement('div');
+    feedback.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        background: linear-gradient(135deg, var(--accent-green) 0%, #00a843 100%);
+        color: white;
+        padding: 32px 48px;
+        border-radius: 20px;
+        font-size: 48px;
+        font-weight: 900;
+        z-index: 10001;
+        box-shadow: 0 20px 60px rgba(0, 200, 83, 0.5);
+        animation: quickAddPop 1s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: center;
+    `;
+    
+    feedback.innerHTML = `
+        <div style="font-size: 64px; margin-bottom: 8px;">✅</div>
+        <div style="font-size: 36px; margin-bottom: 4px;">+${formatCurrency(amount)}</div>
+        <div style="font-size: 16px; opacity: 0.9; font-weight: 600;">Receita adicionada!</div>
+    `;
+    
+    document.body.appendChild(feedback);
+    
+    // Remover após animação
+    setTimeout(() => {
+        feedback.style.animation = 'quickAddPopOut 0.3s ease-out';
+        setTimeout(() => feedback.remove(), 300);
+    }, 1500);
+    
+    // Vibrar (se suportado)
+    if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100]);
+    }
+}
+
+// Adicionar animações CSS
+const quickAddStyle = document.createElement('style');
+quickAddStyle.textContent = `
+    @keyframes quickAddPop {
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes quickAddPopOut {
+        from {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        to {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(quickAddStyle);
+
+console.log('💰 Sistema de adição rápida ativado!');
+console.log('💡 Clique no botão verde 💰 para adicionar receitas rapidamente');
+
+// Atalho de teclado para adição rápida (Ctrl+Shift+A)
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        openQuickAddModal();
+    }
+});
+
+console.log('⌨️ Atalho: Ctrl+Shift+A para adição rápida');

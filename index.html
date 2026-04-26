@@ -257,6 +257,7 @@
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 16px;
             margin-bottom: 24px;
+            overflow: visible;
         }
 
         .circular-card {
@@ -270,7 +271,7 @@
             justify-content: center;
             transition: all 0.3s;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             animation: fadeInScale 0.5s ease-out;
             box-shadow: 0 2px 8px var(--shadow);
         }
@@ -311,10 +312,12 @@
             width: 120px;
             height: 120px;
             margin-bottom: 16px;
+            padding: 4px;
         }
 
         .circular-progress svg {
             transform: rotate(-90deg);
+            overflow: visible;
         }
 
         .circular-progress-bg {
@@ -1572,17 +1575,20 @@
 
             .circular-card {
                 padding: 16px 12px;
+                overflow: visible;
             }
 
             .circular-progress {
                 width: 90px;
                 height: 90px;
                 margin-bottom: 12px;
+                padding: 3px;
             }
 
             .circular-progress svg {
                 width: 90px;
                 height: 90px;
+                overflow: visible;
             }
 
             .circular-progress-percent {
@@ -1838,11 +1844,13 @@
             .circular-progress {
                 width: 80px;
                 height: 80px;
+                padding: 2px;
             }
 
             .circular-progress svg {
                 width: 80px;
                 height: 80px;
+                overflow: visible;
             }
 
             .circular-progress-percent {

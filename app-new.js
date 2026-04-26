@@ -1556,3 +1556,305 @@ setTimeout(showBackupStatus, 2000);
 
 console.log('💾 Sistema de backup automático ativado!');
 console.log('📅 Você será lembrado a cada 7 dias para fazer backup');
+
+
+// ========== PROMPT DE INSTALAÇÃO PWA ==========
+
+let deferredPrompt;
+let installPromptShown = localStorage.getItem('install_prompt_shown') === 'true';
+
+// Capturar o evento beforeinstallprompt
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('📱 Evento beforeinstallprompt capturado');
+    
+    // Prevenir o prompt automático do navegador
+    e.preventDefault();
+    
+    // Guardar o evento para usar depois
+    deferredPrompt = e;
+    
+    // Verificar se já mostrou o prompt antes
+    if (!installPromptShown) {
+        // Aguardar 3 segundos antes de mostrar
+        setTimeout(() => {
+            showInstallPrompt();
+        }, 3000);
+    }
+});
+
+// Mostrar prompt de instalação personalizado
+function showInstallPrompt() {
+    // Verificar se está em dispositivo móvel
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (!isMobile) {
+        console.log('💻 Desktop detectado, não mostrando prompt de instalação');
+        return;
+    }
+    
+    // Verificar se já está instalado
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('✅ App já está instalado');
+        return;
+    }
+    
+    // Criar modal de instalação
+    const installModal = document.createElement('div');
+    installModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        animation: fadeIn 0.3s ease-out;
+    `;
+    
+    installModal.innerHTML = `
+        <div style="
+            background: var(--bg-card);
+            border: 2px solid var(--accent-blue);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(66, 103, 245, 0.3);
+            animation: slideUpModal 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        ">
+            <div style="font-size: 64px; margin-bottom: 16px;">📱</div>
+            <h2 style="
+                font-size: 24px;
+                font-weight: 800;
+                color: var(--text-primary);
+                margin-bottom: 12px;
+            ">Instalar Driver Finance</h2>
+            <p style="
+                font-size: 15px;
+                color: var(--text-secondary);
+                margin-bottom: 24px;
+                line-height: 1.5;
+            ">
+                Instale o app na sua tela inicial para acesso rápido e uso offline!
+            </p>
+            <div style="
+                background: var(--bg-tertiary);
+                border-radius: 12px;
+                padding: 16px;
+                margin-bottom: 24px;
+                text-align: left;
+            ">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <span style="font-size: 20px;">✅</span>
+                    <span style="font-size: 14px; color: var(--text-primary); font-weight: 600;">Funciona offline</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <span style="font-size: 20px;">⚡</span>
+                    <span style="font-size: 14px; color: var(--text-primary); font-weight: 600;">Acesso instantâneo</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">🔔</span>
+                    <span style="font-size: 14px; color: var(--text-primary); font-weight: 600;">Receba notificações</span>
+                </div>
+            </div>
+            <button id="installBtn" style="
+                width: 100%;
+                padding: 16px;
+                background: var(--accent-blue);
+                color: white;
+                border: none;
+                border-radius: 12px;
+                font-size: 16px;
+                font-weight: 700;
+                cursor: pointer;
+                margin-bottom: 12px;
+                transition: all 0.3s;
+            ">
+                📲 Instalar Agora
+            </button>
+            <button id="laterBtn" style="
+                width: 100%;
+                padding: 12px;
+                background: transparent;
+                color: var(--text-secondary);
+                border: none;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+            ">
+                Agora não
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(installModal);
+    
+    // Botão Instalar
+    const installBtn = document.getElementById('installBtn');
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            // Mostrar o prompt de instalação
+            deferredPrompt.prompt();
+            
+            // Aguardar a escolha do usuário
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            console.log(`👤 Usuário escolheu: ${outcome}`);
+            
+            if (outcome === 'accepted') {
+                console.log('✅ App instalado com sucesso!');
+                showNotification('✅ App instalado! Abra pela tela inicial', 'success');
+            } else {
+                console.log('❌ Instalação cancelada');
+            }
+            
+            // Limpar o prompt
+            deferredPrompt = null;
+        }
+        
+        // Marcar que já mostrou o prompt
+        localStorage.setItem('install_prompt_shown', 'true');
+        installPromptShown = true;
+        
+        // Remover modal
+        installModal.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => installModal.remove(), 300);
+    });
+    
+    // Botão Agora não
+    const laterBtn = document.getElementById('laterBtn');
+    laterBtn.addEventListener('click', () => {
+        console.log('⏰ Usuário escolheu instalar depois');
+        
+        // Marcar que já mostrou o prompt
+        localStorage.setItem('install_prompt_shown', 'true');
+        installPromptShown = true;
+        
+        // Remover modal
+        installModal.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => installModal.remove(), 300);
+        
+        showNotification('💡 Você pode instalar depois pelo menu do navegador', 'info');
+    });
+    
+    // Fechar ao clicar fora
+    installModal.addEventListener('click', (e) => {
+        if (e.target === installModal) {
+            laterBtn.click();
+        }
+    });
+}
+
+// Detectar quando o app foi instalado
+window.addEventListener('appinstalled', () => {
+    console.log('🎉 App instalado com sucesso!');
+    showNotification('🎉 Driver Finance instalado com sucesso!', 'success');
+    
+    // Marcar que já está instalado
+    localStorage.setItem('install_prompt_shown', 'true');
+    installPromptShown = true;
+    
+    // Limpar o prompt
+    deferredPrompt = null;
+});
+
+// Verificar se já está instalado ao carregar
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('✅ App rodando em modo standalone (instalado)');
+    } else {
+        console.log('🌐 App rodando no navegador');
+    }
+});
+
+// Adicionar animações CSS para o modal
+const installStyle = document.createElement('style');
+installStyle.textContent = `
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+`;
+document.head.appendChild(installStyle);
+
+console.log('📱 Sistema de instalação PWA ativado!');
+console.log('💡 O prompt aparecerá automaticamente em dispositivos móveis');
+
+// Função para mostrar o prompt manualmente (pode ser chamada de um botão)
+function triggerInstallPrompt() {
+    if (deferredPrompt) {
+        showInstallPrompt();
+    } else if (window.matchMedia('(display-mode: standalone)').matches) {
+        showNotification('✅ App já está instalado!', 'success');
+    } else {
+        showNotification('ℹ️ Use o menu do navegador para instalar', 'info');
+    }
+}
+
+// Resetar o prompt de instalação (útil para testes)
+function resetInstallPrompt() {
+    localStorage.removeItem('install_prompt_shown');
+    installPromptShown = false;
+    console.log('🔄 Prompt de instalação resetado');
+    showNotification('🔄 Prompt resetado! Recarregue a página', 'info');
+}
+
+// Adicionar atalho de teclado para resetar (Ctrl+Shift+I)
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        resetInstallPrompt();
+    }
+});
+
+console.log('💡 Dica: Pressione Ctrl+Shift+I para resetar o prompt de instalação');
+
+
+// ========== BOTÃO DE INSTALAÇÃO NO HEADER ==========
+
+// Mostrar/ocultar botão de instalação no header
+function updateInstallButton() {
+    const installButton = document.getElementById('installButton');
+    
+    if (!installButton) return;
+    
+    // Verificar se já está instalado
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
+    
+    // Verificar se é mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Mostrar botão apenas se:
+    // 1. Não está instalado
+    // 2. É mobile OU tem o deferredPrompt disponível
+    if (!isInstalled && (isMobile || deferredPrompt)) {
+        installButton.style.display = 'block';
+    } else {
+        installButton.style.display = 'none';
+    }
+}
+
+// Atualizar botão ao carregar
+document.addEventListener('DOMContentLoaded', () => {
+    updateInstallButton();
+});
+
+// Atualizar botão quando o prompt estiver disponível
+window.addEventListener('beforeinstallprompt', () => {
+    setTimeout(updateInstallButton, 100);
+});
+
+// Ocultar botão quando instalar
+window.addEventListener('appinstalled', () => {
+    updateInstallButton();
+});
+
+console.log('🔘 Botão de instalação no header configurado!');

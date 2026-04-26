@@ -1515,6 +1515,7 @@
 
             .header {
                 padding: 16px 12px;
+                position: relative;
             }
 
             .header h1 {
@@ -1523,6 +1524,16 @@
 
             .header p {
                 font-size: 12px;
+            }
+            
+            /* Botão de instalação mobile */
+            #installButton {
+                position: static !important;
+                display: block !important;
+                width: 100%;
+                margin-top: 12px;
+                font-size: 12px !important;
+                padding: 10px 12px !important;
             }
 
             .featured-card {
@@ -1875,6 +1886,24 @@
     <div class="header">
         <h1>🚗 DRIVER FINANCE</h1>
         <p>Gestão Financeira Inteligente</p>
+        <button id="installButton" onclick="triggerInstallPrompt()" style="
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(66, 103, 245, 0.3);
+        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            📲 Instalar App
+        </button>
     </div>
 
     <div class="container">

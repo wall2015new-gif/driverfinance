@@ -58,17 +58,17 @@ Sistema completo de gestão financeira para motoristas de aplicativo. PWA modern
 ## 🚀 Como Usar
 
 ### Opção 1: Acesso Online (Recomendado)
-1. Acesse: [https://SEU-USUARIO.github.io/driver-finance](https://SEU-USUARIO.github.io/driver-finance)
+1. Acesse: [https://wall2015new-gif.github.io/driverfinance](https://wall2015new-gif.github.io/driverfinance)
 2. Clique no ícone de instalação no navegador
 3. Use como um app nativo!
 
 ### Opção 2: Executar Localmente
 ```bash
 # Clone o repositório
-git clone https://github.com/SEU-USUARIO/driver-finance.git
+git clone https://github.com/wall2015new-gif/driverfinance.git
 
 # Entre na pasta
-cd driver-finance
+cd driverfinance
 
 # Abra o index.html no navegador
 # Ou use um servidor local:
@@ -203,6 +203,6 @@ Desenvolvido com ❤️ para motoristas de aplicativo
 
 **⭐ Se este projeto te ajudou, deixe uma estrela no GitHub!**
 
-**🐛 Encontrou um bug?** Abra uma [issue](https://github.com/SEU-USUARIO/driver-finance/issues)
+**🐛 Encontrou um bug?** Abra uma [issue](https://github.com/wall2015new-gif/driverfinance/issues)
 
-**💡 Tem uma sugestão?** Abra uma [issue](https://github.com/SEU-USUARIO/driver-finance/issues) ou contribua!
+**💡 Tem uma sugestão?** Abra uma [issue](https://github.com/wall2015new-gif/driverfinance/issues) ou contribua!

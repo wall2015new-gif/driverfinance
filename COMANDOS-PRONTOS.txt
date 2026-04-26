@@ -1,0 +1,75 @@
+═══════════════════════════════════════════════════════════════
+  COMANDOS PRONTOS PARA PUBLICAR NO GITHUB
+═══════════════════════════════════════════════════════════════
+
+📋 COPIE E COLE ESTES COMANDOS NO TERMINAL:
+
+⚠️ IMPORTANTE: Substitua "SEU-USUARIO" pelo seu username do GitHub!
+
+───────────────────────────────────────────────────────────────
+1️⃣ CONECTAR AO GITHUB
+───────────────────────────────────────────────────────────────
+
+git remote add origin https://github.com/SEU-USUARIO/driver-finance.git
+git branch -M main
+git push -u origin main
+
+
+───────────────────────────────────────────────────────────────
+2️⃣ SE DER ERRO DE AUTENTICAÇÃO
+───────────────────────────────────────────────────────────────
+
+Você precisa criar um Personal Access Token:
+
+1. Vá em: https://github.com/settings/tokens
+2. Clique em "Generate new token (classic)"
+3. Marque a opção "repo"
+4. Copie o token gerado
+5. Use o token como senha quando o Git pedir
+
+
+───────────────────────────────────────────────────────────────
+3️⃣ PARA FUTURAS ATUALIZAÇÕES
+───────────────────────────────────────────────────────────────
+
+git add .
+git commit -m "Descrição da mudança"
+git push
+
+
+───────────────────────────────────────────────────────────────
+📱 SEU APP ESTARÁ DISPONÍVEL EM:
+───────────────────────────────────────────────────────────────
+
+https://SEU-USUARIO.github.io/driver-finance
+
+
+═══════════════════════════════════════════════════════════════
+  PASSO A PASSO COMPLETO
+═══════════════════════════════════════════════════════════════
+
+1. Crie uma conta no GitHub (se não tiver): https://github.com
+
+2. Crie um novo repositório:
+   - Nome: driver-finance
+   - Público
+   - NÃO adicione README (já temos)
+
+3. Execute os comandos acima no terminal
+
+4. Ative o GitHub Pages:
+   - Settings → Pages
+   - Source: main branch, / (root)
+   - Save
+
+5. Aguarde 2 minutos e acesse seu app!
+
+
+═══════════════════════════════════════════════════════════════
+  ✅ TUDO PRONTO!
+═══════════════════════════════════════════════════════════════
+
+Seu projeto está preparado e commitado localmente.
+Agora é só seguir os passos acima para publicar!
+
+Precisa de ajuda? Me avise!

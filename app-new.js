@@ -12,6 +12,14 @@ document.addEventListener('DOMContentLoaded', function() {
     createWeeklyChart();
     renderTransactions();
     updateKmDisplay();
+    updateAppComparator();
+    
+    // Restaurar estado do Modo Motorista
+    const button = document.getElementById('driverModeButton');
+    if (button && driverModeActive) {
+        button.textContent = '🛑 Desativar Modo Motorista';
+        button.style.background = 'var(--accent-red)';
+    }
 });
 
 // ========== TEMA ==========
@@ -421,6 +429,7 @@ function addRevenue(event) {
         id: Date.now(),
         type: 'revenue',
         amount: document.getElementById('revenueValue').value,
+        app: document.getElementById('revenueApp').value,
         description: document.getElementById('revenueDesc').value,
         date: document.getElementById('revenueDate').value,
         category: 'revenue'
@@ -437,6 +446,7 @@ function addRevenue(event) {
     updateCircularProgress();
     createWeeklyChart();
     renderTransactions();
+    updateAppComparator();
     
     // Feedback visual
     showNotification('✅ Receita adicionada com sucesso!', 'success');
@@ -523,6 +533,7 @@ function deleteTransaction(id) {
         updateCircularProgress();
         createWeeklyChart();
         renderTransactions();
+        updateAppComparator();
         
         showNotification('✅ Transação excluída com sucesso!', 'success');
     }
@@ -2031,6 +2042,7 @@ function addQuickRevenue(amount) {
         id: Date.now(),
         type: 'revenue',
         amount: amount,
+        app: 'outros', // Quick add sempre vai para "outros"
         description: `Corrida ${time}`,
         date: today,
         category: 'revenue'
@@ -2048,6 +2060,7 @@ function addQuickRevenue(amount) {
     updateCircularProgress();
     createWeeklyChart();
     renderTransactions();
+    updateAppComparator();
     
     // Verificar metas
     setTimeout(checkGoalsAndNotify, 500);
@@ -2159,17 +2172,34 @@ console.log('⌨️ Atalho: Ctrl+Shift+A para adição rápida');
 
 // ========== NOTIFICAÇÃO PERSISTENTE COM BOTÕES DE AÇÃO ==========
 
-let persistentNotificationEnabled = localStorage.getItem('persistent_notification') === 'true';
-let driverModeActive = false;
+let driverModeActive = localStorage.getItem('driverModeActive') === 'true';
 
 // Ativar/Desativar Modo Motorista
-function toggleDriverMode() {
-    driverModeActive = !driverModeActive;
+async function toggleDriverMode() {
+    const button = document.getElementById('driverModeButton');
     
-    if (driverModeActive) {
-        activateDriverMode();
+    if (!driverModeActive) {
+        // Ativar
+        if (button) button.disabled = true;
+        await activateDriverMode();
+        if (button) button.disabled = false;
+        
+        // Atualizar botão se ativou com sucesso
+        if (driverModeActive && button) {
+            button.textContent = '🛑 Desativar Modo Motorista';
+            button.style.background = 'var(--accent-red)';
+        }
     } else {
-        deactivateDriverMode();
+        // Desativar
+        if (button) button.disabled = true;
+        await deactivateDriverMode();
+        if (button) button.disabled = false;
+        
+        // Atualizar botão
+        if (!driverModeActive && button) {
+            button.textContent = '🚗 Ativar Modo Motorista';
+            button.style.background = 'var(--accent-green)';
+        }
     }
 }
 
@@ -2183,14 +2213,18 @@ async function activateDriverMode() {
         if (permission !== 'granted') {
             showNotification('❌ Permissão de notificação negada', 'error');
             driverModeActive = false;
+            const checkbox = document.getElementById('driverModeToggle');
+            if (checkbox) checkbox.checked = false;
             return;
         }
     }
     
     // Verificar se o Service Worker suporta notificações persistentes
     if (!('serviceWorker' in navigator) || !('showNotification' in ServiceWorkerRegistration.prototype)) {
-        showNotification('❌ Notificações persistentes não suportadas', 'error');
+        showNotification('❌ Notificações persistentes não suportadas neste navegador', 'error');
         driverModeActive = false;
+        const checkbox = document.getElementById('driverModeToggle');
+        if (checkbox) checkbox.checked = false;
         return;
     }
     
@@ -2200,8 +2234,8 @@ async function activateDriverMode() {
         // Criar notificação persistente com botões de ação
         await registration.showNotification('🚗 Modo Motorista Ativo', {
             body: 'Toque nos botões para adicionar corridas rapidamente',
-            icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="100" fill="%2300c853"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="280"%3E🚗%3C/text%3E%3C/svg%3E',
-            badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="64"%3E💰%3C/text%3E%3C/svg%3E',
+            icon: './img/logotipo.png',
+            badge: './img/logotipo.png',
             tag: 'driver-mode',
             requireInteraction: true,
             silent: true,
@@ -2209,36 +2243,32 @@ async function activateDriverMode() {
             actions: [
                 {
                     action: 'add-15',
-                    title: '+ R$ 15',
-                    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="48"%3E15%3C/text%3E%3C/svg%3E'
+                    title: '+ R$ 15'
                 },
                 {
                     action: 'add-25',
-                    title: '+ R$ 25',
-                    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="48"%3E25%3C/text%3E%3C/svg%3E'
+                    title: '+ R$ 25'
                 },
                 {
                     action: 'add-30',
-                    title: '+ R$ 30',
-                    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="48"%3E30%3C/text%3E%3C/svg%3E'
+                    title: '+ R$ 30'
                 }
             ]
         });
         
-        localStorage.setItem('persistent_notification', 'true');
-        persistentNotificationEnabled = true;
+        localStorage.setItem('driverModeActive', 'true');
+        driverModeActive = true;
         
         showNotification('✅ Modo Motorista ativado! Use os botões na notificação', 'success');
-        
-        // Atualizar botão na interface
-        updateDriverModeButton();
         
         console.log('✅ Modo Motorista ativado com sucesso!');
         
     } catch (error) {
         console.error('❌ Erro ao ativar Modo Motorista:', error);
-        showNotification('❌ Erro ao ativar Modo Motorista', 'error');
+        showNotification('❌ Erro: ' + error.message, 'error');
         driverModeActive = false;
+        const checkbox = document.getElementById('driverModeToggle');
+        if (checkbox) checkbox.checked = false;
     }
 }
 
@@ -2252,14 +2282,18 @@ async function deactivateDriverMode() {
         
         notifications.forEach(notification => notification.close());
         
-        localStorage.setItem('persistent_notification', 'false');
-        persistentNotificationEnabled = false;
+        localStorage.setItem('driverModeActive', 'false');
+        driverModeActive = false;
         
         showNotification('🛑 Modo Motorista desativado', 'info');
         
-        // Atualizar botão na interface
-        updateDriverModeButton();
+        console.log('✅ Modo Motorista desativado com sucesso!');
         
+    } catch (error) {
+        console.error('❌ Erro ao desativar Modo Motorista:', error);
+        driverModeActive = false;
+    }
+}
         console.log('✅ Modo Motorista desativado');
         
     } catch (error) {
@@ -2725,3 +2759,294 @@ function viewFuelHistory() {
 }
 
 console.log('⛽ Calculadora de combustível carregada!');
+
+// ========== COMPARADOR DE APPS ==========
+
+let appComparisonChart = null;
+
+// Atualizar comparador de apps
+function updateAppComparator() {
+    console.log('📱 Atualizando comparador de apps...');
+    
+    // Filtrar apenas receitas do mês atual
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    const monthRevenues = transactions.filter(t => {
+        if (t.type !== 'revenue') return false;
+        const transDate = new Date(t.date);
+        return transDate.getMonth() === currentMonth && transDate.getFullYear() === currentYear;
+    });
+    
+    // Calcular estatísticas por app
+    const appStats = {
+        uber: { trips: 0, revenue: 0, avg: 0 },
+        '99': { trips: 0, revenue: 0, avg: 0 },
+        indrive: { trips: 0, revenue: 0, avg: 0 },
+        outros: { trips: 0, revenue: 0, avg: 0 }
+    };
+    
+    monthRevenues.forEach(transaction => {
+        const app = transaction.app || 'outros';
+        if (appStats[app]) {
+            appStats[app].trips++;
+            appStats[app].revenue += parseFloat(transaction.amount);
+        }
+    });
+    
+    // Calcular médias
+    Object.keys(appStats).forEach(app => {
+        if (appStats[app].trips > 0) {
+            appStats[app].avg = appStats[app].revenue / appStats[app].trips;
+        }
+    });
+    
+    // Atualizar cards
+    updateAppCard('uber', appStats.uber);
+    updateAppCard('99', appStats['99']);
+    updateAppCard('indrive', appStats.indrive);
+    updateAppCard('outros', appStats.outros);
+    
+    // Encontrar melhor app
+    findBestApp(appStats);
+    
+    // Criar gráfico de comparação
+    createAppComparisonChart(appStats);
+    
+    console.log('✅ Comparador de apps atualizado!', appStats);
+}
+
+// Atualizar card de app individual
+function updateAppCard(appName, stats) {
+    const tripsEl = document.getElementById(`${appName}Trips`);
+    const revenueEl = document.getElementById(`${appName}Revenue`);
+    const avgEl = document.getElementById(`${appName}Avg`);
+    
+    if (tripsEl) tripsEl.textContent = stats.trips;
+    if (revenueEl) revenueEl.textContent = formatCurrency(stats.revenue);
+    if (avgEl) avgEl.textContent = formatCurrency(stats.avg);
+}
+
+// Encontrar e exibir melhor app do mês
+function findBestApp(appStats) {
+    const banner = document.getElementById('bestAppBanner');
+    const nameEl = document.getElementById('bestAppName');
+    const statsEl = document.getElementById('bestAppStats');
+    
+    if (!banner || !nameEl || !statsEl) return;
+    
+    // Encontrar app com maior faturamento
+    let bestApp = null;
+    let maxRevenue = 0;
+    
+    Object.keys(appStats).forEach(app => {
+        if (appStats[app].revenue > maxRevenue) {
+            maxRevenue = appStats[app].revenue;
+            bestApp = app;
+        }
+    });
+    
+    // Se não houver dados, esconder banner
+    if (!bestApp || maxRevenue === 0) {
+        banner.style.display = 'none';
+        return;
+    }
+    
+    // Nomes dos apps
+    const appNames = {
+        uber: 'Uber',
+        '99': '99',
+        indrive: 'InDrive',
+        outros: 'Outros'
+    };
+    
+    // Mostrar banner
+    banner.style.display = 'flex';
+    nameEl.textContent = appNames[bestApp];
+    statsEl.textContent = `${appStats[bestApp].trips} corridas • ${formatCurrency(appStats[bestApp].revenue)} • Média: ${formatCurrency(appStats[bestApp].avg)}`;
+}
+
+// Criar gráfico de comparação de apps
+function createAppComparisonChart(appStats) {
+    const ctx = document.getElementById('appComparisonChart');
+    if (!ctx) return;
+    
+    // Destruir gráfico anterior se existir
+    if (appComparisonChart) {
+        appComparisonChart.destroy();
+    }
+    
+    const isDark = currentTheme === 'dark';
+    const gridColor = isDark ? '#2a2a2a' : '#e4e6eb';
+    const textColor = isDark ? '#a0a0a0' : '#65676b';
+    
+    // Dados para o gráfico
+    const labels = ['Uber', '99', 'InDrive', 'Outros'];
+    const revenues = [
+        appStats.uber.revenue,
+        appStats['99'].revenue,
+        appStats.indrive.revenue,
+        appStats.outros.revenue
+    ];
+    
+    const trips = [
+        appStats.uber.trips,
+        appStats['99'].trips,
+        appStats.indrive.trips,
+        appStats.outros.trips
+    ];
+    
+    appComparisonChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Faturamento (R$)',
+                    data: revenues,
+                    backgroundColor: [
+                        'rgba(0, 0, 0, 0.8)',
+                        'rgba(255, 215, 0, 0.8)',
+                        'rgba(0, 214, 50, 0.8)',
+                        'rgba(108, 117, 125, 0.8)'
+                    ],
+                    borderRadius: 8,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Corridas',
+                    data: trips,
+                    backgroundColor: [
+                        'rgba(0, 0, 0, 0.4)',
+                        'rgba(255, 215, 0, 0.4)',
+                        'rgba(0, 214, 50, 0.4)',
+                        'rgba(108, 117, 125, 0.4)'
+                    ],
+                    borderRadius: 8,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        font: {
+                            size: 12,
+                            weight: 'bold',
+                            family: 'Inter'
+                        },
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: isDark ? '#151515' : '#ffffff',
+                    titleColor: isDark ? '#ffffff' : '#1c1e21',
+                    bodyColor: textColor,
+                    borderColor: gridColor,
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.datasetIndex === 0) {
+                                label += formatCurrency(context.parsed.y);
+                            } else {
+                                label += context.parsed.y + ' corridas';
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    beginAtZero: true,
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor,
+                        font: {
+                            size: 11,
+                            family: 'Inter'
+                        },
+                        callback: function(value) {
+                            return 'R$ ' + value.toFixed(0);
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Faturamento (R$)',
+                        color: textColor,
+                        font: {
+                            size: 12,
+                            weight: 'bold',
+                            family: 'Inter'
+                        }
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    beginAtZero: true,
+                    grid: {
+                        drawOnChartArea: false
+                    },
+                    ticks: {
+                        color: textColor,
+                        font: {
+                            size: 11,
+                            family: 'Inter'
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Corridas',
+                        color: textColor,
+                        font: {
+                            size: 12,
+                            weight: 'bold',
+                            family: 'Inter'
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: textColor,
+                        font: {
+                            size: 11,
+                            family: 'Inter',
+                            weight: 'bold'
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+console.log('📱 Comparador de apps carregado!');
+

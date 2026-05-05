@@ -2033,55 +2033,55 @@
                     </div>
                 </div>
                 <div class="circular-card-title">💵 RECEITAS</div>
-                <div class="circular-card-value">R$ 0,00</div>
+                <div class="circular-card-value" id="circularRevenue">R$ 0,00</div>
             </div>
 
             <div class="circular-card">
                 <div class="circular-progress">
                     <svg width="120" height="120">
                         <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
-                        <circle class="circular-progress-fill red" cx="60" cy="60" r="52" 
+                        <circle id="expenseCircle" class="circular-progress-fill red" cx="60" cy="60" r="52" 
                                 stroke-dasharray="326.73" stroke-dashoffset="163"></circle>
                     </svg>
                     <div class="circular-progress-text">
-                        <div class="circular-progress-percent">50%</div>
+                        <div id="expensePercent" class="circular-progress-percent">50%</div>
                         <div class="circular-progress-label">Gastos</div>
                     </div>
                 </div>
                 <div class="circular-card-title">💸 GASTOS</div>
-                <div class="circular-card-value">R$ 0,00</div>
+                <div class="circular-card-value" id="circularExpense">R$ 0,00</div>
             </div>
 
             <div class="circular-card">
                 <div class="circular-progress">
                     <svg width="120" height="120">
                         <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
-                        <circle class="circular-progress-fill blue" cx="60" cy="60" r="52" 
+                        <circle id="profitCircle" class="circular-progress-fill blue" cx="60" cy="60" r="52" 
                                 stroke-dasharray="326.73" stroke-dashoffset="180"></circle>
                     </svg>
                     <div class="circular-progress-text">
-                        <div class="circular-progress-percent">45%</div>
+                        <div id="profitPercent" class="circular-progress-percent">45%</div>
                         <div class="circular-progress-label">Lucro</div>
                     </div>
                 </div>
                 <div class="circular-card-title">📈 LUCRO LÍQUIDO</div>
-                <div class="circular-card-value">R$ 0,00</div>
+                <div class="circular-card-value" id="circularProfit">R$ 0,00</div>
             </div>
 
             <div class="circular-card">
                 <div class="circular-progress">
                     <svg width="120" height="120">
                         <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
-                        <circle class="circular-progress-fill yellow" cx="60" cy="60" r="52" 
+                        <circle id="tripsCircle" class="circular-progress-fill yellow" cx="60" cy="60" r="52" 
                                 stroke-dasharray="326.73" stroke-dashoffset="196"></circle>
                     </svg>
                     <div class="circular-progress-text">
-                        <div class="circular-progress-percent">40%</div>
+                        <div id="tripsPercent" class="circular-progress-percent">40%</div>
                         <div class="circular-progress-label">Meta</div>
                     </div>
                 </div>
                 <div class="circular-card-title">🚕 CORRIDAS</div>
-                <div class="circular-card-value">0</div>
+                <div class="circular-card-value" id="circularTrips">0</div>
             </div>
         </div>
 
@@ -2089,22 +2089,22 @@
         <div class="mini-stats-grid">
             <div class="mini-stat-card">
                 <div class="mini-stat-icon">⛽</div>
-                <div class="mini-stat-value">R$ 0</div>
+                <div class="mini-stat-value" id="miniGas">R$ 0</div>
                 <div class="mini-stat-label">Combustível</div>
             </div>
             <div class="mini-stat-card">
                 <div class="mini-stat-icon">🔧</div>
-                <div class="mini-stat-value">R$ 0</div>
+                <div class="mini-stat-value" id="miniMaintenance">R$ 0</div>
                 <div class="mini-stat-label">Manutenção</div>
             </div>
             <div class="mini-stat-card">
                 <div class="mini-stat-icon">📱</div>
-                <div class="mini-stat-value">R$ 0</div>
+                <div class="mini-stat-value" id="miniApp">R$ 0</div>
                 <div class="mini-stat-label">App</div>
             </div>
             <div class="mini-stat-card">
                 <div class="mini-stat-icon">🍔</div>
-                <div class="mini-stat-value">R$ 0</div>
+                <div class="mini-stat-value" id="miniFood">R$ 0</div>
                 <div class="mini-stat-label">Alimentação</div>
             </div>
         </div>

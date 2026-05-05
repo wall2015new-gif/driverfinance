@@ -42,6 +42,8 @@ function applyTheme(theme) {
 
 // ========== PROGRESSO CIRCULAR ==========
 function updateCircularProgress() {
+    console.log('🔄 Atualizando dashboard...', transactions.length, 'transações');
+    
     // Calcular totais
     const revenues = transactions.filter(t => t.type === 'revenue');
     const expenses = transactions.filter(t => t.type === 'expense');
@@ -51,28 +53,59 @@ function updateCircularProgress() {
     const profit = totalRevenue - totalExpense;
     const trips = revenues.length;
     
-    // Atualizar valores
-    document.getElementById('circularRevenue').textContent = formatCurrency(totalRevenue);
-    document.getElementById('circularExpense').textContent = formatCurrency(totalExpense);
-    document.getElementById('circularProfit').textContent = formatCurrency(profit);
-    document.getElementById('circularTrips').textContent = trips;
+    console.log('💰 Totais:', { totalRevenue, totalExpense, profit, trips });
     
-    // Atualizar card principal
+    // Atualizar valores dos cards circulares
+    const revenueEl = document.getElementById('circularRevenue');
+    const expenseEl = document.getElementById('circularExpense');
+    const profitEl = document.getElementById('circularProfit');
+    const tripsEl = document.getElementById('circularTrips');
+    
+    if (revenueEl) revenueEl.textContent = formatCurrency(totalRevenue);
+    if (expenseEl) expenseEl.textContent = formatCurrency(totalExpense);
+    if (profitEl) profitEl.textContent = formatCurrency(profit);
+    if (tripsEl) tripsEl.textContent = trips;
+    
+    // Atualizar card principal (faturamento)
     const featuredBalance = document.querySelector('.featured-card-value');
     if (featuredBalance) {
-        featuredBalance.textContent = formatCurrency(profit);
+        featuredBalance.textContent = formatCurrency(totalRevenue);
+        console.log('✅ Card principal atualizado:', formatCurrency(totalRevenue));
     }
     
-    // Atualizar mini stats (exemplo)
+    // Calcular porcentagens para os gráficos circulares
+    // Usar metas ou valores máximos para calcular porcentagem
+    const dailyGoal = goals.daily || 200;
+    const monthlyGoal = goals.monthly || 6000;
+    
+    const revenuePercent = Math.min((totalRevenue / monthlyGoal) * 100, 100);
+    const expensePercent = totalRevenue > 0 ? Math.min((totalExpense / totalRevenue) * 100, 100) : 0;
+    const profitPercent = totalRevenue > 0 ? Math.min((profit / totalRevenue) * 100, 100) : 0;
+    const tripsPercent = Math.min((trips / (goals.trips || 200)) * 100, 100);
+    
+    // Animar gráficos circulares
+    animateCircularProgress('revenueCircle', revenuePercent);
+    animateCircularProgress('expenseCircle', expensePercent);
+    animateCircularProgress('profitCircle', profitPercent);
+    animateCircularProgress('tripsCircle', tripsPercent);
+    
+    // Atualizar mini stats por categoria
     const gasExpenses = expenses.filter(e => e.category === 'gas').reduce((sum, e) => sum + parseFloat(e.amount), 0);
     const maintenanceExpenses = expenses.filter(e => e.category === 'maintenance').reduce((sum, e) => sum + parseFloat(e.amount), 0);
     const appExpenses = expenses.filter(e => e.category === 'app').reduce((sum, e) => sum + parseFloat(e.amount), 0);
     const foodExpenses = expenses.filter(e => e.category === 'food').reduce((sum, e) => sum + parseFloat(e.amount), 0);
     
-    document.getElementById('miniGas').textContent = formatCurrency(gasExpenses);
-    document.getElementById('miniMaintenance').textContent = formatCurrency(maintenanceExpenses);
-    document.getElementById('miniApp').textContent = formatCurrency(appExpenses);
-    document.getElementById('miniFood').textContent = formatCurrency(foodExpenses);
+    const miniGasEl = document.getElementById('miniGas');
+    const miniMaintenanceEl = document.getElementById('miniMaintenance');
+    const miniAppEl = document.getElementById('miniApp');
+    const miniFoodEl = document.getElementById('miniFood');
+    
+    if (miniGasEl) miniGasEl.textContent = formatCurrency(gasExpenses);
+    if (miniMaintenanceEl) miniMaintenanceEl.textContent = formatCurrency(maintenanceExpenses);
+    if (miniAppEl) miniAppEl.textContent = formatCurrency(appExpenses);
+    if (miniFoodEl) miniFoodEl.textContent = formatCurrency(foodExpenses);
+    
+    console.log('✅ Dashboard atualizado com sucesso!');
 }
 
 function animateCircularProgress(circleId, percent) {

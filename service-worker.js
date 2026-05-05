@@ -1,9 +1,10 @@
-const CACHE_NAME = 'driver-finance-v3';
+const CACHE_NAME = 'driver-finance-v4';
 const urlsToCache = [
   './',
   './index.html',
   './app-new.js',
   './manifest.json',
+  './img/logotipo.png',
   'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
@@ -82,8 +83,8 @@ self.addEventListener('fetch', event => {
 self.addEventListener('push', event => {
   const options = {
     body: event.data ? event.data.text() : 'Nova notificação!',
-    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="100" fill="%230a0a0a"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="280" fill="%2300ff88"%3E🚗%3C/text%3E%3C/svg%3E',
-    badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="64"%3E🚗%3C/text%3E%3C/svg%3E',
+    icon: './img/logotipo.png',
+    badge: './img/logotipo.png',
     vibrate: [200, 100, 200],
     tag: 'driver-finance',
     requireInteraction: false
@@ -170,7 +171,7 @@ async function handleQuickAdd(amount) {
     // Mostrar notificação de confirmação
     await self.registration.showNotification('✅ Receita Adicionada!', {
       body: `+ R$ ${amount.toFixed(2)}`,
-      icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="100" fill="%2300c853"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="280"%3E✅%3C/text%3E%3C/svg%3E',
+      icon: './img/logotipo.png',
       tag: 'quick-add-confirmation',
       requireInteraction: false,
       silent: false,
@@ -187,7 +188,7 @@ async function handleQuickAdd(amount) {
     setTimeout(async () => {
       await self.registration.showNotification('🚗 Modo Motorista Ativo', {
         body: 'Toque nos botões para adicionar corridas rapidamente',
-        icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="100" fill="%2300c853"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="280"%3E🚗%3C/text%3E%3C/svg%3E',
+        icon: './img/logotipo.png',
         tag: 'driver-mode',
         requireInteraction: true,
         silent: true,

@@ -2,6 +2,7 @@
 let currentTheme = localStorage.getItem('theme') || 'light';
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 let weeklyChart = null;
+let currentPeriod = 'today'; // Período atual: today, week, month
 
 // Aplicar tema ao carregar
 document.addEventListener('DOMContentLoaded', function() {
@@ -10,14 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeForms();
     createWeeklyChart();
     renderTransactions();
-    
-    // Simular dados para demonstração
-    setTimeout(() => {
-        animateCircularProgress('revenueCircle', 25);
-        animateCircularProgress('expenseCircle', 50);
-        animateCircularProgress('profitCircle', 45);
-        animateCircularProgress('tripsCircle', 40);
-    }, 500);
+    updateKmDisplay();
 });
 
 // ========== TEMA ==========
@@ -44,9 +38,12 @@ function applyTheme(theme) {
 function updateCircularProgress() {
     console.log('🔄 Atualizando dashboard...', transactions.length, 'transações');
     
+    // Filtrar transações por período
+    const filteredTransactions = filterTransactionsByPeriod(transactions, currentPeriod);
+    
     // Calcular totais
-    const revenues = transactions.filter(t => t.type === 'revenue');
-    const expenses = transactions.filter(t => t.type === 'expense');
+    const revenues = filteredTransactions.filter(t => t.type === 'revenue');
+    const expenses = filteredTransactions.filter(t => t.type === 'expense');
     
     const totalRevenue = revenues.reduce((sum, t) => sum + parseFloat(t.amount), 0);
     const totalExpense = expenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
@@ -73,15 +70,36 @@ function updateCircularProgress() {
         console.log('✅ Card principal atualizado:', formatCurrency(totalRevenue));
     }
     
-    // Calcular porcentagens para os gráficos circulares
-    // Usar metas ou valores máximos para calcular porcentagem
-    const dailyGoal = goals.daily || 200;
-    const monthlyGoal = goals.monthly || 6000;
+    // Atualizar subtítulo do card principal com o período
+    const featuredSubtitle = document.querySelector('.featured-card-subtitle');
+    if (featuredSubtitle) {
+        const periodText = {
+            'today': 'Faturamento de Hoje',
+            'week': 'Faturamento da Semana',
+            'month': 'Faturamento do Mês'
+        };
+        featuredSubtitle.textContent = periodText[currentPeriod] || 'Faturamento Total';
+    }
     
-    const revenuePercent = Math.min((totalRevenue / monthlyGoal) * 100, 100);
+    // Calcular porcentagens para os gráficos circulares
+    // Usar metas baseadas no período
+    let revenueGoal, tripsGoal;
+    
+    if (currentPeriod === 'today') {
+        revenueGoal = goals.daily || 200;
+        tripsGoal = 20;
+    } else if (currentPeriod === 'week') {
+        revenueGoal = goals.weekly || 1400;
+        tripsGoal = 100;
+    } else {
+        revenueGoal = goals.monthly || 6000;
+        tripsGoal = goals.trips || 200;
+    }
+    
+    const revenuePercent = revenueGoal > 0 ? Math.min((totalRevenue / revenueGoal) * 100, 100) : 0;
     const expensePercent = totalRevenue > 0 ? Math.min((totalExpense / totalRevenue) * 100, 100) : 0;
     const profitPercent = totalRevenue > 0 ? Math.min((profit / totalRevenue) * 100, 100) : 0;
-    const tripsPercent = Math.min((trips / (goals.trips || 200)) * 100, 100);
+    const tripsPercent = tripsGoal > 0 ? Math.min((trips / tripsGoal) * 100, 100) : 0;
     
     // Animar gráficos circulares
     animateCircularProgress('revenueCircle', revenuePercent);
@@ -89,11 +107,12 @@ function updateCircularProgress() {
     animateCircularProgress('profitCircle', profitPercent);
     animateCircularProgress('tripsCircle', tripsPercent);
     
-    // Atualizar mini stats por categoria
-    const gasExpenses = expenses.filter(e => e.category === 'gas').reduce((sum, e) => sum + parseFloat(e.amount), 0);
-    const maintenanceExpenses = expenses.filter(e => e.category === 'maintenance').reduce((sum, e) => sum + parseFloat(e.amount), 0);
-    const appExpenses = expenses.filter(e => e.category === 'app').reduce((sum, e) => sum + parseFloat(e.amount), 0);
-    const foodExpenses = expenses.filter(e => e.category === 'food').reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    // Atualizar mini stats por categoria (sempre do mês todo)
+    const allExpenses = transactions.filter(t => t.type === 'expense');
+    const gasExpenses = allExpenses.filter(e => e.category === 'gas').reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    const maintenanceExpenses = allExpenses.filter(e => e.category === 'maintenance').reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    const appExpenses = allExpenses.filter(e => e.category === 'app').reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    const foodExpenses = allExpenses.filter(e => e.category === 'food').reduce((sum, e) => sum + parseFloat(e.amount), 0);
     
     const miniGasEl = document.getElementById('miniGas');
     const miniMaintenanceEl = document.getElementById('miniMaintenance');
@@ -106,6 +125,51 @@ function updateCircularProgress() {
     if (miniFoodEl) miniFoodEl.textContent = formatCurrency(foodExpenses);
     
     console.log('✅ Dashboard atualizado com sucesso!');
+}
+
+// Filtrar transações por período
+function filterTransactionsByPeriod(transactions, period) {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    
+    if (period === 'today') {
+        return transactions.filter(t => t.date === today);
+    } else if (period === 'week') {
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - now.getDay()); // Domingo
+        weekStart.setHours(0, 0, 0, 0);
+        
+        return transactions.filter(t => {
+            const transDate = new Date(t.date + 'T00:00:00');
+            return transDate >= weekStart;
+        });
+    } else if (period === 'month') {
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        
+        return transactions.filter(t => {
+            const transDate = new Date(t.date + 'T00:00:00');
+            return transDate >= monthStart;
+        });
+    }
+    
+    return transactions;
+}
+
+// Mudar período
+function changePeriod(period) {
+    currentPeriod = period;
+    
+    // Atualizar botões ativos
+    document.querySelectorAll('.period-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    event.target.classList.add('active');
+    
+    // Atualizar dashboard
+    updateCircularProgress();
+    
+    console.log('📅 Período alterado para:', period);
 }
 
 function animateCircularProgress(circleId, percent) {
@@ -2281,3 +2345,383 @@ if ('serviceWorker' in navigator) {
 }
 
 console.log('📨 Listener de mensagens do Service Worker ativado');
+
+// ========== CONTROLE DE QUILOMETRAGEM ==========
+
+let kmData = JSON.parse(localStorage.getItem('kmData')) || [];
+
+// Salvar KM do dia
+function saveKmDay() {
+    const kmInicial = parseFloat(document.getElementById('kmInicial').value) || 0;
+    const kmFinal = parseFloat(document.getElementById('kmFinal').value) || 0;
+    
+    if (kmInicial === 0 || kmFinal === 0) {
+        showNotification('⚠️ Preencha o KM inicial e final!', 'info');
+        return;
+    }
+    
+    if (kmFinal <= kmInicial) {
+        showNotification('⚠️ KM final deve ser maior que o inicial!', 'info');
+        return;
+    }
+    
+    const kmRodado = kmFinal - kmInicial;
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Verificar se já existe registro para hoje
+    const existingIndex = kmData.findIndex(item => item.date === today);
+    
+    if (existingIndex >= 0) {
+        // Atualizar registro existente
+        kmData[existingIndex] = {
+            date: today,
+            kmInicial: kmInicial,
+            kmFinal: kmFinal,
+            kmRodado: kmRodado
+        };
+    } else {
+        // Adicionar novo registro
+        kmData.push({
+            date: today,
+            kmInicial: kmInicial,
+            kmFinal: kmFinal,
+            kmRodado: kmRodado
+        });
+    }
+    
+    // Ordenar por data (mais recente primeiro)
+    kmData.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Salvar no localStorage
+    localStorage.setItem('kmData', JSON.stringify(kmData));
+    
+    // Atualizar interface
+    updateKmDisplay();
+    
+    // Feedback
+    showNotification(`✅ KM salvo! Você rodou ${kmRodado.toFixed(1)} km hoje`, 'success');
+    
+    // Vibrar no mobile
+    if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100]);
+    }
+}
+
+// Atualizar display de KM
+function updateKmDisplay() {
+    const today = new Date().toISOString().split('T')[0];
+    const todayData = kmData.find(item => item.date === today);
+    
+    // Atualizar KM rodado hoje
+    const kmRodadoHoje = document.getElementById('kmRodadoHoje');
+    if (kmRodadoHoje) {
+        if (todayData) {
+            kmRodadoHoje.textContent = todayData.kmRodado.toFixed(1) + ' km';
+            
+            // Preencher inputs com valores salvos
+            document.getElementById('kmInicial').value = todayData.kmInicial;
+            document.getElementById('kmFinal').value = todayData.kmFinal;
+        } else {
+            kmRodadoHoje.textContent = '0 km';
+        }
+    }
+    
+    // Calcular totais do mês
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    const monthData = kmData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+    });
+    
+    const totalKmMes = monthData.reduce((sum, item) => sum + item.kmRodado, 0);
+    const diasTrabalhados = monthData.length;
+    const mediaKmDia = diasTrabalhados > 0 ? totalKmMes / diasTrabalhados : 0;
+    
+    // Atualizar resumo do mês
+    const kmTotalMesEl = document.getElementById('kmTotalMes');
+    const kmMediaDiaEl = document.getElementById('kmMediaDia');
+    const diasTrabalhadosEl = document.getElementById('diasTrabalhados');
+    
+    if (kmTotalMesEl) kmTotalMesEl.textContent = totalKmMes.toFixed(1) + ' km';
+    if (kmMediaDiaEl) kmMediaDiaEl.textContent = mediaKmDia.toFixed(1) + ' km';
+    if (diasTrabalhadosEl) diasTrabalhadosEl.textContent = diasTrabalhados;
+}
+
+// Ver histórico de KM
+function viewKmHistory() {
+    const modal = document.getElementById('kmHistoryModal');
+    const list = document.getElementById('kmHistoryList');
+    
+    if (!modal || !list) return;
+    
+    if (kmData.length === 0) {
+        list.innerHTML = '<div class="empty-state">📭 Nenhum registro de quilometragem ainda</div>';
+    } else {
+        list.innerHTML = kmData.map(item => {
+            const date = new Date(item.date + 'T00:00:00');
+            const dateStr = date.toLocaleDateString('pt-BR', { 
+                weekday: 'short', 
+                day: '2-digit', 
+                month: 'short' 
+            });
+            
+            return `
+                <div class="km-history-item">
+                    <div>
+                        <div class="km-history-date">${dateStr}</div>
+                        <div class="km-history-details">
+                            ${item.kmInicial.toFixed(1)} km → ${item.kmFinal.toFixed(1)} km
+                        </div>
+                    </div>
+                    <div class="km-history-value">${item.kmRodado.toFixed(1)} km</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    modal.classList.add('active');
+}
+
+// Inicializar KM ao carregar
+document.addEventListener('DOMContentLoaded', function() {
+    updateKmDisplay();
+});
+
+console.log('🚗 Sistema de controle de quilometragem carregado!');
+
+// ========== CALCULADORA DE COMBUSTÍVEL ==========
+
+let fuelData = JSON.parse(localStorage.getItem('fuelData')) || [];
+
+// Atualizar preço por litro em tempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const fuelLitrosInput = document.getElementById('fuelLitros');
+    const fuelValorInput = document.getElementById('fuelValor');
+    
+    if (fuelLitrosInput && fuelValorInput) {
+        fuelLitrosInput.addEventListener('input', calculatePricePerLiter);
+        fuelValorInput.addEventListener('input', calculatePricePerLiter);
+    }
+    
+    updateFuelStats();
+});
+
+// Calcular preço por litro
+function calculatePricePerLiter() {
+    const litros = parseFloat(document.getElementById('fuelLitros').value) || 0;
+    const valor = parseFloat(document.getElementById('fuelValor').value) || 0;
+    
+    const precoLitro = litros > 0 ? valor / litros : 0;
+    
+    const precoLitroEl = document.getElementById('fuelPrecoLitro');
+    if (precoLitroEl) {
+        precoLitroEl.textContent = formatCurrency(precoLitro);
+    }
+}
+
+// Salvar registro de abastecimento
+function saveFuelRecord() {
+    const litros = parseFloat(document.getElementById('fuelLitros').value) || 0;
+    const valor = parseFloat(document.getElementById('fuelValor').value) || 0;
+    const kmAtual = parseFloat(document.getElementById('fuelKmAtual').value) || 0;
+    
+    if (litros === 0 || valor === 0 || kmAtual === 0) {
+        showNotification('⚠️ Preencha todos os campos!', 'info');
+        return;
+    }
+    
+    const today = new Date().toISOString().split('T')[0];
+    const precoLitro = valor / litros;
+    
+    // Calcular consumo se houver abastecimento anterior
+    let consumo = null;
+    let kmRodado = null;
+    
+    if (fuelData.length > 0) {
+        const lastFuel = fuelData[fuelData.length - 1];
+        kmRodado = kmAtual - lastFuel.kmAtual;
+        
+        if (kmRodado > 0) {
+            consumo = kmRodado / litros; // km/litro
+        }
+    }
+    
+    // Adicionar novo registro
+    const newRecord = {
+        id: Date.now(),
+        date: today,
+        litros: litros,
+        valor: valor,
+        precoLitro: precoLitro,
+        kmAtual: kmAtual,
+        kmRodado: kmRodado,
+        consumo: consumo
+    };
+    
+    fuelData.push(newRecord);
+    
+    // Salvar no localStorage
+    localStorage.setItem('fuelData', JSON.stringify(fuelData));
+    
+    // Limpar formulário
+    document.getElementById('fuelLitros').value = '';
+    document.getElementById('fuelValor').value = '';
+    document.getElementById('fuelKmAtual').value = '';
+    document.getElementById('fuelPrecoLitro').textContent = 'R$ 0,00';
+    
+    // Atualizar estatísticas
+    updateFuelStats();
+    
+    // Feedback
+    if (consumo) {
+        showNotification(`✅ Abastecimento registrado! Consumo: ${consumo.toFixed(2)} km/l`, 'success');
+    } else {
+        showNotification('✅ Primeiro abastecimento registrado!', 'success');
+    }
+    
+    // Vibrar no mobile
+    if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100]);
+    }
+}
+
+// Atualizar estatísticas de combustível
+function updateFuelStats() {
+    if (fuelData.length === 0) {
+        // Zerar tudo se não houver dados
+        const consumoMedioEl = document.getElementById('fuelConsumoMedio');
+        const custoKmEl = document.getElementById('fuelCustoKm');
+        const totalMesEl = document.getElementById('fuelTotalMes');
+        const precoMedioEl = document.getElementById('fuelPrecoMedio');
+        
+        if (consumoMedioEl) consumoMedioEl.textContent = '0 km/l';
+        if (custoKmEl) custoKmEl.textContent = 'R$ 0,00';
+        if (totalMesEl) totalMesEl.textContent = 'R$ 0,00';
+        if (precoMedioEl) precoMedioEl.textContent = 'R$ 0,00';
+        
+        // Esconder alerta
+        const alertEl = document.getElementById('fuelAlert');
+        if (alertEl) alertEl.style.display = 'none';
+        
+        return;
+    }
+    
+    // Filtrar dados do mês atual
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    const monthData = fuelData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+    });
+    
+    // Calcular consumo médio (apenas registros com consumo calculado)
+    const recordsWithConsumption = fuelData.filter(item => item.consumo !== null);
+    const avgConsumption = recordsWithConsumption.length > 0
+        ? recordsWithConsumption.reduce((sum, item) => sum + item.consumo, 0) / recordsWithConsumption.length
+        : 0;
+    
+    // Calcular custo por km
+    const totalLitros = monthData.reduce((sum, item) => sum + item.litros, 0);
+    const totalValor = monthData.reduce((sum, item) => sum + item.valor, 0);
+    const totalKmRodado = monthData.reduce((sum, item) => sum + (item.kmRodado || 0), 0);
+    
+    const custoKm = totalKmRodado > 0 ? totalValor / totalKmRodado : 0;
+    
+    // Calcular preço médio por litro
+    const avgPrecoLitro = monthData.length > 0
+        ? monthData.reduce((sum, item) => sum + item.precoLitro, 0) / monthData.length
+        : 0;
+    
+    // Atualizar interface
+    const consumoMedioEl = document.getElementById('fuelConsumoMedio');
+    const custoKmEl = document.getElementById('fuelCustoKm');
+    const totalMesEl = document.getElementById('fuelTotalMes');
+    const precoMedioEl = document.getElementById('fuelPrecoMedio');
+    
+    if (consumoMedioEl) consumoMedioEl.textContent = avgConsumption.toFixed(2) + ' km/l';
+    if (custoKmEl) custoKmEl.textContent = formatCurrency(custoKm);
+    if (totalMesEl) totalMesEl.textContent = formatCurrency(totalValor);
+    if (precoMedioEl) precoMedioEl.textContent = formatCurrency(avgPrecoLitro);
+    
+    // Verificar alerta de consumo
+    checkFuelAlert(avgConsumption, recordsWithConsumption);
+}
+
+// Verificar alerta de consumo
+function checkFuelAlert(avgConsumption, records) {
+    const alertEl = document.getElementById('fuelAlert');
+    const alertMessageEl = document.getElementById('fuelAlertMessage');
+    
+    if (!alertEl || !alertMessageEl || records.length < 3) {
+        if (alertEl) alertEl.style.display = 'none';
+        return;
+    }
+    
+    // Pegar últimos 3 abastecimentos
+    const last3 = records.slice(-3);
+    const last3Avg = last3.reduce((sum, item) => sum + item.consumo, 0) / 3;
+    
+    // Se o consumo dos últimos 3 for 10% menor que a média geral
+    if (last3Avg < avgConsumption * 0.9) {
+        const diff = ((avgConsumption - last3Avg) / avgConsumption * 100).toFixed(1);
+        alertMessageEl.textContent = `Seu consumo caiu ${diff}% nos últimos abastecimentos. Verifique se há algum problema no veículo.`;
+        alertEl.style.display = 'flex';
+    } else {
+        alertEl.style.display = 'none';
+    }
+}
+
+// Ver histórico de combustível
+function viewFuelHistory() {
+    const modal = document.getElementById('fuelHistoryModal');
+    const list = document.getElementById('fuelHistoryList');
+    
+    if (!modal || !list) return;
+    
+    if (fuelData.length === 0) {
+        list.innerHTML = '<div class="empty-state">📭 Nenhum abastecimento registrado ainda</div>';
+    } else {
+        // Ordenar por data (mais recente primeiro)
+        const sortedData = [...fuelData].reverse();
+        
+        list.innerHTML = sortedData.map(item => {
+            const date = new Date(item.date + 'T00:00:00');
+            const dateStr = date.toLocaleDateString('pt-BR', { 
+                weekday: 'short', 
+                day: '2-digit', 
+                month: 'short' 
+            });
+            
+            const consumoText = item.consumo 
+                ? `<div class="fuel-history-consumption">⚡ ${item.consumo.toFixed(2)} km/l</div>`
+                : '';
+            
+            const kmRodadoText = item.kmRodado 
+                ? `${item.kmRodado.toFixed(1)} km rodados • `
+                : '';
+            
+            return `
+                <div class="fuel-history-item">
+                    <div>
+                        <div class="fuel-history-date">${dateStr}</div>
+                        <div class="fuel-history-details">
+                            ${item.litros.toFixed(2)}L • ${formatCurrency(item.precoLitro)}/L
+                        </div>
+                        <div class="fuel-history-details">
+                            ${kmRodadoText}KM: ${item.kmAtual.toFixed(1)}
+                        </div>
+                        ${consumoText}
+                    </div>
+                    <div class="fuel-history-value">${formatCurrency(item.valor)}</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    modal.classList.add('active');
+}
+
+console.log('⛽ Calculadora de combustível carregada!');

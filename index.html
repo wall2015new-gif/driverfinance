@@ -16,11 +16,12 @@
     
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#26A69A">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Driver Finance">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230a0e27'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='280' fill='%2300ff88'%3E🚗%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="./img/logotipo.png">
+    <link rel="icon" type="image/png" href="./img/logotipo.png">
     <style>
         * {
             margin: 0;
@@ -29,49 +30,49 @@
         }
 
         :root {
-            --bg-primary: #0f0a1e;
-            --bg-secondary: #1a1333;
-            --bg-tertiary: #251b47;
-            --bg-card: #1e1640;
-            --border: #2d2257;
-            --border-light: #3d3167;
-            --text-primary: #ffffff;
-            --text-secondary: #b8b0d4;
-            --text-tertiary: #8a7eb8;
-            --accent-blue: #00d4ff;
-            --accent-blue-light: #5ae4ff;
-            --accent-green: #00ff88;
-            --accent-red: #ff006e;
-            --accent-yellow: #ffea00;
-            --accent-purple: #b537f2;
-            --accent-orange: #ff6b35;
-            --accent-pink: #ff006e;
-            --accent-cyan: #00d4ff;
-            --shadow: rgba(0, 0, 0, 0.5);
-            --shadow-hover: rgba(0, 0, 0, 0.7);
-            --glow-cyan: rgba(0, 212, 255, 0.5);
-            --glow-pink: rgba(255, 0, 110, 0.5);
-            --glow-green: rgba(0, 255, 136, 0.5);
-            --glow-yellow: rgba(255, 234, 0, 0.5);
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #0f0a1e;
-            --bg-secondary: #1a1333;
-            --bg-tertiary: #251b47;
-            --bg-card: #1e1640;
-            --border: #2d2257;
-            --border-light: #3d3167;
-            --text-primary: #ffffff;
-            --text-secondary: #b8b0d4;
-            --text-tertiary: #8a7eb8;
-            --shadow: rgba(0, 0, 0, 0.5);
-            --shadow-hover: rgba(0, 0, 0, 0.7);
+            /* Cores do Logotipo */
+            --logo-green-light: #6BBF59;
+            --logo-green: #4CAF50;
+            --logo-turquoise: #26A69A;
+            --logo-blue: #1E88E5;
+            --logo-blue-dark: #1A3A52;
+            
+            /* Backgrounds - Tema Claro Moderno */
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8eef5;
+            --bg-card: #ffffff;
+            --border: #e0e6ed;
+            --border-light: #f0f3f7;
+            
+            /* Textos */
+            --text-primary: #1A3A52;
+            --text-secondary: #5a6c7d;
+            --text-tertiary: #8b9aa8;
+            
+            /* Cores de Destaque - Baseadas no Logo */
+            --accent-blue: #1E88E5;
+            --accent-blue-light: #42a5f5;
+            --accent-green: #4CAF50;
+            --accent-green-light: #6BBF59;
+            --accent-turquoise: #26A69A;
+            --accent-red: #ef5350;
+            --accent-yellow: #ffa726;
+            --accent-purple: #ab47bc;
+            --accent-orange: #ff7043;
+            
+            /* Sombras e Glows */
+            --shadow: rgba(26, 58, 82, 0.08);
+            --shadow-hover: rgba(26, 58, 82, 0.15);
+            --glow-blue: rgba(30, 136, 229, 0.2);
+            --glow-green: rgba(76, 175, 80, 0.2);
+            --glow-turquoise: rgba(38, 166, 154, 0.2);
+            --glow-green-light: rgba(107, 191, 89, 0.2);
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0a1e 0%, #1a1333 50%, #251b47 100%);
+            background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
             padding-bottom: 80px;
@@ -79,7 +80,7 @@
             overflow-x: hidden;
         }
 
-        /* Grid background pattern */
+        /* Grid background pattern - Sutil */
         body::before {
             content: '';
             position: fixed;
@@ -91,23 +92,14 @@
                 linear-gradient(var(--border) 1px, transparent 1px),
                 linear-gradient(90deg, var(--border) 1px, transparent 1px);
             background-size: 50px 50px;
-            opacity: 0.1;
+            opacity: 0.3;
             pointer-events: none;
             z-index: 0;
         }
 
-        /* Glow effect */
+        /* Glow effect - Muito sutil */
         body::after {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.05) 0%, transparent 50%);
-            animation: rotate 20s linear infinite;
-            pointer-events: none;
-            z-index: 0;
+            display: none;
         }
 
         @keyframes rotate {
@@ -138,9 +130,9 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #1a1333 0%, #251b47 100%);
-            border-bottom: 2px solid var(--accent-cyan);
-            box-shadow: 0 0 20px var(--glow-cyan);
+            background: linear-gradient(135deg, var(--logo-blue) 0%, var(--logo-turquoise) 100%);
+            border-bottom: none;
+            box-shadow: 0 2px 12px rgba(30, 136, 229, 0.15);
             color: white;
             padding: 20px;
             text-align: center;
@@ -154,9 +146,9 @@
             font-size: 24px;
             font-weight: 800;
             margin-bottom: 4px;
-            color: var(--accent-cyan);
+            color: #ffffff;
             letter-spacing: -0.5px;
-            text-shadow: 0 0 20px var(--glow-cyan);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .header p {
@@ -175,14 +167,15 @@
 
         /* Card principal destacado */
         .featured-card {
-            background: #ffffff;
-            border: 1px solid var(--border);
-            border-radius: 16px;
+            background: linear-gradient(135deg, var(--logo-green) 0%, var(--logo-green-light) 100%);
+            border: none;
+            border-radius: 20px;
             padding: 32px;
             margin-bottom: 24px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 2px 8px var(--shadow);
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.2);
+            color: white;
         }
 
         .featured-card::before {
@@ -196,7 +189,7 @@
 
         .featured-card-label {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 12px;
             font-weight: 600;
             text-transform: uppercase;
@@ -206,14 +199,14 @@
         .featured-card-value {
             font-size: 48px;
             font-weight: 900;
-            color: var(--text-primary);
+            color: #ffffff;
             margin-bottom: 8px;
             letter-spacing: -2px;
         }
 
         .featured-card-subtitle {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.85);
             font-weight: 500;
         }
 
@@ -247,9 +240,9 @@
         }
 
         .period-btn.active {
-            background: var(--accent-blue);
+            background: var(--logo-turquoise);
             color: #ffffff;
-            box-shadow: 0 2px 8px rgba(66, 103, 245, 0.3);
+            box-shadow: 0 2px 8px var(--glow-turquoise);
         }
 
         .period-btn:hover:not(.active) {
@@ -269,7 +262,7 @@
         .circular-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 24px;
             display: flex;
             flex-direction: column;
@@ -279,7 +272,7 @@
             position: relative;
             overflow: visible;
             animation: fadeInScale 0.5s ease-out;
-            box-shadow: 0 2px 8px var(--shadow);
+            box-shadow: 0 2px 12px var(--shadow);
         }
 
         .circular-card::before {
@@ -289,7 +282,7 @@
         .circular-card:hover {
             border-color: var(--border-light);
             transform: translateY(-4px);
-            box-shadow: 0 4px 16px var(--shadow-hover);
+            box-shadow: 0 8px 24px var(--shadow-hover);
         }
 
         .circular-card:nth-child(1) { animation-delay: 0.1s; }
@@ -298,19 +291,19 @@
         .circular-card:nth-child(4) { animation-delay: 0.4s; }
 
         .circular-card:nth-child(1):hover {
-            box-shadow: 0 4px 16px rgba(66, 103, 245, 0.2);
+            box-shadow: 0 4px 16px var(--glow-green);
         }
 
         .circular-card:nth-child(2):hover {
-            box-shadow: 0 4px 16px rgba(244, 67, 54, 0.2);
+            box-shadow: 0 4px 16px rgba(239, 83, 80, 0.3);
         }
 
         .circular-card:nth-child(3):hover {
-            box-shadow: 0 4px 16px rgba(0, 200, 83, 0.2);
+            box-shadow: 0 4px 16px var(--glow-blue);
         }
 
         .circular-card:nth-child(4):hover {
-            box-shadow: 0 4px 16px rgba(255, 193, 7, 0.2);
+            box-shadow: 0 4px 16px var(--glow-turquoise);
         }
 
         .circular-progress {
@@ -340,23 +333,23 @@
         }
 
         .circular-progress-fill.green {
-            stroke: url(#gradient-cyan);
-            filter: drop-shadow(0 0 10px var(--glow-cyan));
-        }
-
-        .circular-progress-fill.red {
-            stroke: url(#gradient-pink);
-            filter: drop-shadow(0 0 10px var(--glow-pink));
-        }
-
-        .circular-progress-fill.blue {
             stroke: url(#gradient-green);
             filter: drop-shadow(0 0 10px var(--glow-green));
         }
 
+        .circular-progress-fill.red {
+            stroke: url(#gradient-red);
+            filter: drop-shadow(0 0 10px rgba(239, 83, 80, 0.5));
+        }
+
+        .circular-progress-fill.blue {
+            stroke: url(#gradient-blue);
+            filter: drop-shadow(0 0 10px var(--glow-blue));
+        }
+
         .circular-progress-fill.yellow {
-            stroke: url(#gradient-yellow);
-            filter: drop-shadow(0 0 10px var(--glow-yellow));
+            stroke: url(#gradient-turquoise);
+            filter: drop-shadow(0 0 10px var(--glow-turquoise));
         }
 
         .circular-progress-text {
@@ -480,10 +473,541 @@
             letter-spacing: 0.5px;
         }
 
-        /* Ações */
+        /* Controle de Quilometragem */
+        .km-control-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px var(--shadow);
+        }
+
+        .km-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .km-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .km-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--shadow-hover);
+        }
+
+        .km-card-summary {
+            background: linear-gradient(135deg, var(--logo-blue) 0%, var(--logo-turquoise) 100%);
+            color: white;
+            border: none;
+        }
+
+        .km-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .km-icon {
+            font-size: 24px;
+        }
+
+        .km-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .km-card-summary .km-title {
+            color: white;
+        }
+
+        .km-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .km-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .km-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .km-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .km-input:focus {
+            outline: none;
+            border-color: var(--logo-turquoise);
+            box-shadow: 0 0 0 3px var(--glow-turquoise);
+        }
+
+        .btn-save-km {
+            width: 100%;
+            padding: 14px;
+            background: var(--logo-green);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .btn-save-km:hover {
+            background: var(--logo-green-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--glow-green);
+        }
+
+        .btn-save-km:active {
+            transform: translateY(0);
+        }
+
+        .km-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .km-result-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .km-result-value {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--logo-green);
+        }
+
+        .km-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .km-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .km-stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .km-stat-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .km-stat-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: white;
+        }
+
+        .btn-view-km-history {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-view-km-history:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Histórico de KM */
+        .km-history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .km-history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .km-history-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .km-history-date {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .km-history-details {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .km-history-value {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--logo-green);
+        }
+
+        /* Calculadora de Combustível */
+        .fuel-control-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px var(--shadow);
+        }
+
+        .fuel-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .fuel-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .fuel-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--shadow-hover);
+        }
+
+        .fuel-card-stats {
+            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+            color: white;
+            border: none;
+        }
+
+        .fuel-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .fuel-icon {
+            font-size: 24px;
+        }
+
+        .fuel-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .fuel-card-stats .fuel-title {
+            color: white;
+        }
+
+        .fuel-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .fuel-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .fuel-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .fuel-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .fuel-input:focus {
+            outline: none;
+            border-color: #ff9800;
+            box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
+        }
+
+        .fuel-info-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+
+        .fuel-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .fuel-info-item span:last-child {
+            color: #ff9800;
+            font-weight: 900;
+        }
+
+        .btn-save-fuel {
+            width: 100%;
+            padding: 14px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-save-fuel:hover {
+            background: #fb8c00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+        }
+
+        .btn-save-fuel:active {
+            transform: translateY(0);
+        }
+
+        .fuel-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .fuel-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+        }
+
+        .fuel-stat-icon {
+            font-size: 24px;
+        }
+
+        .fuel-stat-content {
+            flex: 1;
+        }
+
+        .fuel-stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 4px;
+        }
+
+        .fuel-stat-value {
+            font-size: 18px;
+            font-weight: 900;
+            color: white;
+        }
+
+        .btn-view-fuel-history {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-view-fuel-history:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Alerta de Combustível */
+        .fuel-alert {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(255, 152, 0, 0.1);
+            border: 2px solid #ff9800;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .fuel-alert-icon {
+            font-size: 32px;
+        }
+
+        .fuel-alert-content {
+            flex: 1;
+        }
+
+        .fuel-alert-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ff9800;
+            margin-bottom: 4px;
+        }
+
+        .fuel-alert-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Histórico de Combustível */
+        .fuel-history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .fuel-history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .fuel-history-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .fuel-history-date {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .fuel-history-details {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .fuel-history-value {
+            font-size: 18px;
+            font-weight: 900;
+            color: #ff9800;
+        }
+
+        .fuel-history-consumption {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--logo-green);
+            margin-top: 4px;
+        }
+
+        /* Ações Rápidas */
         .actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin-bottom: 24px;
         }
@@ -508,14 +1032,14 @@
         }
 
         .btn-primary {
-            border-color: var(--accent-blue);
-            color: var(--accent-blue);
+            border-color: var(--logo-green);
+            color: var(--logo-green);
         }
 
         .btn-primary:hover {
-            background: var(--accent-blue);
+            background: var(--logo-green);
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(66, 103, 245, 0.3);
+            box-shadow: 0 4px 12px var(--glow-green);
         }
 
         .btn-danger {
@@ -526,29 +1050,29 @@
         .btn-danger:hover {
             background: var(--accent-red);
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+            box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
         }
 
         .btn-secondary {
-            border-color: var(--accent-green);
-            color: var(--accent-green);
+            border-color: var(--logo-turquoise);
+            color: var(--logo-turquoise);
         }
 
         .btn-secondary:hover {
-            background: var(--accent-green);
+            background: var(--logo-turquoise);
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3);
+            box-shadow: 0 4px 12px var(--glow-turquoise);
         }
 
         .btn-info {
-            border-color: var(--accent-yellow);
-            color: var(--accent-yellow);
+            border-color: var(--logo-blue);
+            color: var(--logo-blue);
         }
 
         .btn-info:hover {
-            background: var(--accent-yellow);
+            background: var(--logo-blue);
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+            box-shadow: 0 4px 12px var(--glow-blue);
         }
 
         .btn:active {
@@ -561,12 +1085,13 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--bg-secondary);
+            background: var(--bg-card);
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
             padding: 12px 0;
             z-index: 100;
+            box-shadow: 0 -2px 12px var(--shadow);
         }
 
         .nav-item {
@@ -584,7 +1109,7 @@
         }
 
         .nav-item.active {
-            color: var(--accent-blue);
+            color: var(--logo-turquoise);
         }
 
         .nav-icon {
@@ -593,7 +1118,7 @@
         }
 
         .nav-item.active .nav-icon {
-            filter: drop-shadow(0 0 4px var(--accent-blue));
+            filter: drop-shadow(0 0 6px var(--glow-turquoise));
         }
 
         /* Gráficos */
@@ -741,8 +1266,8 @@
 
         .filter-select:focus {
             outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(66, 103, 245, 0.1);
+            border-color: var(--logo-turquoise);
+            box-shadow: 0 0 0 3px var(--glow-turquoise);
         }
 
         /* Transações */
@@ -801,7 +1326,7 @@
         }
 
         .transaction-value.revenue {
-            color: var(--accent-green);
+            color: var(--logo-green-light);
         }
 
         .transaction-value.expense {
@@ -920,8 +1445,8 @@
 
         .form-input:focus, .form-select:focus {
             outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(66, 103, 245, 0.1);
+            border-color: var(--logo-turquoise);
+            box-shadow: 0 0 0 3px var(--glow-turquoise);
         }
 
         .form-actions {
@@ -998,15 +1523,15 @@
 
         .progress-fill {
             height: 100%;
-            background: var(--accent-green);
+            background: var(--logo-green);
             border-radius: 20px;
             transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px rgba(0, 200, 83, 0.5);
+            box-shadow: 0 0 10px var(--glow-green);
         }
 
         .progress-fill.blue {
-            background: var(--accent-blue);
-            box-shadow: 0 0 10px rgba(66, 103, 245, 0.5);
+            background: var(--logo-blue);
+            box-shadow: 0 0 10px var(--glow-blue);
         }
 
         .goal-stats {
@@ -1030,8 +1555,8 @@
         }
 
         .btn-edit:hover {
-            border-color: var(--accent-blue);
-            color: var(--accent-blue);
+            border-color: var(--logo-turquoise);
+            color: var(--logo-turquoise);
         }
 
         /* Conquistas */
@@ -1060,8 +1585,8 @@
         }
 
         .achievement-badge.unlocked {
-            border-color: var(--accent-green);
-            box-shadow: 0 0 20px rgba(0, 200, 83, 0.2);
+            border-color: var(--logo-green);
+            box-shadow: 0 0 20px var(--glow-green);
         }
 
         .achievement-badge.locked {
@@ -1467,12 +1992,12 @@
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-green) 0%, #00a843 100%);
+            background: linear-gradient(135deg, var(--logo-green) 0%, var(--logo-green-light) 100%);
             color: white;
             border: none;
             font-size: 32px;
             cursor: pointer;
-            box-shadow: 0 6px 16px rgba(0, 200, 83, 0.5);
+            box-shadow: 0 6px 16px var(--glow-green);
             transition: all 0.3s;
             z-index: 100;
             animation: pulse 2s infinite;
@@ -1480,16 +2005,16 @@
 
         @keyframes pulse {
             0%, 100% {
-                box-shadow: 0 6px 16px rgba(0, 200, 83, 0.5);
+                box-shadow: 0 6px 16px var(--glow-green);
             }
             50% {
-                box-shadow: 0 6px 24px rgba(0, 200, 83, 0.8);
+                box-shadow: 0 6px 24px var(--glow-green-light);
             }
         }
 
         .fab-quick-add:hover {
             transform: scale(1.15);
-            box-shadow: 0 8px 24px rgba(0, 200, 83, 0.7);
+            box-shadow: 0 8px 24px var(--glow-green-light);
             animation: none;
         }
 
@@ -1510,11 +2035,11 @@
         }
 
         .quick-value-btn:hover {
-            background: var(--accent-green);
-            border-color: var(--accent-green);
+            background: var(--logo-green);
+            border-color: var(--logo-green);
             color: white;
             transform: translateY(-4px);
-            box-shadow: 0 6px 16px rgba(0, 200, 83, 0.3);
+            box-shadow: 0 6px 16px var(--glow-green);
         }
 
         .quick-value-btn:active {
@@ -1534,7 +2059,18 @@
                 height: 60px;
                 font-size: 28px;
             }
-        }
+
+            .km-cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fuel-cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Zona de Perigo */
@@ -1935,7 +2471,6 @@
                 padding: 12px 8px;
                 font-size: 14px;
             }
-        }
 
             .circular-progress svg {
                 width: 80px;
@@ -1995,25 +2530,51 @@
     </style>
 </head>
 <body>
+    <!-- SVG Gradient Definitions - Cores do Logotipo -->
+    <svg width="0" height="0" style="position: absolute;">
+        <defs>
+            <linearGradient id="gradient-green" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#6BBF59;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="gradient-red" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#ef5350;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#e57373;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="gradient-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#1E88E5;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#42a5f5;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="gradient-turquoise" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#26A69A;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#4DB6AC;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+    </svg>
+
     <div class="header">
-        <h1>🚗 DRIVER FINANCE</h1>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 4px;">
+            <img src="./img/logotipo.png" alt="Driver Finance Logo" style="height: 40px; width: auto; filter: drop-shadow(0 0 10px var(--glow-cyan));">
+            <h1 style="margin: 0;">DRIVER FINANCE</h1>
+        </div>
         <p>Gestão Financeira Inteligente</p>
         <button id="installButton" onclick="triggerInstallPrompt()" style="
             display: none;
             position: absolute;
             top: 20px;
             right: 20px;
-            background: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
             color: white;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 10px 16px;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(66, 103, 245, 0.3);
-        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        " onmouseover="this.style.background='rgba(255, 255, 255, 0.35)'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='scale(1)'">
             📲 Instalar App
         </button>
     </div>
@@ -2033,9 +2594,9 @@
 
         <!-- Seletor de Período -->
         <div class="period-selector">
-            <button class="period-btn active">HOJE</button>
-            <button class="period-btn">SEMANA</button>
-            <button class="period-btn">MÊS</button>
+            <button class="period-btn active" onclick="changePeriod('today')">HOJE</button>
+            <button class="period-btn" onclick="changePeriod('week')">SEMANA</button>
+            <button class="period-btn" onclick="changePeriod('month')">MÊS</button>
         </div>
 
         <!-- Cards Circulares de Progresso -->
@@ -2044,11 +2605,11 @@
                 <div class="circular-progress">
                     <svg width="120" height="120">
                         <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
-                        <circle class="circular-progress-fill green" cx="60" cy="60" r="52" 
-                                stroke-dasharray="326.73" stroke-dashoffset="245"></circle>
+                        <circle id="revenueCircle" class="circular-progress-fill green" cx="60" cy="60" r="52" 
+                                stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
                     </svg>
                     <div class="circular-progress-text">
-                        <div class="circular-progress-percent">25%</div>
+                        <div id="revenuePercent" class="circular-progress-percent">0%</div>
                         <div class="circular-progress-label">Meta</div>
                     </div>
                 </div>
@@ -2061,10 +2622,10 @@
                     <svg width="120" height="120">
                         <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
                         <circle id="expenseCircle" class="circular-progress-fill red" cx="60" cy="60" r="52" 
-                                stroke-dasharray="326.73" stroke-dashoffset="163"></circle>
+                                stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
                     </svg>
                     <div class="circular-progress-text">
-                        <div id="expensePercent" class="circular-progress-percent">50%</div>
+                        <div id="expensePercent" class="circular-progress-percent">0%</div>
                         <div class="circular-progress-label">Gastos</div>
                     </div>
                 </div>
@@ -2077,10 +2638,10 @@
                     <svg width="120" height="120">
                         <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
                         <circle id="profitCircle" class="circular-progress-fill blue" cx="60" cy="60" r="52" 
-                                stroke-dasharray="326.73" stroke-dashoffset="180"></circle>
+                                stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
                     </svg>
                     <div class="circular-progress-text">
-                        <div id="profitPercent" class="circular-progress-percent">45%</div>
+                        <div id="profitPercent" class="circular-progress-percent">0%</div>
                         <div class="circular-progress-label">Lucro</div>
                     </div>
                 </div>
@@ -2093,10 +2654,10 @@
                     <svg width="120" height="120">
                         <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
                         <circle id="tripsCircle" class="circular-progress-fill yellow" cx="60" cy="60" r="52" 
-                                stroke-dasharray="326.73" stroke-dashoffset="196"></circle>
+                                stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
                     </svg>
                     <div class="circular-progress-text">
-                        <div id="tripsPercent" class="circular-progress-percent">40%</div>
+                        <div id="tripsPercent" class="circular-progress-percent">0%</div>
                         <div class="circular-progress-label">Meta</div>
                     </div>
                 </div>
@@ -2129,6 +2690,155 @@
             </div>
         </div>
 
+        <!-- Controle de Quilometragem -->
+        <div class="km-control-section">
+            <div class="section-header">
+                <span>🚗</span> Controle de Quilometragem
+            </div>
+            
+            <div class="km-cards-grid">
+                <!-- KM Hoje -->
+                <div class="km-card">
+                    <div class="km-card-header">
+                        <span class="km-icon">📍</span>
+                        <span class="km-title">Hoje</span>
+                    </div>
+                    <div class="km-inputs">
+                        <div class="km-input-group">
+                            <label class="km-label">KM Inicial</label>
+                            <input type="number" id="kmInicial" class="km-input" placeholder="0" step="0.1">
+                        </div>
+                        <div class="km-input-group">
+                            <label class="km-label">KM Final</label>
+                            <input type="number" id="kmFinal" class="km-input" placeholder="0" step="0.1">
+                        </div>
+                    </div>
+                    <button class="btn-save-km" onclick="saveKmDay()">
+                        <span>✅</span> Salvar KM do Dia
+                    </button>
+                    <div class="km-result">
+                        <span class="km-result-label">Rodado Hoje:</span>
+                        <span class="km-result-value" id="kmRodadoHoje">0 km</span>
+                    </div>
+                </div>
+
+                <!-- KM Mês -->
+                <div class="km-card km-card-summary">
+                    <div class="km-card-header">
+                        <span class="km-icon">📊</span>
+                        <span class="km-title">Resumo do Mês</span>
+                    </div>
+                    <div class="km-stats">
+                        <div class="km-stat-item">
+                            <div class="km-stat-label">Total Rodado</div>
+                            <div class="km-stat-value" id="kmTotalMes">0 km</div>
+                        </div>
+                        <div class="km-stat-item">
+                            <div class="km-stat-label">Média Diária</div>
+                            <div class="km-stat-value" id="kmMediaDia">0 km</div>
+                        </div>
+                        <div class="km-stat-item">
+                            <div class="km-stat-label">Dias Trabalhados</div>
+                            <div class="km-stat-value" id="diasTrabalhados">0</div>
+                        </div>
+                    </div>
+                    <button class="btn-view-km-history" onclick="viewKmHistory()">
+                        <span>📋</span> Ver Histórico
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculadora de Combustível -->
+        <div class="fuel-control-section">
+            <div class="section-header">
+                <span>⛽</span> Calculadora de Combustível
+            </div>
+            
+            <div class="fuel-cards-grid">
+                <!-- Registrar Abastecimento -->
+                <div class="fuel-card">
+                    <div class="fuel-card-header">
+                        <span class="fuel-icon">⛽</span>
+                        <span class="fuel-title">Novo Abastecimento</span>
+                    </div>
+                    <div class="fuel-inputs">
+                        <div class="fuel-input-group">
+                            <label class="fuel-label">Litros</label>
+                            <input type="number" id="fuelLitros" class="fuel-input" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="fuel-input-group">
+                            <label class="fuel-label">Valor Total (R$)</label>
+                            <input type="number" id="fuelValor" class="fuel-input" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="fuel-input-group">
+                            <label class="fuel-label">KM Atual</label>
+                            <input type="number" id="fuelKmAtual" class="fuel-input" placeholder="0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="fuel-info-box">
+                        <div class="fuel-info-item">
+                            <span>Preço/Litro:</span>
+                            <span id="fuelPrecoLitro">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <button class="btn-save-fuel" onclick="saveFuelRecord()">
+                        <span>✅</span> Registrar Abastecimento
+                    </button>
+                </div>
+
+                <!-- Estatísticas de Combustível -->
+                <div class="fuel-card fuel-card-stats">
+                    <div class="fuel-card-header">
+                        <span class="fuel-icon">📊</span>
+                        <span class="fuel-title">Estatísticas</span>
+                    </div>
+                    <div class="fuel-stats">
+                        <div class="fuel-stat-item">
+                            <div class="fuel-stat-icon">📏</div>
+                            <div class="fuel-stat-content">
+                                <div class="fuel-stat-label">Consumo Médio</div>
+                                <div class="fuel-stat-value" id="fuelConsumoMedio">0 km/l</div>
+                            </div>
+                        </div>
+                        <div class="fuel-stat-item">
+                            <div class="fuel-stat-icon">💰</div>
+                            <div class="fuel-stat-content">
+                                <div class="fuel-stat-label">Custo por KM</div>
+                                <div class="fuel-stat-value" id="fuelCustoKm">R$ 0,00</div>
+                            </div>
+                        </div>
+                        <div class="fuel-stat-item">
+                            <div class="fuel-stat-icon">⛽</div>
+                            <div class="fuel-stat-content">
+                                <div class="fuel-stat-label">Total Gasto (Mês)</div>
+                                <div class="fuel-stat-value" id="fuelTotalMes">R$ 0,00</div>
+                            </div>
+                        </div>
+                        <div class="fuel-stat-item">
+                            <div class="fuel-stat-icon">📈</div>
+                            <div class="fuel-stat-content">
+                                <div class="fuel-stat-label">Preço Médio/Litro</div>
+                                <div class="fuel-stat-value" id="fuelPrecoMedio">R$ 0,00</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-view-fuel-history" onclick="viewFuelHistory()">
+                        <span>📋</span> Ver Histórico
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alerta de Consumo -->
+            <div id="fuelAlert" class="fuel-alert" style="display: none;">
+                <div class="fuel-alert-icon">⚠️</div>
+                <div class="fuel-alert-content">
+                    <div class="fuel-alert-title">Atenção ao Consumo!</div>
+                    <div class="fuel-alert-message" id="fuelAlertMessage"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Ações Rápidas -->
         <div class="actions">
             <button class="btn btn-primary" onclick="openModal('revenue')">
@@ -2139,9 +2849,6 @@
             </button>
             <button class="btn btn-secondary" onclick="openExportMenu()">
                 <span>📄</span> Exportar
-            </button>
-            <button class="btn btn-info" onclick="toggleTheme()">
-                <span>🌓</span> Tema
             </button>
         </div>
 
@@ -2541,6 +3248,36 @@
                     <button type="submit" class="btn btn-primary">Salvar</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal de Histórico de Combustível -->
+    <div id="fuelHistoryModal" class="modal" onclick="closeModalOnOutsideClick(event, 'fuelHistory')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>⛽</span> Histórico de Abastecimentos
+            </div>
+            <div id="fuelHistoryList" class="fuel-history-list">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('fuelHistory')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Histórico de KM -->
+    <div id="kmHistoryModal" class="modal" onclick="closeModalOnOutsideClick(event, 'kmHistory')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📋</span> Histórico de Quilometragem
+            </div>
+            <div id="kmHistoryList" class="km-history-list">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('kmHistory')">Fechar</button>
+            </div>
         </div>
     </div>
 

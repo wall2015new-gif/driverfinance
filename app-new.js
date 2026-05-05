@@ -1857,38 +1857,84 @@ console.log('💡 Dica: Pressione Ctrl+Shift+I para resetar o prompt de instala�
 function updateInstallButton() {
     const installButton = document.getElementById('installButton');
     
-    if (!installButton) return;
+    if (!installButton) {
+        console.log('⚠️ Botão de instalação não encontrado');
+        return;
+    }
     
-    // Verificar se já está instalado
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
+    // Verificar se já está instalado (múltiplas formas)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isIOSStandalone = window.navigator.standalone === true;
+    const isInstalled = isStandalone || isIOSStandalone;
+    
+    console.log('🔍 Status de instalação:', {
+        isStandalone,
+        isIOSStandalone,
+        isInstalled
+    });
     
     // Verificar se é mobile
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
+    // Ocultar botão se já está instalado
+    if (isInstalled) {
+        installButton.style.display = 'none';
+        console.log('✅ App instalado - botão ocultado');
+        return;
+    }
+    
     // Mostrar botão apenas se:
     // 1. Não está instalado
     // 2. É mobile OU tem o deferredPrompt disponível
-    if (!isInstalled && (isMobile || deferredPrompt)) {
+    if (isMobile || deferredPrompt) {
         installButton.style.display = 'block';
+        console.log('📱 Botão de instalação visível');
     } else {
         installButton.style.display = 'none';
+        console.log('🖥️ Desktop sem prompt - botão ocultado');
     }
 }
 
 // Atualizar botão ao carregar
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 DOM carregado - verificando botão de instalação');
     updateInstallButton();
+    
+    // Verificar novamente após 1 segundo (garantir que tudo carregou)
+    setTimeout(updateInstallButton, 1000);
 });
 
 // Atualizar botão quando o prompt estiver disponível
 window.addEventListener('beforeinstallprompt', () => {
+    console.log('📲 beforeinstallprompt - atualizando botão');
     setTimeout(updateInstallButton, 100);
 });
 
 // Ocultar botão quando instalar
 window.addEventListener('appinstalled', () => {
+    console.log('🎉 App instalado - ocultando botão');
     updateInstallButton();
+    
+    // Garantir que o botão foi ocultado
+    setTimeout(() => {
+        const installButton = document.getElementById('installButton');
+        if (installButton) {
+            installButton.style.display = 'none';
+        }
+    }, 500);
 });
+
+// Verificar a cada 5 segundos se o app foi instalado (fallback)
+setInterval(() => {
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isInstalled) {
+        const installButton = document.getElementById('installButton');
+        if (installButton && installButton.style.display !== 'none') {
+            console.log('🔄 Detectado app instalado - ocultando botão');
+            installButton.style.display = 'none';
+        }
+    }
+}, 5000);
 
 console.log('🔘 Botão de instalação no header configurado!');
 

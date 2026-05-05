@@ -1972,6 +1972,20 @@
                 transform: scale(0.95);
             }
         }
+        
+        /* Ocultar botão de instalação quando app está instalado */
+        @media (display-mode: standalone) {
+            #installButton {
+                display: none !important;
+            }
+        }
+        
+        /* iOS standalone */
+        @media (display-mode: fullscreen) {
+            #installButton {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>

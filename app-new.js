@@ -2330,8 +2330,6 @@ async function activateDriverMode() {
             badge: './img/logotipo.png',
             tag: 'driver-mode',
             requireInteraction: true,
-            silent: true,
-            vibrate: [200, 100, 200],
             actions: [
                 {
                     action: 'add-15',

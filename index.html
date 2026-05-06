@@ -4018,6 +4018,29 @@
                         💡 Informe quantas corridas foram feitas neste valor
                     </small>
                 </div>
+                
+                <!-- Horários de Trabalho -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">⏰ Início</label>
+                        <input type="time" class="form-input" id="revenueStartTime" onchange="calculateWorkTime()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">🏁 Fim</label>
+                        <input type="time" class="form-input" id="revenueEndTime" onchange="calculateWorkTime()">
+                    </div>
+                </div>
+                
+                <!-- Tempo Calculado -->
+                <div id="workTimeDisplay" style="display: none; padding: 12px; background: var(--bg-tertiary); border-radius: 10px; margin-bottom: 16px; text-align: center;">
+                    <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px;">
+                        ⏱️ TEMPO TRABALHADO
+                    </div>
+                    <div id="workTimeValue" style="font-size: 20px; font-weight: 900; color: var(--logo-blue);">
+                        0h 0min
+                    </div>
+                </div>
+                
                 <div class="form-group">
                     <label class="form-label">App</label>
                     <select class="form-select" id="revenueApp" required>

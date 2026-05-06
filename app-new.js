@@ -431,21 +431,67 @@ function initializeForms() {
     if (expenseDate) expenseDate.value = today;
 }
 
+// Calcular tempo trabalhado
+function calculateWorkTime() {
+    const startTime = document.getElementById('revenueStartTime').value;
+    const endTime = document.getElementById('revenueEndTime').value;
+    const display = document.getElementById('workTimeDisplay');
+    const valueEl = document.getElementById('workTimeValue');
+    
+    if (startTime && endTime) {
+        // Converter para minutos
+        const [startHour, startMin] = startTime.split(':').map(Number);
+        const [endHour, endMin] = endTime.split(':').map(Number);
+        
+        let startTotalMin = startHour * 60 + startMin;
+        let endTotalMin = endHour * 60 + endMin;
+        
+        // Se o horário final for menor, assumir que passou da meia-noite
+        if (endTotalMin < startTotalMin) {
+            endTotalMin += 24 * 60; // Adicionar 24 horas
+        }
+        
+        const diffMin = endTotalMin - startTotalMin;
+        const hours = Math.floor(diffMin / 60);
+        const minutes = diffMin % 60;
+        
+        valueEl.textContent = `${hours}h ${minutes}min`;
+        display.style.display = 'block';
+        
+        return { hours, minutes, totalMinutes: diffMin };
+    } else {
+        display.style.display = 'none';
+        return null;
+    }
+}
+
 function addRevenue(event) {
     event.preventDefault();
     
     const trips = parseInt(document.getElementById('revenueTrips').value) || 1;
+    const startTime = document.getElementById('revenueStartTime').value;
+    const endTime = document.getElementById('revenueEndTime').value;
     
     const transaction = {
         id: Date.now(),
         type: 'revenue',
         amount: document.getElementById('revenueValue').value,
         trips: trips, // Quantidade de corridas
+        startTime: startTime || null, // Horário de início
+        endTime: endTime || null, // Horário de fim
         app: document.getElementById('revenueApp').value,
         description: document.getElementById('revenueDesc').value,
         date: document.getElementById('revenueDate').value,
         category: 'revenue'
     };
+    
+    // Calcular tempo trabalhado se ambos os horários foram informados
+    if (startTime && endTime) {
+        const workTime = calculateWorkTime();
+        if (workTime) {
+            transaction.workTime = workTime;
+        }
+    }
     
     transactions.push(transaction);
     transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -454,6 +500,9 @@ function addRevenue(event) {
     closeModal('revenue');
     event.target.reset();
     initializeForms();
+    
+    // Esconder o display de tempo
+    document.getElementById('workTimeDisplay').style.display = 'none';
     
     updateCircularProgress();
     createWeeklyChart();
@@ -520,21 +569,47 @@ function renderTransactions() {
         other: 'Outros'
     };
     
-    container.innerHTML = transactions.map(transaction => `
-        <div class="transaction-item">
-            <div class="transaction-info">
-                <div class="transaction-date">${formatDate(transaction.date)}</div>
-                <div class="transaction-desc">${categoryIcons[transaction.category] || '💰'} ${transaction.description}</div>
-                <div class="transaction-category">${categoryNames[transaction.category] || 'Outros'}</div>
+    container.innerHTML = transactions.map(transaction => {
+        // Montar informações adicionais para receitas
+        let additionalInfo = '';
+        if (transaction.type === 'revenue') {
+            const details = [];
+            
+            // Quantidade de corridas
+            if (transaction.trips && transaction.trips > 1) {
+                details.push(`${transaction.trips} corridas`);
+            }
+            
+            // Tempo trabalhado
+            if (transaction.startTime && transaction.endTime) {
+                details.push(`⏱️ ${transaction.startTime} - ${transaction.endTime}`);
+                if (transaction.workTime) {
+                    details.push(`(${transaction.workTime.hours}h ${transaction.workTime.minutes}min)`);
+                }
+            }
+            
+            if (details.length > 0) {
+                additionalInfo = `<div style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px;">${details.join(' • ')}</div>`;
+            }
+        }
+        
+        return `
+            <div class="transaction-item">
+                <div class="transaction-info">
+                    <div class="transaction-date">${formatDate(transaction.date)}</div>
+                    <div class="transaction-desc">${categoryIcons[transaction.category] || '💰'} ${transaction.description}</div>
+                    <div class="transaction-category">${categoryNames[transaction.category] || 'Outros'}</div>
+                    ${additionalInfo}
+                </div>
+                <div class="transaction-value ${transaction.type}">
+                    ${transaction.type === 'revenue' ? '+' : '-'} ${formatCurrency(transaction.amount)}
+                </div>
+                <div class="transaction-actions">
+                    <button class="btn-icon" onclick="deleteTransaction(${transaction.id})">🗑️</button>
+                </div>
             </div>
-            <div class="transaction-value ${transaction.type}">
-                ${transaction.type === 'revenue' ? '+' : '-'} ${formatCurrency(transaction.amount)}
-            </div>
-            <div class="transaction-actions">
-                <button class="btn-icon" onclick="deleteTransaction(${transaction.id})">🗑️</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function deleteTransaction(id) {

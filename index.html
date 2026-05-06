@@ -2678,68 +2678,6 @@
             transform: scale(0.95);
         }
 
-        /* Botão Flutuante de Adição Rápida */
-        .fab-quick-add {
-            position: fixed;
-            bottom: 160px;
-            right: 20px;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--logo-green) 0%, var(--logo-green-light) 100%);
-            color: white;
-            border: none;
-            font-size: 32px;
-            cursor: pointer;
-            box-shadow: 0 6px 16px var(--glow-green);
-            transition: all 0.3s;
-            z-index: 100;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 6px 16px var(--glow-green);
-            }
-            50% {
-                box-shadow: 0 6px 24px var(--glow-green-light);
-            }
-        }
-
-        .fab-quick-add:hover {
-            transform: scale(1.15);
-            box-shadow: 0 8px 24px var(--glow-green-light);
-            animation: none;
-        }
-
-        .fab-quick-add:active {
-            transform: scale(0.95);
-        }
-
-        /* Botões de Valor Rápido */
-        .quick-value-btn {
-            background: var(--bg-tertiary);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 16px 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Inter', sans-serif;
-            color: var(--text-primary);
-        }
-
-        .quick-value-btn:hover {
-            background: var(--logo-green);
-            border-color: var(--logo-green);
-            color: white;
-            transform: translateY(-4px);
-            box-shadow: 0 6px 16px var(--glow-green);
-        }
-
-        .quick-value-btn:active {
-            transform: translateY(-2px) scale(0.95);
-        }
-
         @media (max-width: 768px) {
             .fab {
                 bottom: 80px;
@@ -3711,18 +3649,6 @@
                 </div>
             </div>
         </div>
-
-
-
-        <!-- Ações Rápidas -->
-        <div class="actions">
-            <button class="btn btn-primary" onclick="openModal('revenue')">
-                <span>💵</span> Receita
-            </button>
-            <button class="btn btn-danger" onclick="openModal('expense')">
-                <span>💸</span> Despesa
-            </button>
-        </div>
     </div>
 
 
@@ -3843,18 +3769,6 @@
             <div class="app-chart-container">
                 <canvas id="appComparisonChart"></canvas>
             </div>
-        </div>
-
-
-
-        <!-- Ações Rápidas -->
-        <div class="actions">
-            <button class="btn btn-primary" onclick="openModal('revenue')">
-                <span>💵</span> Receita
-            </button>
-            <button class="btn btn-danger" onclick="openModal('expense')">
-                <span>💸</span> Despesa
-            </button>
         </div>
     </div>
 
@@ -4385,86 +4299,12 @@
         </div>
     </div>
 
-    <!-- Botão Flutuante de Adição Rápida -->
-    <button class="fab-quick-add" onclick="openQuickAddModal()" title="Adicionar Corrida Rápida">
-        💰
-    </button>
-
     <!-- Botão Flutuante de Notificações -->
     <button class="fab" onclick="openModal('notifications')" title="Notificações">
         🔔
     </button>
 
     <!-- Modal de Adição Rápida -->
-    <div id="quickAddModal" class="modal" onclick="closeModalOnOutsideClick(event, 'quickAdd')">
-        <div class="modal-content" style="max-width: 400px;">
-            <div class="modal-header">💰 Adicionar Corrida Rápida</div>
-            
-            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; text-align: center;">
-                Selecione um valor ou digite personalizado
-            </p>
-            
-            <!-- Botões de Valor Rápido -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;">
-                <button class="quick-value-btn" onclick="addQuickRevenue(10)">
-                    <div style="font-size: 24px; margin-bottom: 4px;">💵</div>
-                    <div style="font-size: 18px; font-weight: 900;">R$ 10</div>
-                </button>
-                <button class="quick-value-btn" onclick="addQuickRevenue(15)">
-                    <div style="font-size: 24px; margin-bottom: 4px;">💵</div>
-                    <div style="font-size: 18px; font-weight: 900;">R$ 15</div>
-                </button>
-                <button class="quick-value-btn" onclick="addQuickRevenue(20)">
-                    <div style="font-size: 24px; margin-bottom: 4px;">💵</div>
-                    <div style="font-size: 18px; font-weight: 900;">R$ 20</div>
-                </button>
-                <button class="quick-value-btn" onclick="addQuickRevenue(25)">
-                    <div style="font-size: 24px; margin-bottom: 4px;">💵</div>
-                    <div style="font-size: 18px; font-weight: 900;">R$ 25</div>
-                </button>
-                <button class="quick-value-btn" onclick="addQuickRevenue(30)">
-                    <div style="font-size: 24px; margin-bottom: 4px;">💵</div>
-                    <div style="font-size: 18px; font-weight: 900;">R$ 30</div>
-                </button>
-                <button class="quick-value-btn" onclick="addQuickRevenue(35)">
-                    <div style="font-size: 24px; margin-bottom: 4px;">💵</div>
-                    <div style="font-size: 18px; font-weight: 900;">R$ 35</div>
-                </button>
-            </div>
-            
-            <!-- Separador -->
-            <div style="text-align: center; margin: 20px 0; color: var(--text-tertiary); font-size: 12px; font-weight: 600;">
-                OU DIGITE O VALOR
-            </div>
-            
-            <!-- Valor Personalizado -->
-            <form onsubmit="addCustomQuickRevenue(event)">
-                <div class="form-group">
-                    <label class="form-label">💰 Valor da Corrida</label>
-                    <input 
-                        type="number" 
-                        id="quickRevenueValue" 
-                        class="form-input" 
-                        placeholder="Ex: 18.50"
-                        step="0.01"
-                        min="0"
-                        required
-                        style="font-size: 20px; font-weight: 700; text-align: center;"
-                    >
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('quickAdd')">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        ✅ Adicionar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script src="app-new.js"></script>
 </body>
 </html>

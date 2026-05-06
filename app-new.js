@@ -56,7 +56,8 @@ function updateCircularProgress() {
     const totalRevenue = revenues.reduce((sum, t) => sum + parseFloat(t.amount), 0);
     const totalExpense = expenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
     const profit = totalRevenue - totalExpense;
-    const trips = revenues.length;
+    // Somar a quantidade de corridas de cada receita
+    const trips = revenues.reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
     
     console.log('💰 Totais:', { totalRevenue, totalExpense, profit, trips });
     
@@ -433,10 +434,13 @@ function initializeForms() {
 function addRevenue(event) {
     event.preventDefault();
     
+    const trips = parseInt(document.getElementById('revenueTrips').value) || 1;
+    
     const transaction = {
         id: Date.now(),
         type: 'revenue',
         amount: document.getElementById('revenueValue').value,
+        trips: trips, // Quantidade de corridas
         app: document.getElementById('revenueApp').value,
         description: document.getElementById('revenueDesc').value,
         date: document.getElementById('revenueDate').value,
@@ -744,9 +748,10 @@ function updateGoals() {
         .filter(t => t.type === 'revenue' && new Date(t.date) >= monthStart)
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
     
+    // Somar a quantidade de corridas de cada receita do mês
     const monthlyTrips = transactions
         .filter(t => t.type === 'revenue' && new Date(t.date) >= monthStart)
-        .length;
+        .reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
     
     // Atualizar metas
     updateGoalCard('Daily', goals.daily, dailyRevenue, true);
@@ -807,7 +812,10 @@ function renderAchievements() {
         .filter(t => t.type === 'revenue')
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
     
-    const totalTrips = transactions.filter(t => t.type === 'revenue').length;
+    // Somar a quantidade de corridas de todas as receitas
+    const totalTrips = transactions
+        .filter(t => t.type === 'revenue')
+        .reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
     
     const achievements = [
         { icon: '🎯', name: 'Primeira Corrida', desc: 'Complete sua primeira corrida', unlocked: totalTrips >= 1 },
@@ -850,7 +858,8 @@ function updateReports() {
     
     // Atualizar análise
     const avgDaily = totalRevenue / Math.max(1, revenues.length);
-    const totalTrips = revenues.length;
+    // Somar a quantidade de corridas de cada receita
+    const totalTrips = revenues.reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
     const avgTicket = totalRevenue / Math.max(1, totalTrips);
     
     const avgDailyEl = document.getElementById('avgDaily');
@@ -3256,7 +3265,9 @@ function updateAppComparator() {
     monthRevenues.forEach(transaction => {
         const app = transaction.app || 'outros';
         if (appStats[app]) {
-            appStats[app].trips++;
+            // Somar a quantidade de corridas informada
+            const trips = parseInt(transaction.trips) || 1;
+            appStats[app].trips += trips;
             appStats[app].revenue += parseFloat(transaction.amount);
         }
     });

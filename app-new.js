@@ -381,6 +381,14 @@ function switchPage(pageName) {
     } else if (pageName === 'history') {
         console.log('📜 Atualizando histórico...');
         renderTransactions();
+    } else if (pageName === 'vehicle') {
+        console.log('🚗 Atualizando página do veículo...');
+        updateKmDisplay();
+        updateFuelStats();
+        updateMaintenanceList();
+    } else if (pageName === 'apps') {
+        console.log('📱 Atualizando comparador de apps...');
+        updateAppComparator();
     }
 }
 

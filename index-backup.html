@@ -3384,81 +3384,6 @@
             </div>
         </div>
 
-        <!-- Ações Rápidas -->
-        <div class="actions">
-            <button class="btn btn-primary" onclick="openModal('revenue')">
-                <span>💵</span> Receita
-            </button>
-            <button class="btn btn-danger" onclick="openModal('expense')">
-                <span>💸</span> Despesa
-            </button>
-            <button class="btn btn-secondary" onclick="openExportMenu()">
-                <span>📄</span> Exportar
-            </button>
-        </div>
-
-        <!-- Gráfico de Barras -->
-        <div class="chart-container">
-            <div class="chart-header">
-                <span>📊</span> Evolução Semanal
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="weeklyChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Estatísticas Detalhadas -->
-        <div class="stats-section">
-            <div class="section-header">
-                <span>📈</span> Estatísticas
-            </div>
-            <div class="stats-detail-grid">
-                <div class="stat-detail-card">
-                    <div class="stat-detail-label">Online</div>
-                    <div class="stat-detail-value">87h 6m</div>
-                </div>
-                <div class="stat-detail-card">
-                    <div class="stat-detail-label">Viagens</div>
-                    <div class="stat-detail-value">170</div>
-                </div>
-                <div class="stat-detail-card">
-                    <div class="stat-detail-label">Pontos</div>
-                    <div class="stat-detail-value">214</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Detalhamento -->
-        <div class="detail-section">
-            <div class="section-header">
-                <span>💰</span> Detalhamento
-            </div>
-            <div class="detail-list">
-                <div class="detail-item">
-                    <div class="detail-item-label">Valor líquido</div>
-                    <div class="detail-item-value">R$ 4.450,12</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-item-label">Promoções</div>
-                    <div class="detail-item-value">R$ 494,00</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-item-label">Outros ganhos</div>
-                    <div class="detail-item-value">R$ 4,17</div>
-                </div>
-            </div>
-        </div>
-        </div>
-        <!-- Fim da Página Dashboard -->
-
-
-    <!-- Página Veículo -->
-    <div id="page-vehicle" class="page">
-        <div class="page-header">
-            <h2>🚗 Veículo</h2>
-            <p>Controle de KM, Combustível e Manutenção</p>
-        </div>
-
         <!-- Controle de Quilometragem -->
         <div class="km-control-section">
             <div class="section-header">
@@ -3536,7 +3461,6 @@
                 </div>
             </div>
         </div>
-
 
         <!-- Calculadora de Combustível -->
         <div class="fuel-control-section">
@@ -3628,7 +3552,6 @@
             </div>
         </div>
 
-
         <!-- Controle de Manutenção -->
         <div class="maintenance-control-section">
             <div class="section-header">
@@ -3712,8 +3635,6 @@
             </div>
         </div>
 
-
-
         <!-- Ações Rápidas -->
         <div class="actions">
             <button class="btn btn-primary" onclick="openModal('revenue')">
@@ -3722,15 +3643,9 @@
             <button class="btn btn-danger" onclick="openModal('expense')">
                 <span>💸</span> Despesa
             </button>
-        </div>
-    </div>
-
-
-    <!-- Página Apps -->
-    <div id="page-apps" class="page">
-        <div class="page-header">
-            <h2>📱 Comparador de Apps</h2>
-            <p>Compare o desempenho entre Uber, 99, InDrive e outros</p>
+            <button class="btn btn-secondary" onclick="openExportMenu()">
+                <span>📄</span> Exportar
+            </button>
         </div>
 
         <!-- Comparador de Apps -->
@@ -3845,18 +3760,59 @@
             </div>
         </div>
 
-
-
-        <!-- Ações Rápidas -->
-        <div class="actions">
-            <button class="btn btn-primary" onclick="openModal('revenue')">
-                <span>💵</span> Receita
-            </button>
-            <button class="btn btn-danger" onclick="openModal('expense')">
-                <span>💸</span> Despesa
-            </button>
+        <!-- Gráfico de Barras -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <span>📊</span> Evolução Semanal
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="weeklyChart"></canvas>
+            </div>
         </div>
-    </div>
+
+        <!-- Estatísticas Detalhadas -->
+        <div class="stats-section">
+            <div class="section-header">
+                <span>📈</span> Estatísticas
+            </div>
+            <div class="stats-detail-grid">
+                <div class="stat-detail-card">
+                    <div class="stat-detail-label">Online</div>
+                    <div class="stat-detail-value">87h 6m</div>
+                </div>
+                <div class="stat-detail-card">
+                    <div class="stat-detail-label">Viagens</div>
+                    <div class="stat-detail-value">170</div>
+                </div>
+                <div class="stat-detail-card">
+                    <div class="stat-detail-label">Pontos</div>
+                    <div class="stat-detail-value">214</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalhamento -->
+        <div class="detail-section">
+            <div class="section-header">
+                <span>💰</span> Detalhamento
+            </div>
+            <div class="detail-list">
+                <div class="detail-item">
+                    <div class="detail-item-label">Valor líquido</div>
+                    <div class="detail-item-value">R$ 4.450,12</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-item-label">Promoções</div>
+                    <div class="detail-item-value">R$ 494,00</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-item-label">Outros ganhos</div>
+                    <div class="detail-item-value">R$ 4,17</div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <!-- Fim da Página Dashboard -->
 
         <!-- Página de Histórico -->
         <div id="page-history" class="page">
@@ -4104,14 +4060,6 @@
         <div class="nav-item active" onclick="switchPage('dashboard')">
             <div class="nav-icon">📊</div>
             Dashboard
-        </div>
-        <div class="nav-item" onclick="switchPage('vehicle')">
-            <div class="nav-icon">🚗</div>
-            Veículo
-        </div>
-        <div class="nav-item" onclick="switchPage('apps')">
-            <div class="nav-icon">📱</div>
-            Apps
         </div>
         <div class="nav-item" onclick="switchPage('history')">
             <div class="nav-icon">📜</div>

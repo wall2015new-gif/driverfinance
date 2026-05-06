@@ -2754,6 +2754,350 @@ function viewFuelHistory() {
 
 console.log('⛽ Calculadora de combustível carregada!');
 
+// ========== CONTROLE DE MANUTENÇÃO ==========
+
+let maintenanceData = JSON.parse(localStorage.getItem('maintenanceData')) || [];
+
+// Tipos de manutenção com ícones
+const maintenanceTypes = {
+    'oil': { name: 'Troca de Óleo', icon: '🛢️', defaultInterval: 5000 },
+    'oil-filter': { name: 'Filtro de Óleo', icon: '🔧', defaultInterval: 5000 },
+    'air-filter': { name: 'Filtro de Ar', icon: '💨', defaultInterval: 10000 },
+    'fuel-filter': { name: 'Filtro de Combustível', icon: '⛽', defaultInterval: 20000 },
+    'cabin-filter': { name: 'Filtro de Cabine', icon: '🌬️', defaultInterval: 10000 },
+    'tires': { name: 'Pneus', icon: '🛞', defaultInterval: 40000 },
+    'brakes': { name: 'Freios', icon: '🛑', defaultInterval: 30000 },
+    'battery': { name: 'Bateria', icon: '🔋', defaultInterval: 50000 },
+    'alignment': { name: 'Alinhamento', icon: '📐', defaultInterval: 10000 },
+    'balancing': { name: 'Balanceamento', icon: '⚖️', defaultInterval: 10000 },
+    'suspension': { name: 'Suspensão', icon: '🔩', defaultInterval: 30000 },
+    'other': { name: 'Outros', icon: '🔧', defaultInterval: 10000 }
+};
+
+// Salvar registro de manutenção
+function saveMaintenanceRecord() {
+    const type = document.getElementById('maintenanceType').value;
+    const date = document.getElementById('maintenanceDate').value;
+    const currentKm = parseFloat(document.getElementById('maintenanceCurrentKm').value) || 0;
+    const nextKm = parseFloat(document.getElementById('maintenanceNextKm').value) || 0;
+    const cost = parseFloat(document.getElementById('maintenanceCost').value) || 0;
+    const notes = document.getElementById('maintenanceNotes').value;
+    
+    if (!type || !date || currentKm === 0 || nextKm === 0) {
+        showNotification('⚠️ Preencha todos os campos obrigatórios!', 'info');
+        return;
+    }
+    
+    if (nextKm <= currentKm) {
+        showNotification('⚠️ KM da próxima troca deve ser maior que o KM atual!', 'info');
+        return;
+    }
+    
+    const newRecord = {
+        id: Date.now(),
+        type: type,
+        date: date,
+        currentKm: currentKm,
+        nextKm: nextKm,
+        cost: cost,
+        notes: notes,
+        completed: false
+    };
+    
+    maintenanceData.push(newRecord);
+    
+    // Ordenar por próxima troca (mais urgente primeiro)
+    maintenanceData.sort((a, b) => a.nextKm - b.nextKm);
+    
+    // Salvar no localStorage
+    localStorage.setItem('maintenanceData', JSON.stringify(maintenanceData));
+    
+    // Limpar formulário
+    document.getElementById('maintenanceType').value = '';
+    document.getElementById('maintenanceDate').value = '';
+    document.getElementById('maintenanceCurrentKm').value = '';
+    document.getElementById('maintenanceNextKm').value = '';
+    document.getElementById('maintenanceCost').value = '';
+    document.getElementById('maintenanceNotes').value = '';
+    
+    // Atualizar interface
+    updateMaintenanceDisplay();
+    
+    // Feedback
+    const typeName = maintenanceTypes[type].name;
+    showNotification(`✅ ${typeName} registrada com sucesso!`, 'success');
+    
+    // Vibrar no mobile
+    if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100]);
+    }
+    
+    // Verificar alertas
+    checkMaintenanceAlerts();
+}
+
+// Atualizar display de manutenções
+function updateMaintenanceDisplay() {
+    const list = document.getElementById('maintenanceList');
+    
+    if (!list) return;
+    
+    // Filtrar apenas manutenções ativas (não completadas)
+    const activeMaintenances = maintenanceData.filter(m => !m.completed);
+    
+    if (activeMaintenances.length === 0) {
+        list.innerHTML = '<div class="empty-state">📭 Nenhuma manutenção registrada</div>';
+        return;
+    }
+    
+    // Pegar KM atual do último registro de KM
+    const kmData = JSON.parse(localStorage.getItem('kmData')) || [];
+    let currentKm = 0;
+    if (kmData.length > 0) {
+        const lastKm = kmData[kmData.length - 1];
+        currentKm = lastKm.kmFinal || 0;
+    }
+    
+    list.innerHTML = activeMaintenances.map(maintenance => {
+        const typeInfo = maintenanceTypes[maintenance.type];
+        const kmRemaining = maintenance.nextKm - currentKm;
+        const kmTotal = maintenance.nextKm - maintenance.currentKm;
+        const progress = currentKm > maintenance.currentKm 
+            ? Math.min(((currentKm - maintenance.currentKm) / kmTotal) * 100, 100)
+            : 0;
+        
+        // Determinar status
+        let status = 'ok';
+        let statusText = '✅ Em dia';
+        let progressClass = '';
+        
+        if (kmRemaining <= 0) {
+            status = 'urgent';
+            statusText = '🚨 Atrasado!';
+            progressClass = 'danger';
+        } else if (kmRemaining <= 500) {
+            status = 'urgent';
+            statusText = '⚠️ Urgente!';
+            progressClass = 'danger';
+        } else if (kmRemaining <= 1000) {
+            status = 'warning';
+            statusText = '⚠️ Atenção';
+            progressClass = 'warning';
+        }
+        
+        return `
+            <div class="maintenance-item">
+                <div class="maintenance-item-header">
+                    <div class="maintenance-item-type">
+                        ${typeInfo.icon} ${typeInfo.name}
+                    </div>
+                    <div class="maintenance-item-date">
+                        ${formatDate(maintenance.date)}
+                    </div>
+                </div>
+                <div class="maintenance-item-details">
+                    <div class="maintenance-detail">
+                        <div class="maintenance-detail-label">KM Atual</div>
+                        <div class="maintenance-detail-value">${currentKm.toFixed(0)} km</div>
+                    </div>
+                    <div class="maintenance-detail">
+                        <div class="maintenance-detail-label">Próxima Troca</div>
+                        <div class="maintenance-detail-value">${maintenance.nextKm.toFixed(0)} km</div>
+                    </div>
+                    <div class="maintenance-detail">
+                        <div class="maintenance-detail-label">Faltam</div>
+                        <div class="maintenance-detail-value">${Math.max(0, kmRemaining).toFixed(0)} km</div>
+                    </div>
+                    ${maintenance.cost > 0 ? `
+                    <div class="maintenance-detail">
+                        <div class="maintenance-detail-label">Custo</div>
+                        <div class="maintenance-detail-value">${formatCurrency(maintenance.cost)}</div>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="maintenance-progress-bar">
+                    <div class="maintenance-progress-fill ${progressClass}" style="width: ${progress}%"></div>
+                </div>
+                <div class="maintenance-status ${status}">${statusText}</div>
+            </div>
+        `;
+    }).join('');
+    
+    // Verificar alertas
+    checkMaintenanceAlerts();
+}
+
+// Verificar alertas de manutenção
+function checkMaintenanceAlerts() {
+    const alertEl = document.getElementById('maintenanceAlert');
+    const alertMessageEl = document.getElementById('maintenanceAlertMessage');
+    
+    if (!alertEl || !alertMessageEl) return;
+    
+    // Pegar KM atual
+    const kmData = JSON.parse(localStorage.getItem('kmData')) || [];
+    let currentKm = 0;
+    if (kmData.length > 0) {
+        const lastKm = kmData[kmData.length - 1];
+        currentKm = lastKm.kmFinal || 0;
+    }
+    
+    // Filtrar manutenções urgentes
+    const urgentMaintenances = maintenanceData.filter(m => {
+        if (m.completed) return false;
+        const kmRemaining = m.nextKm - currentKm;
+        return kmRemaining <= 500;
+    });
+    
+    if (urgentMaintenances.length === 0) {
+        alertEl.style.display = 'none';
+        return;
+    }
+    
+    // Mostrar alerta
+    alertEl.style.display = 'flex';
+    
+    if (urgentMaintenances.length === 1) {
+        const m = urgentMaintenances[0];
+        const typeInfo = maintenanceTypes[m.type];
+        const kmRemaining = m.nextKm - currentKm;
+        
+        if (kmRemaining <= 0) {
+            alertMessageEl.textContent = `${typeInfo.name} está atrasada! Você já passou ${Math.abs(kmRemaining).toFixed(0)} km da troca.`;
+        } else {
+            alertMessageEl.textContent = `${typeInfo.name} precisa ser feita em breve! Faltam apenas ${kmRemaining.toFixed(0)} km.`;
+        }
+    } else {
+        alertMessageEl.textContent = `Você tem ${urgentMaintenances.length} manutenções urgentes! Verifique a lista.`;
+    }
+    
+    // Enviar notificação se suportado
+    sendMaintenanceNotification(urgentMaintenances);
+}
+
+// Enviar notificação de manutenção
+function sendMaintenanceNotification(urgentMaintenances) {
+    if (Notification.permission !== 'granted') return;
+    if (urgentMaintenances.length === 0) return;
+    
+    // Verificar se já enviou notificação hoje
+    const lastNotification = localStorage.getItem('last_maintenance_notification');
+    const today = new Date().toISOString().split('T')[0];
+    
+    if (lastNotification === today) return;
+    
+    // Enviar notificação
+    const m = urgentMaintenances[0];
+    const typeInfo = maintenanceTypes[m.type];
+    
+    new Notification('🔧 Manutenção Urgente!', {
+        body: `${typeInfo.name} precisa ser feita em breve!`,
+        icon: './img/logotipo.png',
+        badge: './img/logotipo.png',
+        vibrate: [200, 100, 200, 100, 200],
+        tag: 'maintenance-alert'
+    });
+    
+    localStorage.setItem('last_maintenance_notification', today);
+}
+
+// Ver histórico de manutenção
+function viewMaintenanceHistory() {
+    const modal = document.getElementById('maintenanceHistoryModal');
+    const list = document.getElementById('maintenanceHistoryList');
+    
+    if (!modal || !list) return;
+    
+    if (maintenanceData.length === 0) {
+        list.innerHTML = '<div class="empty-state">📭 Nenhuma manutenção registrada ainda</div>';
+    } else {
+        // Ordenar por data (mais recente primeiro)
+        const sortedData = [...maintenanceData].sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        list.innerHTML = sortedData.map(maintenance => {
+            const typeInfo = maintenanceTypes[maintenance.type];
+            const date = new Date(maintenance.date + 'T00:00:00');
+            const dateStr = date.toLocaleDateString('pt-BR', { 
+                weekday: 'short', 
+                day: '2-digit', 
+                month: 'short',
+                year: 'numeric'
+            });
+            
+            return `
+                <div class="maintenance-history-item">
+                    <div class="maintenance-history-info">
+                        <div class="maintenance-history-type">
+                            ${typeInfo.icon} ${typeInfo.name}
+                        </div>
+                        <div class="maintenance-history-date">${dateStr}</div>
+                        <div class="maintenance-history-details">
+                            KM: ${maintenance.currentKm.toFixed(0)} → ${maintenance.nextKm.toFixed(0)}
+                            ${maintenance.cost > 0 ? ` • Custo: ${formatCurrency(maintenance.cost)}` : ''}
+                            ${maintenance.notes ? ` • ${maintenance.notes}` : ''}
+                        </div>
+                    </div>
+                    <div class="maintenance-history-actions">
+                        <button class="btn-delete-maintenance" onclick="deleteMaintenanceRecord(${maintenance.id})">
+                            🗑️ Excluir
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    modal.classList.add('active');
+}
+
+// Excluir registro de manutenção
+function deleteMaintenanceRecord(id) {
+    if (confirm('Tem certeza que deseja excluir este registro de manutenção?')) {
+        maintenanceData = maintenanceData.filter(m => m.id !== id);
+        localStorage.setItem('maintenanceData', JSON.stringify(maintenanceData));
+        
+        updateMaintenanceDisplay();
+        viewMaintenanceHistory(); // Atualizar modal se estiver aberto
+        
+        showNotification('✅ Registro de manutenção excluído!', 'success');
+    }
+}
+
+// Marcar manutenção como completada
+function completeMaintenanceRecord(id) {
+    const maintenance = maintenanceData.find(m => m.id === id);
+    if (maintenance) {
+        maintenance.completed = true;
+        localStorage.setItem('maintenanceData', JSON.stringify(maintenanceData));
+        
+        updateMaintenanceDisplay();
+        showNotification('✅ Manutenção marcada como completada!', 'success');
+    }
+}
+
+// Inicializar manutenção ao carregar
+document.addEventListener('DOMContentLoaded', function() {
+    const maintenanceDateInput = document.getElementById('maintenanceDate');
+    if (maintenanceDateInput) {
+        maintenanceDateInput.value = new Date().toISOString().split('T')[0];
+    }
+    
+    updateMaintenanceDisplay();
+});
+
+// Atualizar manutenção quando KM mudar
+const originalSaveKmDay = saveKmDay;
+if (typeof saveKmDay === 'function') {
+    saveKmDay = function() {
+        originalSaveKmDay();
+        setTimeout(() => {
+            updateMaintenanceDisplay();
+        }, 500);
+    };
+}
+
+console.log('🔧 Sistema de controle de manutenção carregado!');
+
 // ========== COMPARADOR DE APPS ==========
 
 let appComparisonChart = null;

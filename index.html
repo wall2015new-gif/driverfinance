@@ -1004,6 +1004,419 @@
             margin-top: 4px;
         }
 
+        /* Controle de Manutenção */
+        .maintenance-control-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px var(--shadow);
+        }
+
+        .maintenance-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .maintenance-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .maintenance-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--shadow-hover);
+        }
+
+        .maintenance-card-add {
+            background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+            color: white;
+            border: none;
+        }
+
+        .maintenance-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .maintenance-icon {
+            font-size: 24px;
+        }
+
+        .maintenance-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .maintenance-card-add .maintenance-title {
+            color: white;
+        }
+
+        .maintenance-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .maintenance-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .maintenance-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .maintenance-card-add .maintenance-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .maintenance-input,
+        .maintenance-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .maintenance-card-add .maintenance-input,
+        .maintenance-card-add .maintenance-select {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .maintenance-card-add .maintenance-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .maintenance-input:focus,
+        .maintenance-select:focus {
+            outline: none;
+            border-color: #9c27b0;
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+        }
+
+        .maintenance-card-add .maintenance-input:focus,
+        .maintenance-card-add .maintenance-select:focus {
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-save-maintenance {
+            width: 100%;
+            padding: 14px;
+            background: #9c27b0;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-save-maintenance:hover {
+            background: #7b1fa2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.4);
+        }
+
+        .btn-save-maintenance:active {
+            transform: translateY(0);
+        }
+
+        .maintenance-card-add .btn-save-maintenance {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .maintenance-card-add .btn-save-maintenance:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Lista de Manutenções */
+        .maintenance-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .maintenance-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .maintenance-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .maintenance-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .maintenance-item-type {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .maintenance-item-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .maintenance-item-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .maintenance-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .maintenance-detail-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .maintenance-detail-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .maintenance-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .maintenance-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .maintenance-progress-fill.warning {
+            background: linear-gradient(90deg, #FFC107 0%, #FFB300 100%);
+        }
+
+        .maintenance-progress-fill.danger {
+            background: linear-gradient(90deg, #F44336 0%, #E53935 100%);
+        }
+
+        .maintenance-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .maintenance-status.ok {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+
+        .maintenance-status.warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: #FFC107;
+        }
+
+        .maintenance-status.urgent {
+            background: rgba(244, 67, 54, 0.1);
+            color: #F44336;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .btn-view-maintenance-history {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .btn-view-maintenance-history:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        /* Alerta de Manutenção */
+        .maintenance-alert {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(244, 67, 54, 0.1);
+            border: 2px solid #F44336;
+            border-radius: 12px;
+            margin-top: 20px;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .maintenance-alert-icon {
+            font-size: 32px;
+        }
+
+        .maintenance-alert-content {
+            flex: 1;
+        }
+
+        .maintenance-alert-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #F44336;
+            margin-bottom: 4px;
+        }
+
+        .maintenance-alert-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Histórico de Manutenção */
+        .maintenance-history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .maintenance-history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .maintenance-history-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .maintenance-history-info {
+            flex: 1;
+        }
+
+        .maintenance-history-type {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .maintenance-history-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .maintenance-history-details {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .maintenance-history-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-delete-maintenance {
+            padding: 8px 12px;
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-delete-maintenance:hover {
+            background: #d32f2f;
+            transform: scale(1.05);
+        }
+
         /* Comparador de Apps */
         .app-comparator-section {
             background: var(--bg-card);
@@ -3008,6 +3421,89 @@
             </div>
         </div>
 
+        <!-- Controle de Manutenção -->
+        <div class="maintenance-control-section">
+            <div class="section-header">
+                <span>🔧</span> Controle de Manutenção
+            </div>
+            
+            <div class="maintenance-cards-grid">
+                <!-- Card de Adicionar Manutenção -->
+                <div class="maintenance-card maintenance-card-add">
+                    <div class="maintenance-card-header">
+                        <div class="maintenance-icon">➕</div>
+                        <div class="maintenance-title">Nova Manutenção</div>
+                    </div>
+                    <div class="maintenance-inputs">
+                        <div class="maintenance-input-group">
+                            <label class="maintenance-label">Tipo de Manutenção</label>
+                            <select class="maintenance-select" id="maintenanceType">
+                                <option value="">Selecione...</option>
+                                <option value="oil">🛢️ Troca de Óleo</option>
+                                <option value="oil-filter">🔧 Filtro de Óleo</option>
+                                <option value="air-filter">💨 Filtro de Ar</option>
+                                <option value="fuel-filter">⛽ Filtro de Combustível</option>
+                                <option value="cabin-filter">🌬️ Filtro de Cabine</option>
+                                <option value="tires">🛞 Pneus</option>
+                                <option value="brakes">🛑 Freios</option>
+                                <option value="battery">🔋 Bateria</option>
+                                <option value="alignment">📐 Alinhamento</option>
+                                <option value="balancing">⚖️ Balanceamento</option>
+                                <option value="suspension">🔩 Suspensão</option>
+                                <option value="other">🔧 Outros</option>
+                            </select>
+                        </div>
+                        <div class="maintenance-input-group">
+                            <label class="maintenance-label">Data da Manutenção</label>
+                            <input type="date" class="maintenance-input" id="maintenanceDate">
+                        </div>
+                        <div class="maintenance-input-group">
+                            <label class="maintenance-label">KM Atual</label>
+                            <input type="number" class="maintenance-input" id="maintenanceCurrentKm" placeholder="Ex: 50000" step="1">
+                        </div>
+                        <div class="maintenance-input-group">
+                            <label class="maintenance-label">KM da Próxima Troca</label>
+                            <input type="number" class="maintenance-input" id="maintenanceNextKm" placeholder="Ex: 55000" step="1">
+                        </div>
+                        <div class="maintenance-input-group">
+                            <label class="maintenance-label">Custo (Opcional)</label>
+                            <input type="number" class="maintenance-input" id="maintenanceCost" placeholder="0,00" step="0.01">
+                        </div>
+                        <div class="maintenance-input-group">
+                            <label class="maintenance-label">Observações (Opcional)</label>
+                            <input type="text" class="maintenance-input" id="maintenanceNotes" placeholder="Ex: Oficina XYZ">
+                        </div>
+                    </div>
+                    <button class="btn-save-maintenance" onclick="saveMaintenanceRecord()">
+                        <span>✅</span> Registrar Manutenção
+                    </button>
+                </div>
+
+                <!-- Card de Manutenções Ativas -->
+                <div class="maintenance-card">
+                    <div class="maintenance-card-header">
+                        <div class="maintenance-icon">📋</div>
+                        <div class="maintenance-title">Manutenções Ativas</div>
+                    </div>
+                    <div class="maintenance-list" id="maintenanceList">
+                        <div class="empty-state">📭 Nenhuma manutenção registrada</div>
+                    </div>
+                    <button class="btn-view-maintenance-history" onclick="viewMaintenanceHistory()">
+                        <span>📜</span> Ver Histórico Completo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alerta de Manutenção Próxima -->
+            <div id="maintenanceAlert" class="maintenance-alert" style="display: none;">
+                <div class="maintenance-alert-icon">🚨</div>
+                <div class="maintenance-alert-content">
+                    <div class="maintenance-alert-title">Manutenção Urgente!</div>
+                    <div class="maintenance-alert-message" id="maintenanceAlertMessage"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Ações Rápidas -->
         <div class="actions">
             <button class="btn btn-primary" onclick="openModal('revenue')">
@@ -3568,6 +4064,21 @@
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('kmHistory')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Histórico de Manutenção -->
+    <div id="maintenanceHistoryModal" class="modal" onclick="closeModalOnOutsideClick(event, 'maintenanceHistory')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🔧</span> Histórico de Manutenções
+            </div>
+            <div id="maintenanceHistoryList" class="maintenance-history-list">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('maintenanceHistory')">Fechar</button>
             </div>
         </div>
     </div>

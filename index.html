@@ -598,6 +598,118 @@
             transform: translateY(0);
         }
 
+        /* Status do Dia */
+        .km-day-status {
+            margin-bottom: 20px;
+        }
+
+        .km-status-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .km-status-badge.active {
+            background: linear-gradient(135deg, var(--logo-green) 0%, var(--logo-green-light) 100%);
+            border-color: var(--logo-green);
+            color: white;
+            animation: pulse-glow 2s infinite;
+        }
+
+        .km-status-badge.completed {
+            background: linear-gradient(135deg, var(--logo-blue) 0%, var(--logo-turquoise) 100%);
+            border-color: var(--logo-blue);
+            color: white;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 var(--glow-green);
+            }
+            50% {
+                box-shadow: 0 0 20px 5px var(--glow-green);
+            }
+        }
+
+        .km-status-icon {
+            font-size: 20px;
+        }
+
+        .km-status-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .km-status-badge.active .km-status-text,
+        .km-status-badge.completed .km-status-text {
+            color: white;
+        }
+
+        /* Botões de Ação */
+        .km-action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .btn-start-day,
+        .btn-end-day {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-start-day {
+            background: var(--logo-green);
+            color: white;
+        }
+
+        .btn-start-day:hover {
+            background: var(--logo-green-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--glow-green);
+        }
+
+        .btn-end-day {
+            background: var(--logo-blue);
+            color: white;
+        }
+
+        .btn-end-day:hover {
+            background: var(--logo-blue-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--glow-blue);
+        }
+
+        .btn-start-day:active,
+        .btn-end-day:active {
+            transform: translateY(0);
+        }
+
+        .btn-start-day:disabled,
+        .btn-end-day:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .km-result {
             display: flex;
             justify-content: space-between;
@@ -3283,22 +3395,41 @@
                 <div class="km-card">
                     <div class="km-card-header">
                         <span class="km-icon">📍</span>
-                        <span class="km-title">Hoje</span>
+                        <span class="km-title">Controle Diário</span>
                     </div>
+                    
+                    <!-- Status do Dia -->
+                    <div id="kmDayStatus" class="km-day-status">
+                        <div class="km-status-badge" id="kmStatusBadge">
+                            <span class="km-status-icon">⏸️</span>
+                            <span class="km-status-text">Dia não iniciado</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulário de KM -->
                     <div class="km-inputs">
                         <div class="km-input-group">
                             <label class="km-label">KM Inicial</label>
-                            <input type="number" id="kmInicial" class="km-input" placeholder="0" step="0.1">
+                            <input type="number" id="kmInicial" class="km-input" placeholder="0" step="0.1" readonly>
                         </div>
                         <div class="km-input-group">
                             <label class="km-label">KM Final</label>
-                            <input type="number" id="kmFinal" class="km-input" placeholder="0" step="0.1">
+                            <input type="number" id="kmFinal" class="km-input" placeholder="0" step="0.1" readonly>
                         </div>
                     </div>
-                    <button class="btn-save-km" onclick="saveKmDay()">
-                        <span>✅</span> Salvar KM do Dia
-                    </button>
-                    <div class="km-result">
+                    
+                    <!-- Botões de Ação -->
+                    <div class="km-action-buttons">
+                        <button class="btn-start-day" id="btnStartDay" onclick="startDay()">
+                            <span>🚀</span> Iniciar Dia
+                        </button>
+                        <button class="btn-end-day" id="btnEndDay" onclick="endDay()" style="display: none;">
+                            <span>🏁</span> Finalizar Dia
+                        </button>
+                    </div>
+                    
+                    <!-- Resultado -->
+                    <div class="km-result" id="kmResult" style="display: none;">
                         <span class="km-result-label">Rodado Hoje:</span>
                         <span class="km-result-value" id="kmRodadoHoje">0 km</span>
                     </div>

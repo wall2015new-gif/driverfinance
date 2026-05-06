@@ -2374,47 +2374,103 @@ if ('serviceWorker' in navigator) {
 
 console.log('📨 Listener de mensagens do Service Worker ativado');
 
-// ========== CONTROLE DE QUILOMETRAGEM ==========
+// ========== CONTROLE DE QUILOMETRAGEM (NOVO SISTEMA) ==========
 
 let kmData = JSON.parse(localStorage.getItem('kmData')) || [];
+let currentDaySession = JSON.parse(localStorage.getItem('currentDaySession')) || null;
 
-// Salvar KM do dia
-function saveKmDay() {
-    const kmInicial = parseFloat(document.getElementById('kmInicial').value) || 0;
-    const kmFinal = parseFloat(document.getElementById('kmFinal').value) || 0;
-    
-    if (kmInicial === 0 || kmFinal === 0) {
-        showNotification('⚠️ Preencha o KM inicial e final!', 'info');
-        return;
-    }
-    
-    if (kmFinal <= kmInicial) {
-        showNotification('⚠️ KM final deve ser maior que o inicial!', 'info');
-        return;
-    }
-    
-    const kmRodado = kmFinal - kmInicial;
+// Iniciar dia de trabalho
+function startDay() {
     const today = new Date().toISOString().split('T')[0];
     
+    // Verificar se já tem sessão ativa hoje
+    if (currentDaySession && currentDaySession.date === today) {
+        showNotification('⚠️ Dia já foi iniciado!', 'info');
+        return;
+    }
+    
+    // Pedir KM inicial
+    const kmInicial = prompt('Digite o KM inicial do veículo:');
+    
+    if (!kmInicial || kmInicial.trim() === '') {
+        showNotification('❌ KM inicial não informado', 'info');
+        return;
+    }
+    
+    const kmInicialNum = parseFloat(kmInicial);
+    
+    if (isNaN(kmInicialNum) || kmInicialNum < 0) {
+        showNotification('❌ KM inicial inválido', 'info');
+        return;
+    }
+    
+    // Criar sessão do dia
+    currentDaySession = {
+        date: today,
+        kmInicial: kmInicialNum,
+        startTime: new Date().toISOString()
+    };
+    
+    localStorage.setItem('currentDaySession', JSON.stringify(currentDaySession));
+    
+    // Atualizar interface
+    updateKmInterface();
+    
+    showNotification(`🚀 Dia iniciado! KM inicial: ${kmInicialNum.toFixed(1)} km`, 'success');
+    
+    // Vibrar
+    if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100]);
+    }
+}
+
+// Finalizar dia de trabalho
+function endDay() {
+    if (!currentDaySession) {
+        showNotification('⚠️ Você precisa iniciar o dia primeiro!', 'info');
+        return;
+    }
+    
+    // Pedir KM final
+    const kmFinal = prompt('Digite o KM final do veículo:');
+    
+    if (!kmFinal || kmFinal.trim() === '') {
+        showNotification('❌ KM final não informado', 'info');
+        return;
+    }
+    
+    const kmFinalNum = parseFloat(kmFinal);
+    
+    if (isNaN(kmFinalNum) || kmFinalNum < 0) {
+        showNotification('❌ KM final inválido', 'info');
+        return;
+    }
+    
+    if (kmFinalNum <= currentDaySession.kmInicial) {
+        showNotification('❌ KM final deve ser maior que o inicial!', 'info');
+        return;
+    }
+    
+    // Calcular KM rodado
+    const kmRodado = kmFinalNum - currentDaySession.kmInicial;
+    
+    // Salvar registro
+    const record = {
+        date: currentDaySession.date,
+        kmInicial: currentDaySession.kmInicial,
+        kmFinal: kmFinalNum,
+        kmRodado: kmRodado,
+        startTime: currentDaySession.startTime,
+        endTime: new Date().toISOString()
+    };
+    
     // Verificar se já existe registro para hoje
-    const existingIndex = kmData.findIndex(item => item.date === today);
+    const existingIndex = kmData.findIndex(item => item.date === currentDaySession.date);
     
     if (existingIndex >= 0) {
-        // Atualizar registro existente
-        kmData[existingIndex] = {
-            date: today,
-            kmInicial: kmInicial,
-            kmFinal: kmFinal,
-            kmRodado: kmRodado
-        };
+        kmData[existingIndex] = record;
     } else {
-        // Adicionar novo registro
-        kmData.push({
-            date: today,
-            kmInicial: kmInicial,
-            kmFinal: kmFinal,
-            kmRodado: kmRodado
-        });
+        kmData.push(record);
     }
     
     // Ordenar por data (mais recente primeiro)
@@ -2423,37 +2479,101 @@ function saveKmDay() {
     // Salvar no localStorage
     localStorage.setItem('kmData', JSON.stringify(kmData));
     
+    // Limpar sessão atual
+    currentDaySession = null;
+    localStorage.removeItem('currentDaySession');
+    
     // Atualizar interface
+    updateKmInterface();
     updateKmDisplay();
     
-    // Feedback
-    showNotification(`✅ KM salvo! Você rodou ${kmRodado.toFixed(1)} km hoje`, 'success');
+    // Atualizar manutenção
+    if (typeof updateMaintenanceDisplay === 'function') {
+        updateMaintenanceDisplay();
+    }
     
-    // Vibrar no mobile
+    showNotification(`🏁 Dia finalizado! Você rodou ${kmRodado.toFixed(1)} km hoje`, 'success');
+    
+    // Vibrar
     if ('vibrate' in navigator) {
-        navigator.vibrate([100, 50, 100]);
+        navigator.vibrate([200, 100, 200]);
     }
 }
 
-// Atualizar display de KM
-function updateKmDisplay() {
-    const today = new Date().toISOString().split('T')[0];
-    const todayData = kmData.find(item => item.date === today);
-    
-    // Atualizar KM rodado hoje
+// Atualizar interface do controle de KM
+function updateKmInterface() {
+    const kmInicialInput = document.getElementById('kmInicial');
+    const kmFinalInput = document.getElementById('kmFinal');
+    const btnStartDay = document.getElementById('btnStartDay');
+    const btnEndDay = document.getElementById('btnEndDay');
+    const statusBadge = document.getElementById('kmStatusBadge');
+    const kmResult = document.getElementById('kmResult');
     const kmRodadoHoje = document.getElementById('kmRodadoHoje');
-    if (kmRodadoHoje) {
-        if (todayData) {
-            kmRodadoHoje.textContent = todayData.kmRodado.toFixed(1) + ' km';
-            
-            // Preencher inputs com valores salvos
-            document.getElementById('kmInicial').value = todayData.kmInicial;
-            document.getElementById('kmFinal').value = todayData.kmFinal;
-        } else {
-            kmRodadoHoje.textContent = '0 km';
+    
+    if (!btnStartDay || !btnEndDay || !statusBadge) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Verificar se já finalizou hoje
+    const todayRecord = kmData.find(item => item.date === today);
+    
+    if (todayRecord) {
+        // Dia já finalizado
+        statusBadge.className = 'km-status-badge completed';
+        statusBadge.innerHTML = `
+            <span class="km-status-icon">✅</span>
+            <span class="km-status-text">Dia finalizado</span>
+        `;
+        
+        kmInicialInput.value = todayRecord.kmInicial.toFixed(1);
+        kmFinalInput.value = todayRecord.kmFinal.toFixed(1);
+        
+        btnStartDay.style.display = 'none';
+        btnEndDay.style.display = 'none';
+        
+        if (kmResult) {
+            kmResult.style.display = 'flex';
+            kmRodadoHoje.textContent = todayRecord.kmRodado.toFixed(1) + ' km';
+        }
+    } else if (currentDaySession && currentDaySession.date === today) {
+        // Dia em andamento
+        statusBadge.className = 'km-status-badge active';
+        statusBadge.innerHTML = `
+            <span class="km-status-icon">🚗</span>
+            <span class="km-status-text">Dia em andamento</span>
+        `;
+        
+        kmInicialInput.value = currentDaySession.kmInicial.toFixed(1);
+        kmFinalInput.value = '';
+        
+        btnStartDay.style.display = 'none';
+        btnEndDay.style.display = 'block';
+        
+        if (kmResult) {
+            kmResult.style.display = 'none';
+        }
+    } else {
+        // Dia não iniciado
+        statusBadge.className = 'km-status-badge';
+        statusBadge.innerHTML = `
+            <span class="km-status-icon">⏸️</span>
+            <span class="km-status-text">Dia não iniciado</span>
+        `;
+        
+        kmInicialInput.value = '';
+        kmFinalInput.value = '';
+        
+        btnStartDay.style.display = 'block';
+        btnEndDay.style.display = 'none';
+        
+        if (kmResult) {
+            kmResult.style.display = 'none';
         }
     }
-    
+}
+
+// Atualizar display de KM (resumo do mês)
+function updateKmDisplay() {
     // Calcular totais do mês
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
@@ -2514,6 +2634,7 @@ function viewKmHistory() {
 
 // Inicializar KM ao carregar
 document.addEventListener('DOMContentLoaded', function() {
+    updateKmInterface();
     updateKmDisplay();
 });
 

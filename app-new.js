@@ -2294,12 +2294,6 @@ async function deactivateDriverMode() {
         driverModeActive = false;
     }
 }
-        console.log('✅ Modo Motorista desativado');
-        
-    } catch (error) {
-        console.error('❌ Erro ao desativar Modo Motorista:', error);
-    }
-}
 
 // Atualizar botão de Modo Motorista na interface
 function updateDriverModeButton() {

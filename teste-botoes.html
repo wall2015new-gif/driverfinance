@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Botões - Driver Finance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background: #4CAF50;
+            color: white;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Teste de Botões - Driver Finance</h1>
+    
+    <div class="test-section">
+        <h2>1. Teste de Funções Básicas</h2>
+        <button onclick="testBasicFunction()">Testar Função Básica</button>
+        <div id="result1" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Teste de Modal</h2>
+        <button onclick="testOpenModal()">Abrir Modal de Receita</button>
+        <button onclick="testCloseModal()">Fechar Modal</button>
+        <div id="result2" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Teste de Navegação</h2>
+        <button onclick="testSwitchPage('dashboard')">Dashboard</button>
+        <button onclick="testSwitchPage('history')">Histórico</button>
+        <button onclick="testSwitchPage('goals')">Metas</button>
+        <div id="result3" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Teste de Período</h2>
+        <button onclick="testChangePeriod('today')">Hoje</button>
+        <button onclick="testChangePeriod('week')">Semana</button>
+        <button onclick="testChangePeriod('month')">Mês</button>
+        <div id="result4" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Verificar Carregamento do app-new.js</h2>
+        <button onclick="checkScriptLoaded()">Verificar Script</button>
+        <div id="result5" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Console de Erros</h2>
+        <button onclick="showConsoleErrors()">Mostrar Erros do Console</button>
+        <div id="result6" class="result"></div>
+    </div>
+
+    <script>
+        // Capturar erros
+        let consoleErrors = [];
+        const originalError = console.error;
+        console.error = function(...args) {
+            consoleErrors.push(args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        function testBasicFunction() {
+            const result = document.getElementById('result1');
+            try {
+                result.innerHTML = '<span class="success">✅ Função básica funcionando!</span>';
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Erro: ${error.message}</span>`;
+            }
+        }
+
+        function testOpenModal() {
+            const result = document.getElementById('result2');
+            try {
+                if (typeof openModal === 'function') {
+                    result.innerHTML = '<span class="success">✅ Função openModal existe!</span>';
+                } else {
+                    result.innerHTML = '<span class="error">❌ Função openModal NÃO existe!</span>';
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Erro: ${error.message}</span>`;
+            }
+        }
+
+        function testCloseModal() {
+            const result = document.getElementById('result2');
+            try {
+                if (typeof closeModal === 'function') {
+                    result.innerHTML = '<span class="success">✅ Função closeModal existe!</span>';
+                } else {
+                    result.innerHTML = '<span class="error">❌ Função closeModal NÃO existe!</span>';
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Erro: ${error.message}</span>`;
+            }
+        }
+
+        function testSwitchPage(page) {
+            const result = document.getElementById('result3');
+            try {
+                if (typeof switchPage === 'function') {
+                    result.innerHTML = `<span class="success">✅ Função switchPage existe! Tentando ir para: ${page}</span>`;
+                } else {
+                    result.innerHTML = '<span class="error">❌ Função switchPage NÃO existe!</span>';
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Erro: ${error.message}</span>`;
+            }
+        }
+
+        function testChangePeriod(period) {
+            const result = document.getElementById('result4');
+            try {
+                if (typeof changePeriod === 'function') {
+                    result.innerHTML = `<span class="success">✅ Função changePeriod existe! Período: ${period}</span>`;
+                } else {
+                    result.innerHTML = '<span class="error">❌ Função changePeriod NÃO existe!</span>';
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ Erro: ${error.message}</span>`;
+            }
+        }
+
+        function checkScriptLoaded() {
+            const result = document.getElementById('result5');
+            let html = '<h3>Verificação de Funções:</h3><ul>';
+            
+            const functions = [
+                'openModal',
+                'closeModal',
+                'switchPage',
+                'changePeriod',
+                'addRevenue',
+                'addExpense',
+                'updateCircularProgress',
+                'updateAppComparator',
+                'saveKmDay',
+                'saveFuelRecord'
+            ];
+
+            functions.forEach(func => {
+                if (typeof window[func] === 'function') {
+                    html += `<li class="success">✅ ${func} - OK</li>`;
+                } else {
+                    html += `<li class="error">❌ ${func} - NÃO ENCONTRADA</li>`;
+                }
+            });
+
+            html += '</ul>';
+            result.innerHTML = html;
+        }
+
+        function showConsoleErrors() {
+            const result = document.getElementById('result6');
+            if (consoleErrors.length === 0) {
+                result.innerHTML = '<span class="success">✅ Nenhum erro no console!</span>';
+            } else {
+                let html = '<h3>Erros Capturados:</h3><ul>';
+                consoleErrors.forEach(error => {
+                    html += `<li class="error">${error}</li>`;
+                });
+                html += '</ul>';
+                result.innerHTML = html;
+            }
+        }
+
+        // Verificar automaticamente ao carregar
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('🔍 Página de teste carregada');
+                checkScriptLoaded();
+            }, 1000);
+        });
+    </script>
+
+    <!-- Tentar carregar o app-new.js -->
+    <script src="./app-new.js"></script>
+</body>
+</html>

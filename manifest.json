@@ -4,7 +4,7 @@
   "description": "Sistema completo de gestão financeira para motoristas de aplicativo",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0a1929",
+  "background_color": "#ffffff",
   "theme_color": "#26A69A",
   "orientation": "portrait",
   "icons": [
@@ -12,13 +12,49 @@
       "src": "./img/logotipo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "./img/logotipo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./img/logotipo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./img/logotipo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./img/logotipo.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./img/logotipo.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./img/logotipo.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./img/logotipo.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "categories": ["finance", "productivity", "business"],
@@ -31,7 +67,7 @@
       "url": "./?quick=15",
       "icons": [
         {
-          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%2300c853'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='48' fill='white' font-weight='bold'%3E15%3C/text%3E%3C/svg%3E",
+          "src": "./img/logotipo.png",
           "sizes": "96x96"
         }
       ]
@@ -43,7 +79,7 @@
       "url": "./?quick=25",
       "icons": [
         {
-          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%2300c853'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='48' fill='white' font-weight='bold'%3E25%3C/text%3E%3C/svg%3E",
+          "src": "./img/logotipo.png",
           "sizes": "96x96"
         }
       ]
@@ -55,7 +91,7 @@
       "url": "./?quick=30",
       "icons": [
         {
-          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%2300c853'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='48' fill='white' font-weight='bold'%3E30%3C/text%3E%3C/svg%3E",
+          "src": "./img/logotipo.png",
           "sizes": "96x96"
         }
       ]
@@ -67,7 +103,7 @@
       "url": "./?action=quick",
       "icons": [
         {
-          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='64'%3E💰%3C/text%3E%3C/svg%3E",
+          "src": "./img/logotipo.png",
           "sizes": "96x96"
         }
       ]

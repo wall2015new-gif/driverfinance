@@ -6437,89 +6437,40 @@
     
     <!-- Script para menu expansível -->
     <script>
-        // Controle do menu expansível
         let currentExpandedCategory = null;
 
         function toggleNavCategory(category, event) {
             event.stopPropagation();
-            
-            const navCategory = document.querySelector(`[data-category="${category}"]`);
+            const navCategory = document.querySelector('[data-category="' + category + '"]');
             const backdrop = document.getElementById('navBackdrop');
-            
-            // Se já está expandido, fecha
             if (currentExpandedCategory === category) {
                 navCategory.classList.remove('expanded');
                 backdrop.classList.remove('active');
                 currentExpandedCategory = null;
                 return;
             }
-            
-            // Fecha qualquer categoria aberta
             closeAllSubmenus();
-            
-            // Abre a nova categoria
             navCategory.classList.add('expanded');
             backdrop.classList.add('active');
             currentExpandedCategory = category;
         }
 
         function closeAllSubmenus() {
-            const allCategories = document.querySelectorAll('.nav-category');
-            allCategories.forEach(cat => cat.classList.remove('expanded'));
-            
-            const backdrop = document.getElementById('navBackdrop');
-            backdrop.classList.remove('active');
-            
+            document.querySelectorAll('.nav-category').forEach(function(cat) {
+                cat.classList.remove('expanded');
+            });
+            var backdrop = document.getElementById('navBackdrop');
+            if (backdrop) backdrop.classList.remove('active');
             currentExpandedCategory = null;
         }
 
-        // Fecha submenu ao clicar em um subitem
         document.addEventListener('click', function(e) {
             if (e.target.closest('.nav-subitem')) {
                 closeAllSubmenus();
             }
         });
-
-        // Atualiza o item ativo quando troca de página
-        // app-new.js carrega depois e define window.switchPage,
-        // então encadeamos após o load completo da página
-        window.addEventListener('load', function() {
-            const appSwitchPage = window.switchPage;
-            window.switchPage = function(page) {
-                // Atualiza nav ativo
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                
-                const pageMap = {
-                    'dashboard': 'overview',
-                    'vehicle': 'management',
-                    'apps': 'management',
-                    'history': 'management',
-                    'ai': 'ai',
-                    'goals': 'analysis',
-                    'reports': 'analysis'
-                };
-                
-                const category = pageMap[page];
-                if (category) {
-                    const categoryElement = document.querySelector(`[data-category="${category}"]`);
-                    if (categoryElement) {
-                        const navItem = categoryElement.querySelector('.nav-item');
-                        if (navItem && !navItem.querySelector('.nav-arrow')) {
-                            navItem.classList.add('active');
-                        }
-                    }
-                }
-                
-                closeAllSubmenus();
-                
-                // Chama a função do app-new.js
-                if (appSwitchPage) appSwitchPage(page);
-            };
-        });
     </script>
-    
+
     <script src="app-new.js"></script>
 </body>
 </html>

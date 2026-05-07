@@ -519,6 +519,9 @@ function switchPage(pageName) {
     
     // Fechar FAB se estiver aberto
     closeFAB();
+
+    // Fechar submenus do nav
+    if (typeof closeAllSubmenus === 'function') closeAllSubmenus();
     
     // Esconder todas as páginas
     document.querySelectorAll('.page').forEach(page => {

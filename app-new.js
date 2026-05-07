@@ -878,10 +878,6 @@ function addMaintenance(event) {
     
     showNotification('🔧 Manutenção registrada!', 'success');
 }
-    
-    // Feedback visual
-    showNotification('✅ Despesa adicionada com sucesso!', 'success');
-}
 
 // ========== HISTÓRICO ==========
 function renderTransactions() {
@@ -1099,13 +1095,6 @@ document.head.appendChild(style);
 console.log('🚗 Driver Finance carregado com sucesso!');
 
 // ========== METAS ==========
-let goals = JSON.parse(localStorage.getItem('goals')) || {
-    daily: 200,
-    weekly: 1400,
-    monthly: 6000,
-    trips: 200
-};
-
 function editGoal(type) {
     const titles = {
         daily: 'Meta Diária',

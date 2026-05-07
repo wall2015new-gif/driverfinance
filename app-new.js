@@ -1841,18 +1841,40 @@ function renderBills() {
 
 // Atualizar calculadora inteligente
 function updateSmartCalculator() {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const currentDay = today.getDate();
     
-    // Total de contas não pagas do mês
-    const monthBills = bills.filter(bill => {
+    // Total de contas não pagas do mês atual E MESES FUTUROS
+    const currentAndFutureBills = bills.filter(bill => {
         const billDate = new Date(bill.dueDate);
-        return billDate.getMonth() === currentMonth && 
-               billDate.getFullYear() === currentYear &&
-               !bill.paid;
+        const billYear = billDate.getFullYear();
+        const billMonth = billDate.getMonth();
+        
+        // Incluir se não está paga E (ano futuro OU mesmo ano mas mês atual ou futuro)
+        return !bill.paid && (
+            billYear > currentYear || 
+            (billYear === currentYear && billMonth >= currentMonth)
+        );
     });
     
-    const totalBills = monthBills.reduce((sum, bill) => sum + bill.amount, 0);
+    const totalBills = currentAndFutureBills.reduce((sum, bill) => sum + bill.amount, 0);
+    
+    // Separar contas do mês atual e meses futuros para exibição
+    const currentMonthBills = currentAndFutureBills.filter(bill => {
+        const billDate = new Date(bill.dueDate);
+        return billDate.getMonth() === currentMonth && billDate.getFullYear() === currentYear;
+    });
+    
+    const futureMonthsBills = currentAndFutureBills.filter(bill => {
+        const billDate = new Date(bill.dueDate);
+        return billDate.getFullYear() > currentYear || 
+               (billDate.getFullYear() === currentYear && billDate.getMonth() > currentMonth);
+    });
+    
+    const totalCurrentMonth = currentMonthBills.reduce((sum, bill) => sum + bill.amount, 0);
+    const totalFutureMonths = futureMonthsBills.reduce((sum, bill) => sum + bill.amount, 0);
     
     // Calcular gasto médio com combustível por dia
     const monthStart = new Date(currentYear, currentMonth, 1);
@@ -1864,18 +1886,16 @@ function updateSmartCalculator() {
     });
     
     const totalFuel = fuelExpenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const currentDay = new Date().getDate();
     const avgFuelPerDay = currentDay > 0 ? totalFuel / currentDay : 0;
     
     // Dias úteis restantes no mês (considerando 26 dias úteis por mês)
     const workingDaysInMonth = 26;
-    const workingDaysLeft = Math.max(0, workingDaysInMonth - currentDay);
+    const workingDaysLeft = Math.max(1, workingDaysInMonth - currentDay);
     
     // Meta diária necessária = (Total de contas + Combustível estimado) / Dias restantes
     const estimatedFuelRemaining = avgFuelPerDay * workingDaysLeft;
     const totalNeeded = totalBills + estimatedFuelRemaining;
-    const dailyTargetNeeded = workingDaysLeft > 0 ? totalNeeded / workingDaysLeft : 0;
+    const dailyTargetNeeded = totalNeeded / workingDaysLeft;
     
     // Atualizar interface
     const totalBillsEl = document.getElementById('totalBills');
@@ -1883,7 +1903,20 @@ function updateSmartCalculator() {
     const workingDaysLeftEl = document.getElementById('workingDaysLeft');
     const dailyTargetNeededEl = document.getElementById('dailyTargetNeeded');
     
-    if (totalBillsEl) totalBillsEl.textContent = formatCurrency(totalBills);
+    // Atualizar com informação detalhada
+    if (totalBillsEl) {
+        if (futureMonthsBills.length > 0) {
+            totalBillsEl.innerHTML = `
+                ${formatCurrency(totalBills)}
+                <div style="font-size: 11px; font-weight: 500; margin-top: 4px; opacity: 0.9;">
+                    ${formatCurrency(totalCurrentMonth)} este mês + ${formatCurrency(totalFutureMonths)} futuros
+                </div>
+            `;
+        } else {
+            totalBillsEl.textContent = formatCurrency(totalBills);
+        }
+    }
+    
     if (avgFuelPerDayEl) avgFuelPerDayEl.textContent = formatCurrency(avgFuelPerDay);
     if (workingDaysLeftEl) workingDaysLeftEl.textContent = workingDaysLeft;
     if (dailyTargetNeededEl) dailyTargetNeededEl.textContent = formatCurrency(dailyTargetNeeded);

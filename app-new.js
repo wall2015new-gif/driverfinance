@@ -12,13 +12,18 @@ let goals = JSON.parse(localStorage.getItem('goals')) || {
 
 // Aplicar tema ao carregar
 document.addEventListener('DOMContentLoaded', function() {
-    applyTheme(currentTheme);
-    updateHomePage();
-    initializeForms();
-    createWeeklyChart();
-    renderTransactions();
-    updateKmDisplay();
-    updateAppComparator();
+    console.log('🚀 Driver Finance carregando...');
+    
+    try {
+        applyTheme(currentTheme);
+        updateHomePage();
+        initializeForms();
+        createWeeklyChart();
+        
+        console.log('✅ Driver Finance carregado com sucesso!');
+    } catch (error) {
+        console.error('❌ Erro ao carregar:', error);
+    }
 });
 
 // ========== FAB & BOTTOM SHEET - Premium ========== 
@@ -698,9 +703,13 @@ function initializeForms() {
     const today = new Date().toISOString().split('T')[0];
     const revenueDate = document.getElementById('revenueDate');
     const expenseDate = document.getElementById('expenseDate');
+    const fuelDate = document.getElementById('fuelDate');
+    const maintenanceDate = document.getElementById('maintenanceDate');
     
     if (revenueDate) revenueDate.value = today;
     if (expenseDate) expenseDate.value = today;
+    if (fuelDate) fuelDate.value = today;
+    if (maintenanceDate) maintenanceDate.value = today;
 }
 
 // Calcular tempo trabalhado

@@ -4329,93 +4329,111 @@
 
         /* ========== RESPONSIVIDADE MOBILE ========== */
         
-        /* Mobile Portrait (até 480px) */
+        /* ========== MOBILE (até 480px) ========== */
         @media (max-width: 480px) {
+
+            /* Base */
             body {
-                padding-bottom: 70px;
+                padding-bottom: 75px;
+                font-size: 14px;
             }
 
             .container {
-                padding: 12px;
+                padding: 10px;
             }
 
+            /* Header */
             .header {
-                padding: 16px 12px;
-                position: relative;
+                padding: 14px 12px;
+                position: sticky;
+                top: 0;
             }
 
             .header h1 {
-                font-size: 20px;
+                font-size: 18px;
+                letter-spacing: -0.3px;
             }
 
             .header p {
-                font-size: 12px;
+                font-size: 11px;
             }
-            
-            /* Botão de instalação mobile */
+
+            .header img {
+                height: 32px !important;
+            }
+
+            /* Botão instalar */
             #installButton {
                 position: static !important;
                 display: block !important;
                 width: 100%;
-                margin-top: 12px;
+                margin-top: 10px;
                 font-size: 12px !important;
-                padding: 10px 12px !important;
+                padding: 9px 12px !important;
             }
 
+            /* Card principal */
             .featured-card {
-                padding: 24px 16px;
-                margin-bottom: 16px;
+                padding: 20px 14px;
+                margin-bottom: 12px;
+                border-radius: 16px;
             }
 
             .featured-card-label {
-                font-size: 11px;
-            }
-
-            .featured-card-value {
-                font-size: 32px;
-            }
-
-            .featured-card-subtitle {
-                font-size: 12px;
-            }
-
-            .period-selector {
-                gap: 4px;
-                padding: 4px;
-                margin-bottom: 16px;
-            }
-
-            .period-btn {
-                padding: 8px 4px;
                 font-size: 10px;
             }
 
+            .featured-card-value {
+                font-size: 30px;
+                line-height: 1.1;
+            }
+
+            .featured-card-subtitle {
+                font-size: 11px;
+            }
+
+            .featured-card-icon {
+                font-size: 36px;
+            }
+
+            /* Seletor de período */
+            .period-selector {
+                gap: 4px;
+                padding: 3px;
+                margin-bottom: 12px;
+            }
+
+            .period-btn {
+                padding: 7px 4px;
+                font-size: 10px;
+                letter-spacing: 0.3px;
+            }
+
+            /* Cards circulares — 2 por linha */
             .circular-cards {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-                margin-bottom: 16px;
+                gap: 10px;
+                margin-bottom: 12px;
             }
 
             .circular-card {
-                padding: 16px 12px;
-                overflow: visible;
+                padding: 14px 10px;
             }
 
             .circular-progress {
-                width: 90px;
-                height: 90px;
-                margin-bottom: 12px;
-                padding: 3px;
+                width: 84px;
+                height: 84px;
+                margin-bottom: 10px;
+                padding: 2px;
             }
 
             .circular-progress svg {
-                width: 90px;
-                height: 90px;
-                overflow: visible;
+                width: 84px;
+                height: 84px;
             }
 
             .circular-progress-percent {
-                font-size: 22px;
+                font-size: 20px;
             }
 
             .circular-progress-label {
@@ -4423,17 +4441,19 @@
             }
 
             .circular-card-title {
-                font-size: 11px;
+                font-size: 10px;
+                letter-spacing: 0.3px;
             }
 
             .circular-card-value {
-                font-size: 16px;
+                font-size: 15px;
             }
 
+            /* Mini stats — 2 por linha */
             .mini-stats-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
-                margin-bottom: 16px;
+                margin-bottom: 12px;
             }
 
             .mini-stat-card {
@@ -4445,169 +4465,325 @@
             }
 
             .mini-stat-value {
-                font-size: 16px;
+                font-size: 15px;
             }
 
             .mini-stat-label {
                 font-size: 9px;
             }
 
+            /* Botões de ação — 2 por linha */
             .actions {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
-                margin-bottom: 16px;
+                margin-bottom: 12px;
+            }
+
+            /* Botão exportar ocupa linha inteira */
+            .actions .btn:last-child:nth-child(odd) {
+                grid-column: 1 / -1;
             }
 
             .btn {
                 padding: 12px 8px;
                 font-size: 12px;
+                border-radius: 10px;
             }
 
-            .chart-container, .stats-section, .detail-section {
-                padding: 16px 12px;
-                margin-bottom: 16px;
+            /* Gráfico */
+            .chart-container,
+            .stats-section,
+            .detail-section {
+                padding: 14px 10px;
+                margin-bottom: 12px;
+                border-radius: 14px;
+            }
+
+            .chart-header {
+                font-size: 13px;
+                margin-bottom: 12px;
             }
 
             .chart-wrapper {
-                height: 200px;
+                height: 180px;
             }
 
+            /* Stats detalhadas */
             .stats-detail-grid {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
+                gap: 6px;
             }
 
             .stat-detail-card {
-                padding: 12px 8px;
+                padding: 10px 6px;
             }
 
             .stat-detail-value {
-                font-size: 16px;
+                font-size: 14px;
+            }
+
+            .stat-detail-label {
+                font-size: 9px;
+            }
+
+            /* Cabeçalho de páginas */
+            .page-header {
+                padding: 12px 0;
+                margin-bottom: 12px;
             }
 
             .page-header h2 {
-                font-size: 20px;
+                font-size: 18px;
             }
 
+            .page-header p {
+                font-size: 12px;
+            }
+
+            /* Filtros */
             .filter-section {
                 flex-direction: column;
                 gap: 8px;
             }
 
+            .filter-section select,
+            .filter-section input {
+                width: 100%;
+            }
+
+            /* Transações */
             .transaction-item {
-                padding: 12px;
-                flex-wrap: wrap;
+                padding: 12px 10px;
+                gap: 8px;
             }
 
             .transaction-value {
-                font-size: 16px;
+                font-size: 15px;
             }
 
+            .transaction-desc {
+                font-size: 12px;
+            }
+
+            .transaction-date {
+                font-size: 10px;
+            }
+
+            /* Metas */
             .goals-grid {
                 grid-template-columns: 1fr;
-                gap: 12px;
+                gap: 10px;
             }
 
             .goal-card {
-                padding: 16px;
+                padding: 14px;
             }
 
             .goal-target {
-                font-size: 24px;
+                font-size: 22px;
             }
 
+            .goal-label {
+                font-size: 11px;
+            }
+
+            /* Conquistas */
             .achievements-grid {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 8px;
             }
 
             .achievement-badge {
-                padding: 12px 8px;
+                padding: 10px 6px;
             }
 
+            .achievement-icon {
+                font-size: 24px;
+            }
+
+            .achievement-name {
+                font-size: 9px;
+            }
+
+            /* Relatórios */
             .report-summary {
                 grid-template-columns: 1fr;
-                gap: 12px;
+                gap: 10px;
             }
 
             .analysis-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+                gap: 10px;
             }
 
+            /* Calendário */
             .calendar-section {
-                padding: 16px 12px;
+                padding: 14px 10px;
             }
 
             .calendar-grid {
-                gap: 4px;
+                gap: 3px;
             }
 
             .calendar-day {
-                font-size: 11px;
+                font-size: 10px;
+                padding: 4px 2px;
             }
 
             .calendar-day-value {
                 font-size: 7px;
             }
 
+            /* Modais */
             .modal {
-                padding: 12px;
+                padding: 10px;
+                align-items: flex-end;
             }
 
             .modal-content {
-                padding: 24px 16px;
+                padding: 20px 14px;
+                border-radius: 20px 20px 0 0;
+                max-height: 90vh;
+                overflow-y: auto;
             }
 
             .modal-header {
-                font-size: 18px;
+                font-size: 16px;
+                margin-bottom: 16px;
             }
 
-            .form-input, .form-select {
-                font-size: 16px !important;
+            .form-group {
+                margin-bottom: 14px;
             }
 
+            .form-label {
+                font-size: 12px;
+            }
+
+            .form-input,
+            .form-select {
+                font-size: 16px !important; /* evita zoom no iOS */
+                padding: 12px 14px;
+            }
+
+            /* Exportar */
             .export-option-btn {
-                padding: 16px;
+                padding: 14px;
+                font-size: 13px;
             }
 
+            /* Notificações */
             .notification-item {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 12px;
+                gap: 10px;
             }
 
             .switch {
                 align-self: flex-end;
             }
 
+            /* Menu inferior */
             .bottom-nav {
-                padding: 0;
-                height: 60px;
+                height: 60px !important;
             }
 
             .nav-item {
-                padding: 6px 2px;
-                font-size: 9px;
+                padding: 5px 2px !important;
                 height: 60px !important;
-                gap: 2px;
+                gap: 2px !important;
             }
 
             .nav-icon {
-                font-size: 22px;
-            }
-            
-            .nav-label {
-                font-size: 9px;
-                margin-top: 2px;
+                font-size: 20px !important;
             }
 
-            .fab {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-                bottom: 75px;
-                right: 12px;
+            .nav-label {
+                font-size: 9px !important;
+            }
+
+            /* Submenu */
+            .nav-subitem {
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+
+            .nav-subicon {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+            }
+
+            /* Seções de veículo */
+            .km-action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .vehicle-tabs {
+                gap: 4px;
+            }
+
+            .vehicle-tab {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+
+            /* Cards de manutenção */
+            .maintenance-card {
+                padding: 14px;
+            }
+
+            /* Comparador de apps */
+            .app-selector {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .app-option {
+                padding: 12px;
+            }
+        }
+
+        /* ========== TELAS MUITO PEQUENAS (até 360px) ========== */
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 16px;
+            }
+
+            .featured-card-value {
+                font-size: 26px;
+            }
+
+            .circular-progress {
+                width: 76px;
+                height: 76px;
+            }
+
+            .circular-progress svg {
+                width: 76px;
+                height: 76px;
+            }
+
+            .circular-progress-percent {
+                font-size: 17px;
+            }
+
+            .circular-card-value {
+                font-size: 13px;
+            }
+
+            .btn {
+                font-size: 11px;
+                padding: 10px 6px;
+            }
+
+            .nav-icon {
+                font-size: 18px !important;
+            }
+
+            .nav-label {
+                font-size: 8px !important;
             }
         }
 

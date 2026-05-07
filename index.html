@@ -6481,43 +6481,43 @@
         });
 
         // Atualiza o item ativo quando troca de página
-        const originalSwitchPage = window.switchPage;
-        window.switchPage = function(page) {
-            // Remove active de todos os nav-items
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Adiciona active no item correto
-            const pageMap = {
-                'dashboard': 'overview',
-                'vehicle': 'management',
-                'apps': 'management',
-                'history': 'management',
-                'ai': 'ai',
-                'goals': 'analysis',
-                'reports': 'analysis'
-            };
-            
-            const category = pageMap[page];
-            if (category) {
-                const categoryElement = document.querySelector(`[data-category="${category}"]`);
-                if (categoryElement) {
-                    const navItem = categoryElement.querySelector('.nav-item');
-                    if (navItem && !navItem.querySelector('.nav-arrow')) {
-                        navItem.classList.add('active');
+        // app-new.js carrega depois e define window.switchPage,
+        // então encadeamos após o load completo da página
+        window.addEventListener('load', function() {
+            const appSwitchPage = window.switchPage;
+            window.switchPage = function(page) {
+                // Atualiza nav ativo
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                const pageMap = {
+                    'dashboard': 'overview',
+                    'vehicle': 'management',
+                    'apps': 'management',
+                    'history': 'management',
+                    'ai': 'ai',
+                    'goals': 'analysis',
+                    'reports': 'analysis'
+                };
+                
+                const category = pageMap[page];
+                if (category) {
+                    const categoryElement = document.querySelector(`[data-category="${category}"]`);
+                    if (categoryElement) {
+                        const navItem = categoryElement.querySelector('.nav-item');
+                        if (navItem && !navItem.querySelector('.nav-arrow')) {
+                            navItem.classList.add('active');
+                        }
                     }
                 }
-            }
-            
-            // Fecha submenus
-            closeAllSubmenus();
-            
-            // Chama a função original
-            if (originalSwitchPage) {
-                originalSwitchPage(page);
-            }
-        };
+                
+                closeAllSubmenus();
+                
+                // Chama a função do app-new.js
+                if (appSwitchPage) appSwitchPage(page);
+            };
+        });
     </script>
     
     <script src="app-new.js"></script>

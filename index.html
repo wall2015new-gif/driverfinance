@@ -786,6 +786,29 @@
             transform: translateY(-2px);
         }
 
+        .btn-add-km-record {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-add-km-record:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
         /* Histórico de KM */
         .km-history-list {
             max-height: 400px;
@@ -2309,6 +2332,557 @@
             color: var(--text-secondary);
         }
 
+        /* Contas a Pagar */
+        .bills-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+            margin-top: 24px;
+        }
+
+        .btn-add-bill {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .btn-add-bill:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .smart-calculator {
+            background: linear-gradient(135deg, var(--logo-blue) 0%, var(--logo-turquoise) 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(30, 136, 229, 0.2);
+        }
+
+        .calculator-header {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calculator-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .calculator-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            color: white;
+        }
+
+        .calculator-row.highlight {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        .calc-label {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .calc-value {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .calc-value-big {
+            font-size: 24px;
+            font-weight: 900;
+            color: #FFD700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .calculator-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 12px 0;
+        }
+
+        .calculator-explanation {
+            text-align: center;
+            margin-top: 12px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .bills-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .bill-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .bill-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .bill-item.overdue {
+            border-left: 4px solid var(--accent-red);
+            background: rgba(244, 67, 54, 0.05);
+        }
+
+        .bill-item.due-soon {
+            border-left: 4px solid #FFA726;
+            background: rgba(255, 167, 38, 0.05);
+        }
+
+        .bill-item.paid {
+            opacity: 0.6;
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .bill-info {
+            flex: 1;
+        }
+
+        .bill-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .bill-details {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .bill-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-red);
+            margin-right: 12px;
+        }
+
+        .bill-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-pay-bill {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-pay-bill:hover {
+            background: #45a049;
+        }
+
+        .btn-edit-bill {
+            background: var(--logo-blue);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-edit-bill:hover {
+            background: #1565C0;
+        }
+
+        .btn-delete-bill {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-delete-bill:hover {
+            background: #D32F2F;
+        }
+
+        /* Assistente IA */
+        .ai-quick-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .ai-summary-card {
+            background: linear-gradient(135deg, var(--logo-green) 0%, var(--logo-turquoise) 100%);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 16px rgba(76, 175, 80, 0.2);
+        }
+
+        .ai-summary-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .ai-summary-content {
+            flex: 1;
+        }
+
+        .ai-summary-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .ai-summary-value {
+            font-size: 18px;
+            font-weight: 900;
+            color: white;
+        }
+
+        .ai-insights-section,
+        .ai-recommendations-section,
+        .ai-patterns-section,
+        .ai-predictions-section,
+        .ai-alerts-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .btn-refresh-ai {
+            background: var(--logo-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .btn-refresh-ai:hover {
+            background: #1565C0;
+            transform: translateY(-2px);
+        }
+
+        .ai-insights-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .ai-insight-card {
+            background: var(--bg-secondary);
+            border-left: 4px solid;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .ai-insight-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .ai-insight-card.success {
+            border-color: var(--accent-green);
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .ai-insight-card.warning {
+            border-color: #FFA726;
+            background: rgba(255, 167, 38, 0.05);
+        }
+
+        .ai-insight-card.info {
+            border-color: var(--logo-blue);
+            background: rgba(30, 136, 229, 0.05);
+        }
+
+        .ai-insight-card.danger {
+            border-color: var(--accent-red);
+            background: rgba(244, 67, 54, 0.05);
+        }
+
+        .ai-insight-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .ai-insight-content {
+            flex: 1;
+        }
+
+        .ai-insight-message {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .ai-insight-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .ai-recommendations-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .ai-recommendation-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .ai-recommendation-number {
+            background: var(--logo-blue);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .ai-recommendation-text {
+            flex: 1;
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .ai-patterns-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .ai-pattern-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .ai-pattern-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .ai-pattern-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .ai-pattern-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .ai-pattern-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--logo-blue);
+            margin-bottom: 4px;
+        }
+
+        .ai-pattern-detail {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .ai-predictions-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .ai-prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ai-prediction-item:last-child {
+            border-bottom: none;
+        }
+
+        .ai-prediction-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .ai-prediction-value {
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--logo-blue);
+        }
+
+        .ai-alerts-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .ai-alert-card {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid var(--accent-red);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ai-alert-icon {
+            font-size: 24px;
+        }
+
+        .ai-alert-text {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Exportação de Relatórios */
+        .export-reports-section {
+            background: linear-gradient(135deg, var(--logo-blue) 0%, var(--logo-turquoise) 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(30, 136, 229, 0.2);
+        }
+
+        .export-reports-section .section-header {
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .export-options {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .export-period-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .btn-export-period {
+            background: white;
+            color: var(--logo-blue);
+            border: none;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-export-period:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-export-period.custom {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .btn-export-period.custom:hover {
+            background: #45a049;
+        }
+
+        .export-info {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
         /* Relatórios */
         .report-summary {
             display: grid;
@@ -3430,6 +4004,9 @@
                     <button class="btn-view-km-history" onclick="viewKmHistory()">
                         <span>📋</span> Ver Histórico
                     </button>
+                    <button class="btn-add-km-record" onclick="openAddKmModal()" style="margin-top: 8px;">
+                        <span>➕</span> Adicionar Registro
+                    </button>
                 </div>
             </div>
         </div>
@@ -3731,6 +4308,145 @@
         </div>
     </div>
 
+    <!-- Página de Assistente IA -->
+    <div id="page-ai" class="page">
+        <div class="page-header">
+            <h2>🤖 Assistente IA</h2>
+            <p>Análises inteligentes e recomendações personalizadas</p>
+        </div>
+
+        <!-- Resumo Rápido -->
+        <div class="ai-quick-summary">
+            <div class="ai-summary-card">
+                <div class="ai-summary-icon">📊</div>
+                <div class="ai-summary-content">
+                    <div class="ai-summary-label">Status Atual</div>
+                    <div class="ai-summary-value" id="aiStatusValue">Analisando...</div>
+                </div>
+            </div>
+            <div class="ai-summary-card">
+                <div class="ai-summary-icon">🎯</div>
+                <div class="ai-summary-content">
+                    <div class="ai-summary-label">Meta do Dia</div>
+                    <div class="ai-summary-value" id="aiDailyTarget">R$ 0,00</div>
+                </div>
+            </div>
+            <div class="ai-summary-card">
+                <div class="ai-summary-icon">💰</div>
+                <div class="ai-summary-content">
+                    <div class="ai-summary-label">Faturado Hoje</div>
+                    <div class="ai-summary-value" id="aiTodayRevenue">R$ 0,00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights Principais -->
+        <div class="ai-insights-section">
+            <div class="section-header">
+                <span>💡</span> Insights Inteligentes
+                <button class="btn-refresh-ai" onclick="refreshAIInsights()">
+                    <span>🔄</span> Atualizar
+                </button>
+            </div>
+            <div class="ai-insights-grid" id="aiInsightsList">
+                <!-- Insights serão inseridos aqui -->
+            </div>
+        </div>
+
+        <!-- Recomendações -->
+        <div class="ai-recommendations-section">
+            <div class="section-header">
+                <span>🎯</span> Recomendações Personalizadas
+            </div>
+            <div class="ai-recommendations-list" id="aiRecommendationsList">
+                <!-- Recomendações serão inseridas aqui -->
+            </div>
+        </div>
+
+        <!-- Análise de Padrões -->
+        <div class="ai-patterns-section">
+            <div class="section-header">
+                <span>📈</span> Análise de Padrões
+            </div>
+            <div class="ai-patterns-grid">
+                <!-- Melhor Dia da Semana -->
+                <div class="ai-pattern-card">
+                    <div class="ai-pattern-icon">📅</div>
+                    <div class="ai-pattern-content">
+                        <div class="ai-pattern-label">Melhor Dia da Semana</div>
+                        <div class="ai-pattern-value" id="aiBestDay">-</div>
+                        <div class="ai-pattern-detail" id="aiBestDayDetail">-</div>
+                    </div>
+                </div>
+
+                <!-- Melhor Horário -->
+                <div class="ai-pattern-card">
+                    <div class="ai-pattern-icon">⏰</div>
+                    <div class="ai-pattern-content">
+                        <div class="ai-pattern-label">Melhor Horário</div>
+                        <div class="ai-pattern-value" id="aiBestTime">-</div>
+                        <div class="ai-pattern-detail" id="aiBestTimeDetail">-</div>
+                    </div>
+                </div>
+
+                <!-- Eficiência (R$/km) -->
+                <div class="ai-pattern-card">
+                    <div class="ai-pattern-icon">⚡</div>
+                    <div class="ai-pattern-content">
+                        <div class="ai-pattern-label">Eficiência (R$/km)</div>
+                        <div class="ai-pattern-value" id="aiEfficiency">-</div>
+                        <div class="ai-pattern-detail" id="aiEfficiencyDetail">-</div>
+                    </div>
+                </div>
+
+                <!-- Melhor App -->
+                <div class="ai-pattern-card">
+                    <div class="ai-pattern-icon">📱</div>
+                    <div class="ai-pattern-content">
+                        <div class="ai-pattern-label">App Mais Rentável</div>
+                        <div class="ai-pattern-value" id="aiBestApp">-</div>
+                        <div class="ai-pattern-detail" id="aiBestAppDetail">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Previsões -->
+        <div class="ai-predictions-section">
+            <div class="section-header">
+                <span>🔮</span> Previsões do Mês
+            </div>
+            <div class="ai-predictions-card">
+                <div class="ai-prediction-item">
+                    <div class="ai-prediction-label">📊 Faturamento Projetado:</div>
+                    <div class="ai-prediction-value" id="aiProjectedRevenue">R$ 0,00</div>
+                </div>
+                <div class="ai-prediction-item">
+                    <div class="ai-prediction-label">🎯 Probabilidade de Atingir Meta:</div>
+                    <div class="ai-prediction-value" id="aiGoalProbability">0%</div>
+                </div>
+                <div class="ai-prediction-item">
+                    <div class="ai-prediction-label">💰 Valor Necessário nos Próximos Dias:</div>
+                    <div class="ai-prediction-value" id="aiNeededAmount">R$ 0,00</div>
+                </div>
+                <div class="ai-prediction-item">
+                    <div class="ai-prediction-label">📈 Tendência:</div>
+                    <div class="ai-prediction-value" id="aiTrend">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div class="ai-alerts-section" id="aiAlertsSection" style="display: none;">
+            <div class="section-header">
+                <span>⚠️</span> Alertas Importantes
+            </div>
+            <div class="ai-alerts-list" id="aiAlertsList">
+                <!-- Alertas serão inseridos aqui -->
+            </div>
+        </div>
+    </div>
+
         <!-- Página de Histórico -->
         <div id="page-history" class="page">
             <div class="page-header">
@@ -3851,21 +4567,6 @@
                 </div>
             </div>
 
-            <!-- Meta de Viagens -->
-            <div class="goal-card">
-                <div class="goal-header">
-                    <div class="goal-title">� Meta de Viagens</div>
-                    <button class="btn-edit" onclick="editGoal('trips')">✏️ Editar</button>
-                </div>
-                <div class="goal-target" id="goalTripsTarget">200 viagens</div>
-                <div class="progress-bar">
-                    <div class="progress-fill blue" id="progressTrips" style="width: 0%"></div>
-                </div>
-                <div class="goal-stats">
-                    <span id="goalTripsCurrent">0 viagens</span>
-                    <span id="goalTripsPercent">0%</span>
-                </div>
-            </div>
         </div>
 
         <!-- Conquistas -->
@@ -3877,6 +4578,50 @@
                 <!-- Conquistas serão inseridas aqui -->
             </div>
         </div>
+
+        <!-- Contas a Pagar -->
+        <div class="bills-section">
+            <div class="section-header">
+                <span>💳</span> Contas a Pagar
+                <button class="btn-add-bill" onclick="openAddBillModal()">
+                    <span>➕</span> Adicionar Conta
+                </button>
+            </div>
+
+            <!-- Calculadora Inteligente -->
+            <div class="smart-calculator">
+                <div class="calculator-header">
+                    <span>🧮</span> Calculadora Inteligente
+                </div>
+                <div class="calculator-content">
+                    <div class="calculator-row">
+                        <span class="calc-label">💰 Total de Contas do Mês:</span>
+                        <span class="calc-value" id="totalBills">R$ 0,00</span>
+                    </div>
+                    <div class="calculator-row">
+                        <span class="calc-label">⛽ Gasto Médio com Combustível/Dia:</span>
+                        <span class="calc-value" id="avgFuelPerDay">R$ 0,00</span>
+                    </div>
+                    <div class="calculator-row">
+                        <span class="calc-label">📅 Dias Úteis Restantes no Mês:</span>
+                        <span class="calc-value" id="workingDaysLeft">0</span>
+                    </div>
+                    <div class="calculator-divider"></div>
+                    <div class="calculator-row highlight">
+                        <span class="calc-label">🎯 Meta Diária Necessária:</span>
+                        <span class="calc-value-big" id="dailyTargetNeeded">R$ 0,00</span>
+                    </div>
+                    <div class="calculator-explanation">
+                        <small>💡 Valor que você precisa fazer por dia para pagar todas as contas + combustível</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Contas -->
+            <div class="bills-list" id="billsList">
+                <!-- Contas serão inseridas aqui -->
+            </div>
+        </div>
     </div>
 
     <!-- Página de Relatórios -->
@@ -3884,6 +4629,32 @@
         <div class="page-header">
             <h2>📈 Relatórios</h2>
             <p>Análises detalhadas do seu desempenho</p>
+        </div>
+
+        <!-- Exportação de Relatórios -->
+        <div class="export-reports-section">
+            <div class="section-header">
+                <span>📄</span> Exportar Relatório em PDF
+            </div>
+            <div class="export-options">
+                <div class="export-period-buttons">
+                    <button class="btn-export-period" onclick="exportReportPDF(7)">
+                        <span>📅</span> Últimos 7 Dias
+                    </button>
+                    <button class="btn-export-period" onclick="exportReportPDF(15)">
+                        <span>📅</span> Últimos 15 Dias
+                    </button>
+                    <button class="btn-export-period" onclick="exportReportPDF(30)">
+                        <span>📅</span> Últimos 30 Dias
+                    </button>
+                    <button class="btn-export-period custom" onclick="openCustomPeriodModal()">
+                        <span>🗓️</span> Período Personalizado
+                    </button>
+                </div>
+                <div class="export-info">
+                    <small>💡 O relatório incluirá: receitas, despesas, lucro, gráficos, análise de apps, KM rodado, manutenções e muito mais!</small>
+                </div>
+            </div>
         </div>
 
         <!-- Resumo do Período -->
@@ -3985,6 +4756,10 @@
         <div class="nav-item" onclick="switchPage('apps')">
             <div class="nav-icon">📱</div>
             Apps
+        </div>
+        <div class="nav-item" onclick="switchPage('ai')">
+            <div class="nav-icon">🤖</div>
+            IA
         </div>
         <div class="nav-item" onclick="switchPage('history')">
             <div class="nav-icon">📜</div>
@@ -4154,6 +4929,114 @@
         </div>
     </div>
 
+    <!-- Modal de Adicionar Registro de KM -->
+    <div id="addKmModal" class="modal" onclick="closeModalOnOutsideClick(event, 'addKm')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>➕</span> Adicionar Registro de KM
+            </div>
+            <form onsubmit="saveKmRecord(event)">
+                <div class="form-group">
+                    <label for="kmRecordDate">📅 Data</label>
+                    <input type="date" id="kmRecordDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="kmRecordInicial">🚗 KM Inicial</label>
+                    <input type="number" id="kmRecordInicial" class="form-input" placeholder="Ex: 45000.0" step="0.1" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="kmRecordFinal">🏁 KM Final</label>
+                    <input type="number" id="kmRecordFinal" class="form-input" placeholder="Ex: 45250.5" step="0.1" min="0" required>
+                </div>
+                <div class="form-group" style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-secondary); font-size: 14px;">📏 KM Rodado:</span>
+                        <span id="kmRecordCalculated" style="color: var(--accent-green); font-weight: 700; font-size: 18px;">0 km</span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">💾 Salvar</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addKm')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Adicionar Conta -->
+    <div id="addBillModal" class="modal" onclick="closeModalOnOutsideClick(event, 'addBill')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>💳</span> <span id="billModalTitle">Adicionar Conta</span>
+            </div>
+            <form onsubmit="saveBill(event)">
+                <input type="hidden" id="billId">
+                <div class="form-group">
+                    <label for="billName">📝 Nome da Conta</label>
+                    <input type="text" id="billName" class="form-input" placeholder="Ex: Parcela do Carro" required>
+                </div>
+                <div class="form-group">
+                    <label for="billCategory">🏷️ Categoria</label>
+                    <select id="billCategory" class="form-input" required>
+                        <option value="">Selecione...</option>
+                        <option value="vehicle">🚗 Veículo (Parcela, IPVA, Seguro)</option>
+                        <option value="internet">📡 Internet/Telefone</option>
+                        <option value="housing">🏠 Moradia (Aluguel, Água, Luz)</option>
+                        <option value="personal">👤 Pessoal (Cartão, Empréstimo)</option>
+                        <option value="other">📦 Outros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="billAmount">💰 Valor</label>
+                    <input type="number" id="billAmount" class="form-input" placeholder="Ex: 450.00" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="billDueDate">📅 Vencimento</label>
+                    <input type="date" id="billDueDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="billRecurring">🔄 Conta Recorrente?</label>
+                    <select id="billRecurring" class="form-input">
+                        <option value="false">Não (Pagamento único)</option>
+                        <option value="true">Sim (Repete todo mês)</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">💾 Salvar</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addBill')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Período Personalizado -->
+    <div id="customPeriodModal" class="modal" onclick="closeModalOnOutsideClick(event, 'customPeriod')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🗓️</span> Período Personalizado
+            </div>
+            <form onsubmit="exportCustomPeriodPDF(event)">
+                <div class="form-group">
+                    <label for="reportStartDate">📅 Data Inicial</label>
+                    <input type="date" id="reportStartDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="reportEndDate">📅 Data Final</label>
+                    <input type="date" id="reportEndDate" class="form-input" required>
+                </div>
+                <div class="form-group" style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-secondary); font-size: 14px;">📊 Período:</span>
+                        <span id="periodDays" style="color: var(--accent-green); font-weight: 700; font-size: 18px;">0 dias</span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">📄 Gerar PDF</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('customPeriod')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal de Histórico de Manutenção -->
     <div id="maintenanceHistoryModal" class="modal" onclick="closeModalOnOutsideClick(event, 'maintenanceHistory')">
         <div class="modal-content">
@@ -4251,29 +5134,6 @@
                 </div>
             </div>
             
-            <!-- Modo Motorista -->
-            <div style="background: var(--bg-tertiary); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <div style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                    🚗 Modo Motorista
-                </div>
-                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
-                    Ative para adicionar corridas pela notificação, mesmo com o app fechado!
-                </div>
-                <button id="driverModeButton" class="btn" onclick="toggleDriverMode()" style="
-                    width: 100%;
-                    background: var(--accent-green);
-                    color: white;
-                    border: none;
-                    padding: 14px;
-                    font-size: 15px;
-                    font-weight: 700;
-                ">
-                    🚗 Ativar Modo Motorista
-                </button>
-                <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 12px; text-align: center;">
-                    💡 Aparecerá uma notificação com botões [+R$ 15] [+R$ 25] [+R$ 30]
-                </div>
-            </div>
             
             <div class="danger-zone">
                 <div class="danger-zone-header">⚠️ Zona de Perigo</div>

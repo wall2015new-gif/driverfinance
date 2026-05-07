@@ -13,13 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
     renderTransactions();
     updateKmDisplay();
     updateAppComparator();
-    
-    // Restaurar estado do Modo Motorista
-    const button = document.getElementById('driverModeButton');
-    if (button && driverModeActive) {
-        button.textContent = '🛑 Desativar Modo Motorista';
-        button.style.background = 'var(--accent-red)';
-    }
 });
 
 // ========== TEMA ==========
@@ -375,6 +368,11 @@ function switchPage(pageName) {
     if (pageName === 'goals') {
         console.log('📊 Atualizando metas...');
         updateGoals();
+        renderBills();
+        updateSmartCalculator();
+    } else if (pageName === 'ai') {
+        console.log('🤖 Atualizando Assistente IA...');
+        updateAIPage();
     } else if (pageName === 'reports') {
         console.log('📈 Atualizando relatórios...');
         updateReports();
@@ -832,7 +830,6 @@ function updateGoals() {
     updateGoalCard('Daily', goals.daily, dailyRevenue, true);
     updateGoalCard('Weekly', goals.weekly, weeklyRevenue, true);
     updateGoalCard('Monthly', goals.monthly, monthlyRevenue, true);
-    updateGoalCard('Trips', goals.trips, monthlyTrips, false);
     
     // Atualizar conquistas
     renderAchievements();
@@ -1195,6 +1192,1518 @@ function nextMonth() {
 // ========== INICIALIZAÇÃO COMPLETA ==========
 
 console.log('🎯 Metas, Relatórios e Calendário carregados!');
+
+// ========== CONTAS A PAGAR ==========
+
+let bills = JSON.parse(localStorage.getItem('bills')) || [];
+
+// Abrir modal de adicionar conta
+function openAddBillModal() {
+    const modal = document.getElementById('addBillModal');
+    if (!modal) return;
+    
+    // Limpar formulário
+    document.getElementById('billId').value = '';
+    document.getElementById('billName').value = '';
+    document.getElementById('billCategory').value = '';
+    document.getElementById('billAmount').value = '';
+    document.getElementById('billDueDate').value = '';
+    document.getElementById('billRecurring').value = 'false';
+    document.getElementById('billModalTitle').textContent = 'Adicionar Conta';
+    
+    modal.classList.add('active');
+}
+
+// Salvar conta
+function saveBill(event) {
+    event.preventDefault();
+    
+    const id = document.getElementById('billId').value;
+    const name = document.getElementById('billName').value;
+    const category = document.getElementById('billCategory').value;
+    const amount = parseFloat(document.getElementById('billAmount').value);
+    const dueDate = document.getElementById('billDueDate').value;
+    const recurring = document.getElementById('billRecurring').value === 'true';
+    
+    if (!name || !category || !amount || !dueDate) {
+        showNotification('❌ Preencha todos os campos', 'info');
+        return;
+    }
+    
+    const bill = {
+        id: id || Date.now(),
+        name,
+        category,
+        amount,
+        dueDate,
+        recurring,
+        paid: false,
+        createdAt: new Date().toISOString()
+    };
+    
+    if (id) {
+        // Editar existente
+        const index = bills.findIndex(b => b.id == id);
+        if (index >= 0) {
+            bills[index] = { ...bills[index], ...bill };
+        }
+    } else {
+        // Adicionar nova
+        bills.push(bill);
+    }
+    
+    // Ordenar por data de vencimento
+    bills.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+    
+    localStorage.setItem('bills', JSON.stringify(bills));
+    
+    closeModal('addBill');
+    renderBills();
+    updateSmartCalculator();
+    
+    showNotification('✅ Conta salva com sucesso!', 'success');
+}
+
+// Editar conta
+function editBill(id) {
+    const bill = bills.find(b => b.id == id);
+    if (!bill) return;
+    
+    document.getElementById('billId').value = bill.id;
+    document.getElementById('billName').value = bill.name;
+    document.getElementById('billCategory').value = bill.category;
+    document.getElementById('billAmount').value = bill.amount;
+    document.getElementById('billDueDate').value = bill.dueDate;
+    document.getElementById('billRecurring').value = bill.recurring ? 'true' : 'false';
+    document.getElementById('billModalTitle').textContent = 'Editar Conta';
+    
+    openModal('addBill');
+}
+
+// Marcar conta como paga
+function payBill(id) {
+    const bill = bills.find(b => b.id == id);
+    if (!bill) return;
+    
+    bill.paid = true;
+    bill.paidAt = new Date().toISOString();
+    
+    localStorage.setItem('bills', JSON.stringify(bills));
+    
+    renderBills();
+    updateSmartCalculator();
+    
+    showNotification('✅ Conta marcada como paga!', 'success');
+}
+
+// Deletar conta
+function deleteBill(id) {
+    if (!confirm('Tem certeza que deseja excluir esta conta?')) return;
+    
+    bills = bills.filter(b => b.id != id);
+    localStorage.setItem('bills', JSON.stringify(bills));
+    
+    renderBills();
+    updateSmartCalculator();
+    
+    showNotification('✅ Conta excluída!', 'success');
+}
+
+// Renderizar lista de contas
+function renderBills() {
+    const container = document.getElementById('billsList');
+    if (!container) return;
+    
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    // Filtrar contas do mês atual
+    const monthBills = bills.filter(bill => {
+        const billDate = new Date(bill.dueDate);
+        return billDate.getMonth() === currentMonth && billDate.getFullYear() === currentYear;
+    });
+    
+    if (monthBills.length === 0) {
+        container.innerHTML = '<div class="empty-state">📭 Nenhuma conta cadastrada para este mês</div>';
+        return;
+    }
+    
+    const categoryIcons = {
+        vehicle: '🚗',
+        internet: '📡',
+        housing: '🏠',
+        personal: '👤',
+        other: '📦'
+    };
+    
+    const categoryNames = {
+        vehicle: 'Veículo',
+        internet: 'Internet/Telefone',
+        housing: 'Moradia',
+        personal: 'Pessoal',
+        other: 'Outros'
+    };
+    
+    container.innerHTML = monthBills.map(bill => {
+        const dueDate = new Date(bill.dueDate + 'T00:00:00');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+        
+        let statusClass = '';
+        let statusText = '';
+        
+        if (bill.paid) {
+            statusClass = 'paid';
+            statusText = '✅ Paga';
+        } else if (daysUntilDue < 0) {
+            statusClass = 'overdue';
+            statusText = `⚠️ Vencida há ${Math.abs(daysUntilDue)} dias`;
+        } else if (daysUntilDue <= 3) {
+            statusClass = 'due-soon';
+            statusText = `⏰ Vence em ${daysUntilDue} dias`;
+        } else {
+            statusText = `📅 Vence em ${daysUntilDue} dias`;
+        }
+        
+        return `
+            <div class="bill-item ${statusClass}">
+                <div class="bill-info">
+                    <div class="bill-name">
+                        ${categoryIcons[bill.category] || '📦'} ${bill.name}
+                    </div>
+                    <div class="bill-details">
+                        <span>${categoryNames[bill.category] || 'Outros'}</span>
+                        <span>${dueDate.toLocaleDateString('pt-BR')}</span>
+                        <span>${statusText}</span>
+                        ${bill.recurring ? '<span>🔄 Recorrente</span>' : ''}
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="bill-amount">${formatCurrency(bill.amount)}</div>
+                    <div class="bill-actions">
+                        ${!bill.paid ? `<button class="btn-pay-bill" onclick="payBill(${bill.id})">✅ Pagar</button>` : ''}
+                        <button class="btn-edit-bill" onclick="editBill(${bill.id})">✏️</button>
+                        <button class="btn-delete-bill" onclick="deleteBill(${bill.id})">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Atualizar calculadora inteligente
+function updateSmartCalculator() {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    // Total de contas não pagas do mês
+    const monthBills = bills.filter(bill => {
+        const billDate = new Date(bill.dueDate);
+        return billDate.getMonth() === currentMonth && 
+               billDate.getFullYear() === currentYear &&
+               !bill.paid;
+    });
+    
+    const totalBills = monthBills.reduce((sum, bill) => sum + bill.amount, 0);
+    
+    // Calcular gasto médio com combustível por dia
+    const monthStart = new Date(currentYear, currentMonth, 1);
+    const fuelExpenses = transactions.filter(t => {
+        const transDate = new Date(t.date);
+        return t.type === 'expense' && 
+               t.category === 'gas' && 
+               transDate >= monthStart;
+    });
+    
+    const totalFuel = fuelExpenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const currentDay = new Date().getDate();
+    const avgFuelPerDay = currentDay > 0 ? totalFuel / currentDay : 0;
+    
+    // Dias úteis restantes no mês (considerando 26 dias úteis por mês)
+    const workingDaysInMonth = 26;
+    const workingDaysLeft = Math.max(0, workingDaysInMonth - currentDay);
+    
+    // Meta diária necessária = (Total de contas + Combustível estimado) / Dias restantes
+    const estimatedFuelRemaining = avgFuelPerDay * workingDaysLeft;
+    const totalNeeded = totalBills + estimatedFuelRemaining;
+    const dailyTargetNeeded = workingDaysLeft > 0 ? totalNeeded / workingDaysLeft : 0;
+    
+    // Atualizar interface
+    const totalBillsEl = document.getElementById('totalBills');
+    const avgFuelPerDayEl = document.getElementById('avgFuelPerDay');
+    const workingDaysLeftEl = document.getElementById('workingDaysLeft');
+    const dailyTargetNeededEl = document.getElementById('dailyTargetNeeded');
+    
+    if (totalBillsEl) totalBillsEl.textContent = formatCurrency(totalBills);
+    if (avgFuelPerDayEl) avgFuelPerDayEl.textContent = formatCurrency(avgFuelPerDay);
+    if (workingDaysLeftEl) workingDaysLeftEl.textContent = workingDaysLeft;
+    if (dailyTargetNeededEl) dailyTargetNeededEl.textContent = formatCurrency(dailyTargetNeeded);
+}
+
+// Inicializar contas ao carregar a página de metas
+document.addEventListener('DOMContentLoaded', function() {
+    renderBills();
+    updateSmartCalculator();
+});
+
+console.log('💳 Sistema de Contas a Pagar carregado!');
+
+// ========== ASSISTENTE IA (LOCAL) ==========
+
+const AIAssistant = {
+    // Coletar todos os dados necessários
+    collectData() {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        
+        // Dados do mês
+        const monthStart = new Date(currentYear, currentMonth, 1);
+        const monthTransactions = transactions.filter(t => {
+            const transDate = new Date(t.date);
+            return transDate >= monthStart;
+        });
+        
+        const monthRevenues = monthTransactions.filter(t => t.type === 'revenue');
+        const monthExpenses = monthTransactions.filter(t => t.type === 'expense');
+        
+        const totalRevenue = monthRevenues.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        const totalExpense = monthExpenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        const totalTrips = monthRevenues.reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
+        
+        // Dados de hoje
+        const todayRevenues = monthRevenues.filter(t => t.date === today);
+        const todayRevenue = todayRevenues.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        const todayTrips = todayRevenues.reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
+        
+        // Dias trabalhados
+        const uniqueDays = [...new Set(monthRevenues.map(t => t.date))];
+        const daysWorked = uniqueDays.length;
+        const avgDailyRevenue = daysWorked > 0 ? totalRevenue / daysWorked : 0;
+        
+        // KM rodado
+        const monthKm = kmData.filter(item => {
+            const itemDate = new Date(item.date);
+            return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+        });
+        const totalKm = monthKm.reduce((sum, item) => sum + item.kmRodado, 0);
+        
+        // Combustível
+        const fuelExpenses = monthExpenses.filter(e => e.category === 'gas');
+        const totalFuel = fuelExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+        const avgFuelPerDay = daysWorked > 0 ? totalFuel / daysWorked : 0;
+        
+        // Eficiência
+        const efficiency = totalKm > 0 ? totalRevenue / totalKm : 0;
+        
+        // Contas
+        const monthBills = bills.filter(bill => {
+            const billDate = new Date(bill.dueDate);
+            return billDate.getMonth() === currentMonth && 
+                   billDate.getFullYear() === currentYear &&
+                   !bill.paid;
+        });
+        const totalBills = monthBills.reduce((sum, bill) => sum + bill.amount, 0);
+        
+        // Dias restantes
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const currentDay = now.getDate();
+        const daysLeft = daysInMonth - currentDay;
+        const workingDaysLeft = Math.max(0, 26 - daysWorked);
+        
+        return {
+            today,
+            currentMonth,
+            currentYear,
+            totalRevenue,
+            totalExpense,
+            totalTrips,
+            todayRevenue,
+            todayTrips,
+            daysWorked,
+            avgDailyRevenue,
+            totalKm,
+            totalFuel,
+            avgFuelPerDay,
+            efficiency,
+            totalBills,
+            daysLeft,
+            workingDaysLeft,
+            monthRevenues,
+            monthExpenses,
+            monthKm,
+            goals: goals
+        };
+    },
+    
+    // Gerar insights inteligentes
+    generateInsights() {
+        const data = this.collectData();
+        const insights = [];
+        
+        // Insight 1: Performance vs Meta
+        const targetDaily = data.goals.daily || 200;
+        const percentVsTarget = ((data.avgDailyRevenue - targetDaily) / targetDaily) * 100;
+        
+        if (percentVsTarget >= 10) {
+            insights.push({
+                type: 'success',
+                icon: '🎉',
+                message: `Excelente! Você está ${percentVsTarget.toFixed(1)}% acima da meta diária!`,
+                detail: `Média de ${formatCurrency(data.avgDailyRevenue)}/dia vs meta de ${formatCurrency(targetDaily)}/dia`
+            });
+        } else if (percentVsTarget >= 0) {
+            insights.push({
+                type: 'success',
+                icon: '✅',
+                message: `Bom trabalho! Você está ${percentVsTarget.toFixed(1)}% acima da meta.`,
+                detail: `Continue assim para atingir seus objetivos`
+            });
+        } else if (percentVsTarget >= -10) {
+            insights.push({
+                type: 'warning',
+                icon: '⚠️',
+                message: `Atenção! Você está ${Math.abs(percentVsTarget).toFixed(1)}% abaixo da meta.`,
+                detail: `Precisa fazer mais ${formatCurrency(Math.abs(data.avgDailyRevenue - targetDaily))}/dia`
+            });
+        } else {
+            insights.push({
+                type: 'danger',
+                icon: '🚨',
+                message: `Alerta! Você está ${Math.abs(percentVsTarget).toFixed(1)}% abaixo da meta!`,
+                detail: `É necessário aumentar o ritmo urgentemente`
+            });
+        }
+        
+        // Insight 2: Desempenho de hoje
+        if (data.todayRevenue > 0) {
+            if (data.todayRevenue >= targetDaily) {
+                insights.push({
+                    type: 'success',
+                    icon: '💰',
+                    message: `Hoje você já fez ${formatCurrency(data.todayRevenue)}!`,
+                    detail: `Meta diária já atingida com ${data.todayTrips} corridas`
+                });
+            } else {
+                const remaining = targetDaily - data.todayRevenue;
+                insights.push({
+                    type: 'info',
+                    icon: '📊',
+                    message: `Você já fez ${formatCurrency(data.todayRevenue)} hoje.`,
+                    detail: `Faltam ${formatCurrency(remaining)} para atingir a meta diária`
+                });
+            }
+        }
+        
+        // Insight 3: Contas a vencer
+        const upcomingBills = bills.filter(bill => {
+            const billDate = new Date(bill.dueDate + 'T00:00:00');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const daysUntil = Math.ceil((billDate - today) / (1000 * 60 * 60 * 24));
+            return daysUntil >= 0 && daysUntil <= 7 && !bill.paid;
+        });
+        
+        if (upcomingBills.length > 0) {
+            const totalUpcoming = upcomingBills.reduce((sum, b) => sum + b.amount, 0);
+            insights.push({
+                type: 'warning',
+                icon: '💳',
+                message: `${upcomingBills.length} conta(s) vencem nos próximos 7 dias`,
+                detail: `Total de ${formatCurrency(totalUpcoming)} a pagar`
+            });
+        }
+        
+        // Insight 4: Eficiência
+        if (data.efficiency > 0) {
+            insights.push({
+                type: 'info',
+                icon: '⚡',
+                message: `Sua eficiência está em ${formatCurrency(data.efficiency)}/km`,
+                detail: `${formatCurrency(data.totalRevenue)} faturados em ${data.totalKm.toFixed(0)} km rodados`
+            });
+        }
+        
+        // Insight 5: Manutenções próximas
+        const maintenanceInsights = this.getMaintenanceInsights(data);
+        insights.push(...maintenanceInsights);
+        
+        return insights;
+    },
+    
+    // Gerar recomendações personalizadas
+    generateRecommendations() {
+        const data = this.collectData();
+        const recommendations = [];
+        
+        // Recomendação 1: Baseada em meta
+        const targetMonthly = data.goals.monthly || 6000;
+        const projected = data.avgDailyRevenue * 26; // 26 dias úteis
+        
+        if (projected < targetMonthly) {
+            const needed = (targetMonthly - data.totalRevenue) / data.workingDaysLeft;
+            recommendations.push(
+                `Para atingir sua meta mensal de ${formatCurrency(targetMonthly)}, você precisa fazer ${formatCurrency(needed)}/dia nos próximos ${data.workingDaysLeft} dias úteis.`
+            );
+        } else {
+            recommendations.push(
+                `Você está no caminho certo! Mantendo este ritmo, vai faturar ${formatCurrency(projected)} este mês.`
+            );
+        }
+        
+        // Recomendação 2: Melhor dia da semana
+        const bestDay = this.findBestDayOfWeek(data.monthRevenues);
+        if (bestDay) {
+            recommendations.push(
+                `Seus melhores dias são ${bestDay.name} (média de ${formatCurrency(bestDay.avg)}). Considere trabalhar mais nestes dias.`
+            );
+        }
+        
+        // Recomendação 3: Combustível
+        if (data.avgFuelPerDay > 0) {
+            const fuelPercent = (data.totalFuel / data.totalRevenue) * 100;
+            if (fuelPercent > 20) {
+                recommendations.push(
+                    `Seu gasto com combustível está em ${fuelPercent.toFixed(1)}% do faturamento. Considere otimizar suas rotas ou procurar postos mais baratos.`
+                );
+            } else {
+                recommendations.push(
+                    `Seu gasto com combustível está controlado em ${fuelPercent.toFixed(1)}% do faturamento. Continue assim!`
+                );
+            }
+        }
+        
+        // Recomendação 4: Apps
+        const bestApp = this.findBestApp(data.monthRevenues);
+        if (bestApp && bestApp.name !== 'Não especificado') {
+            recommendations.push(
+                `O app ${bestApp.name} está sendo mais rentável para você (${formatCurrency(bestApp.avg)}/corrida). Foque mais nele.`
+            );
+        }
+        
+        // Recomendação 5: Manutenções
+        const maintenanceRecs = this.getMaintenanceRecommendations(data);
+        recommendations.push(...maintenanceRecs);
+        
+        return recommendations;
+    },
+    
+    // Obter insights de manutenção
+    getMaintenanceInsights(data) {
+        const insights = [];
+        const maintenanceTypes = {
+            'oil': { name: 'Troca de Óleo', icon: '🛢️' },
+            'oil-filter': { name: 'Filtro de Óleo', icon: '🔧' },
+            'air-filter': { name: 'Filtro de Ar', icon: '💨' },
+            'fuel-filter': { name: 'Filtro de Combustível', icon: '⛽' },
+            'cabin-filter': { name: 'Filtro de Cabine', icon: '🌬️' },
+            'tires': { name: 'Pneus', icon: '🛞' },
+            'brakes': { name: 'Freios', icon: '🛑' },
+            'battery': { name: 'Bateria', icon: '🔋' },
+            'alignment': { name: 'Alinhamento', icon: '📐' },
+            'balancing': { name: 'Balanceamento', icon: '⚖️' },
+            'suspension': { name: 'Suspensão', icon: '🔩' },
+            'other': { name: 'Outros', icon: '🔧' }
+        };
+        
+        // Pegar KM atual
+        let currentKm = 0;
+        if (data.monthKm.length > 0) {
+            const lastKm = data.monthKm[data.monthKm.length - 1];
+            currentKm = lastKm.kmFinal || 0;
+        }
+        
+        // Verificar manutenções ativas
+        const activeMaintenances = maintenanceData.filter(m => !m.completed);
+        
+        if (activeMaintenances.length === 0) {
+            return insights;
+        }
+        
+        // Manutenções críticas (atrasadas)
+        const overdue = activeMaintenances.filter(m => m.nextKm <= currentKm);
+        if (overdue.length > 0) {
+            const m = overdue[0];
+            const typeInfo = maintenanceTypes[m.type];
+            const kmOverdue = currentKm - m.nextKm;
+            
+            insights.push({
+                type: 'danger',
+                icon: '🚨',
+                message: `${typeInfo.icon} ${typeInfo.name} está atrasada!`,
+                detail: `Você já passou ${kmOverdue.toFixed(0)} km da troca programada`
+            });
+        }
+        
+        // Manutenções urgentes (menos de 500 km)
+        const urgent = activeMaintenances.filter(m => {
+            const kmRemaining = m.nextKm - currentKm;
+            return kmRemaining > 0 && kmRemaining <= 500;
+        });
+        
+        if (urgent.length > 0) {
+            const m = urgent[0];
+            const typeInfo = maintenanceTypes[m.type];
+            const kmRemaining = m.nextKm - currentKm;
+            
+            insights.push({
+                type: 'warning',
+                icon: '⚠️',
+                message: `${typeInfo.icon} ${typeInfo.name} precisa ser feita em breve!`,
+                detail: `Faltam apenas ${kmRemaining.toFixed(0)} km para a troca`
+            });
+        }
+        
+        // Manutenções próximas (500-1000 km)
+        const upcoming = activeMaintenances.filter(m => {
+            const kmRemaining = m.nextKm - currentKm;
+            return kmRemaining > 500 && kmRemaining <= 1000;
+        });
+        
+        if (upcoming.length > 0 && overdue.length === 0 && urgent.length === 0) {
+            const m = upcoming[0];
+            const typeInfo = maintenanceTypes[m.type];
+            const kmRemaining = m.nextKm - currentKm;
+            
+            insights.push({
+                type: 'info',
+                icon: '🔧',
+                message: `${typeInfo.icon} ${typeInfo.name} se aproxima`,
+                detail: `Faltam ${kmRemaining.toFixed(0)} km. Planeje-se!`
+            });
+        }
+        
+        return insights;
+    },
+    
+    // Obter recomendações de manutenção
+    getMaintenanceRecommendations(data) {
+        const recommendations = [];
+        const maintenanceTypes = {
+            'oil': { name: 'Troca de Óleo', icon: '🛢️' },
+            'oil-filter': { name: 'Filtro de Óleo', icon: '🔧' },
+            'air-filter': { name: 'Filtro de Ar', icon: '💨' },
+            'fuel-filter': { name: 'Filtro de Combustível', icon: '⛽' },
+            'cabin-filter': { name: 'Filtro de Cabine', icon: '🌬️' },
+            'tires': { name: 'Pneus', icon: '🛞' },
+            'brakes': { name: 'Freios', icon: '🛑' },
+            'battery': { name: 'Bateria', icon: '🔋' },
+            'alignment': { name: 'Alinhamento', icon: '📐' },
+            'balancing': { name: 'Balanceamento', icon: '⚖️' },
+            'suspension': { name: 'Suspensão', icon: '🔩' },
+            'other': { name: 'Outros', icon: '🔧' }
+        };
+        
+        // Pegar KM atual
+        let currentKm = 0;
+        if (data.monthKm.length > 0) {
+            const lastKm = data.monthKm[data.monthKm.length - 1];
+            currentKm = lastKm.kmFinal || 0;
+        }
+        
+        // Verificar manutenções ativas
+        const activeMaintenances = maintenanceData.filter(m => !m.completed);
+        
+        // Manutenções urgentes (menos de 1000 km)
+        const urgent = activeMaintenances.filter(m => {
+            const kmRemaining = m.nextKm - currentKm;
+            return kmRemaining <= 1000;
+        });
+        
+        if (urgent.length > 0) {
+            const totalCost = urgent.reduce((sum, m) => sum + (m.cost || 0), 0);
+            const maintenanceNames = urgent.map(m => maintenanceTypes[m.type].name).join(', ');
+            
+            if (totalCost > 0) {
+                recommendations.push(
+                    `Você tem ${urgent.length} manutenção(ões) próxima(s): ${maintenanceNames}. Reserve aproximadamente ${formatCurrency(totalCost)} para os custos.`
+                );
+            } else {
+                recommendations.push(
+                    `Você tem ${urgent.length} manutenção(ões) próxima(s): ${maintenanceNames}. Planeje-se para não atrasar!`
+                );
+            }
+        }
+        
+        // Análise de custos de manutenção
+        const monthMaintenances = maintenanceData.filter(m => {
+            const mDate = new Date(m.date);
+            return mDate.getMonth() === data.currentMonth && 
+                   mDate.getFullYear() === data.currentYear &&
+                   m.cost > 0;
+        });
+        
+        if (monthMaintenances.length > 0) {
+            const totalMaintenanceCost = monthMaintenances.reduce((sum, m) => sum + m.cost, 0);
+            const percentOfRevenue = data.totalRevenue > 0 ? (totalMaintenanceCost / data.totalRevenue) * 100 : 0;
+            
+            if (percentOfRevenue > 15) {
+                recommendations.push(
+                    `Seus gastos com manutenção estão altos este mês (${percentOfRevenue.toFixed(1)}% do faturamento). Considere fazer manutenções preventivas para evitar custos maiores.`
+                );
+            }
+        }
+        
+        return recommendations;
+    },
+    
+    // Encontrar melhor dia da semana
+    findBestDayOfWeek(revenues) {
+        const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        const dayStats = {};
+        
+        revenues.forEach(t => {
+            const date = new Date(t.date + 'T00:00:00');
+            const dayOfWeek = date.getDay();
+            
+            if (!dayStats[dayOfWeek]) {
+                dayStats[dayOfWeek] = { total: 0, count: 0, name: dayNames[dayOfWeek] };
+            }
+            
+            dayStats[dayOfWeek].total += parseFloat(t.amount);
+            dayStats[dayOfWeek].count++;
+        });
+        
+        let bestDay = null;
+        let bestAvg = 0;
+        
+        Object.values(dayStats).forEach(day => {
+            const avg = day.total / day.count;
+            if (avg > bestAvg) {
+                bestAvg = avg;
+                bestDay = { ...day, avg };
+            }
+        });
+        
+        return bestDay;
+    },
+    
+    // Encontrar melhor app
+    findBestApp(revenues) {
+        const appStats = {};
+        
+        revenues.forEach(t => {
+            const app = t.app || 'Não especificado';
+            const trips = parseInt(t.trips) || 1;
+            
+            if (!appStats[app]) {
+                appStats[app] = { total: 0, trips: 0, name: app };
+            }
+            
+            appStats[app].total += parseFloat(t.amount);
+            appStats[app].trips += trips;
+        });
+        
+        let bestApp = null;
+        let bestAvg = 0;
+        
+        Object.values(appStats).forEach(app => {
+            const avg = app.total / app.trips;
+            if (avg > bestAvg && app.trips >= 5) { // Mínimo 5 corridas
+                bestAvg = avg;
+                bestApp = { ...app, avg };
+            }
+        });
+        
+        return bestApp;
+    },
+    
+    // Encontrar melhor horário
+    findBestTime(revenues) {
+        const timeStats = {};
+        
+        revenues.forEach(t => {
+            if (t.startTime) {
+                const hour = parseInt(t.startTime.split(':')[0]);
+                const period = hour < 12 ? 'Manhã (6h-12h)' : 
+                              hour < 18 ? 'Tarde (12h-18h)' : 
+                              'Noite (18h-00h)';
+                
+                if (!timeStats[period]) {
+                    timeStats[period] = { total: 0, count: 0, name: period };
+                }
+                
+                timeStats[period].total += parseFloat(t.amount);
+                timeStats[period].count++;
+            }
+        });
+        
+        let bestTime = null;
+        let bestAvg = 0;
+        
+        Object.values(timeStats).forEach(time => {
+            const avg = time.total / time.count;
+            if (avg > bestAvg) {
+                bestAvg = avg;
+                bestTime = { ...time, avg };
+            }
+        });
+        
+        return bestTime;
+    },
+    
+    // Gerar previsões
+    generatePredictions() {
+        const data = this.collectData();
+        
+        // Faturamento projetado
+        const projectedRevenue = data.avgDailyRevenue * 26; // 26 dias úteis
+        
+        // Probabilidade de atingir meta
+        const targetMonthly = data.goals.monthly || 6000;
+        const progress = (data.totalRevenue / targetMonthly) * 100;
+        const daysProgress = (data.daysWorked / 26) * 100;
+        const probability = Math.min(100, (progress / daysProgress) * 100);
+        
+        // Valor necessário
+        const needed = Math.max(0, targetMonthly - data.totalRevenue);
+        
+        // Tendência
+        let trend = '';
+        if (probability >= 90) {
+            trend = '📈 Excelente! Muito acima da meta';
+        } else if (probability >= 70) {
+            trend = '✅ Boa! No caminho certo';
+        } else if (probability >= 50) {
+            trend = '⚠️ Atenção! Precisa melhorar';
+        } else {
+            trend = '🚨 Crítica! Muito abaixo';
+        }
+        
+        return {
+            projectedRevenue,
+            probability: probability.toFixed(0),
+            needed,
+            trend
+        };
+    },
+    
+    // Gerar alertas
+    generateAlerts() {
+        const data = this.collectData();
+        const alerts = [];
+        
+        // Alerta 1: Manutenções atrasadas (PRIORIDADE MÁXIMA)
+        const maintenanceAlerts = this.getMaintenanceAlerts(data);
+        alerts.push(...maintenanceAlerts);
+        
+        // Alerta 2: Contas vencidas
+        const overdueBills = bills.filter(bill => {
+            const billDate = new Date(bill.dueDate + 'T00:00:00');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return billDate < today && !bill.paid;
+        });
+        
+        if (overdueBills.length > 0) {
+            const totalOverdue = overdueBills.reduce((sum, b) => sum + b.amount, 0);
+            alerts.push({
+                icon: '🚨',
+                text: `Você tem ${overdueBills.length} conta(s) vencida(s) no valor de ${formatCurrency(totalOverdue)}`
+            });
+        }
+        
+        // Alerta 3: Meta muito distante
+        const targetMonthly = data.goals.monthly || 6000;
+        const needed = targetMonthly - data.totalRevenue;
+        const dailyNeeded = data.workingDaysLeft > 0 ? needed / data.workingDaysLeft : 0;
+        
+        if (dailyNeeded > data.avgDailyRevenue * 1.5) {
+            alerts.push({
+                icon: '⚠️',
+                text: `Para atingir a meta, você precisa fazer ${formatCurrency(dailyNeeded)}/dia, 50% acima da sua média atual`
+            });
+        }
+        
+        // Alerta 4: Combustível alto
+        if (data.totalFuel > 0 && data.totalRevenue > 0) {
+            const fuelPercent = (data.totalFuel / data.totalRevenue) * 100;
+            if (fuelPercent > 25) {
+                alerts.push({
+                    icon: '⛽',
+                    text: `Seu gasto com combustível está muito alto (${fuelPercent.toFixed(1)}% do faturamento)`
+                });
+            }
+        }
+        
+        return alerts;
+    },
+    
+    // Obter alertas de manutenção
+    getMaintenanceAlerts(data) {
+        const alerts = [];
+        const maintenanceTypes = {
+            'oil': { name: 'Troca de Óleo', icon: '🛢️' },
+            'oil-filter': { name: 'Filtro de Óleo', icon: '🔧' },
+            'air-filter': { name: 'Filtro de Ar', icon: '💨' },
+            'fuel-filter': { name: 'Filtro de Combustível', icon: '⛽' },
+            'cabin-filter': { name: 'Filtro de Cabine', icon: '🌬️' },
+            'tires': { name: 'Pneus', icon: '🛞' },
+            'brakes': { name: 'Freios', icon: '🛑' },
+            'battery': { name: 'Bateria', icon: '🔋' },
+            'alignment': { name: 'Alinhamento', icon: '📐' },
+            'balancing': { name: 'Balanceamento', icon: '⚖️' },
+            'suspension': { name: 'Suspensão', icon: '🔩' },
+            'other': { name: 'Outros', icon: '🔧' }
+        };
+        
+        // Pegar KM atual
+        let currentKm = 0;
+        if (data.monthKm.length > 0) {
+            const lastKm = data.monthKm[data.monthKm.length - 1];
+            currentKm = lastKm.kmFinal || 0;
+        }
+        
+        // Verificar manutenções ativas
+        const activeMaintenances = maintenanceData.filter(m => !m.completed);
+        
+        // Manutenções atrasadas (CRÍTICO)
+        const overdue = activeMaintenances.filter(m => m.nextKm <= currentKm);
+        overdue.forEach(m => {
+            const typeInfo = maintenanceTypes[m.type];
+            const kmOverdue = currentKm - m.nextKm;
+            alerts.push({
+                icon: '🚨',
+                text: `${typeInfo.icon} ${typeInfo.name} está ${kmOverdue.toFixed(0)} km atrasada! Faça urgentemente para evitar danos ao veículo.`
+            });
+        });
+        
+        // Manutenções muito urgentes (menos de 200 km)
+        const veryUrgent = activeMaintenances.filter(m => {
+            const kmRemaining = m.nextKm - currentKm;
+            return kmRemaining > 0 && kmRemaining <= 200;
+        });
+        
+        veryUrgent.forEach(m => {
+            const typeInfo = maintenanceTypes[m.type];
+            const kmRemaining = m.nextKm - currentKm;
+            alerts.push({
+                icon: '⚠️',
+                text: `${typeInfo.icon} ${typeInfo.name} precisa ser feita URGENTE! Faltam apenas ${kmRemaining.toFixed(0)} km.`
+            });
+        });
+        
+        return alerts;
+    }
+};
+
+// Atualizar página de IA
+function updateAIPage() {
+    const data = AIAssistant.collectData();
+    
+    // Atualizar resumo rápido
+    const targetDaily = data.goals.daily || 200;
+    const percentVsTarget = ((data.avgDailyRevenue - targetDaily) / targetDaily) * 100;
+    
+    let statusText = '';
+    if (percentVsTarget >= 10) {
+        statusText = '🎉 Excelente!';
+    } else if (percentVsTarget >= 0) {
+        statusText = '✅ Bom';
+    } else if (percentVsTarget >= -10) {
+        statusText = '⚠️ Atenção';
+    } else {
+        statusText = '🚨 Crítico';
+    }
+    
+    document.getElementById('aiStatusValue').textContent = statusText;
+    document.getElementById('aiDailyTarget').textContent = formatCurrency(targetDaily);
+    document.getElementById('aiTodayRevenue').textContent = formatCurrency(data.todayRevenue);
+    
+    // Atualizar insights
+    const insights = AIAssistant.generateInsights();
+    const insightsList = document.getElementById('aiInsightsList');
+    if (insightsList) {
+        insightsList.innerHTML = insights.map(insight => `
+            <div class="ai-insight-card ${insight.type}">
+                <div class="ai-insight-icon">${insight.icon}</div>
+                <div class="ai-insight-content">
+                    <div class="ai-insight-message">${insight.message}</div>
+                    <div class="ai-insight-detail">${insight.detail}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Atualizar recomendações
+    const recommendations = AIAssistant.generateRecommendations();
+    const recommendationsList = document.getElementById('aiRecommendationsList');
+    if (recommendationsList) {
+        recommendationsList.innerHTML = recommendations.map((rec, index) => `
+            <div class="ai-recommendation-card">
+                <div class="ai-recommendation-number">${index + 1}</div>
+                <div class="ai-recommendation-text">${rec}</div>
+            </div>
+        `).join('');
+    }
+    
+    // Atualizar padrões
+    const bestDay = AIAssistant.findBestDayOfWeek(data.monthRevenues);
+    if (bestDay) {
+        document.getElementById('aiBestDay').textContent = bestDay.name;
+        document.getElementById('aiBestDayDetail').textContent = `Média de ${formatCurrency(bestDay.avg)}`;
+    }
+    
+    const bestTime = AIAssistant.findBestTime(data.monthRevenues);
+    if (bestTime) {
+        document.getElementById('aiBestTime').textContent = bestTime.name;
+        document.getElementById('aiBestTimeDetail').textContent = `Média de ${formatCurrency(bestTime.avg)}`;
+    } else {
+        document.getElementById('aiBestTime').textContent = 'Sem dados';
+        document.getElementById('aiBestTimeDetail').textContent = 'Registre horários nas receitas';
+    }
+    
+    if (data.efficiency > 0) {
+        document.getElementById('aiEfficiency').textContent = formatCurrency(data.efficiency);
+        document.getElementById('aiEfficiencyDetail').textContent = `${data.totalKm.toFixed(0)} km rodados`;
+    }
+    
+    const bestApp = AIAssistant.findBestApp(data.monthRevenues);
+    if (bestApp) {
+        document.getElementById('aiBestApp').textContent = bestApp.name;
+        document.getElementById('aiBestAppDetail').textContent = `${formatCurrency(bestApp.avg)}/corrida`;
+    }
+    
+    // Atualizar previsões
+    const predictions = AIAssistant.generatePredictions();
+    document.getElementById('aiProjectedRevenue').textContent = formatCurrency(predictions.projectedRevenue);
+    document.getElementById('aiGoalProbability').textContent = predictions.probability + '%';
+    document.getElementById('aiNeededAmount').textContent = formatCurrency(predictions.needed);
+    document.getElementById('aiTrend').textContent = predictions.trend;
+    
+    // Atualizar alertas
+    const alerts = AIAssistant.generateAlerts();
+    const alertsSection = document.getElementById('aiAlertsSection');
+    const alertsList = document.getElementById('aiAlertsList');
+    
+    if (alerts.length > 0) {
+        alertsSection.style.display = 'block';
+        alertsList.innerHTML = alerts.map(alert => `
+            <div class="ai-alert-card">
+                <div class="ai-alert-icon">${alert.icon}</div>
+                <div class="ai-alert-text">${alert.text}</div>
+            </div>
+        `).join('');
+    } else {
+        alertsSection.style.display = 'none';
+    }
+}
+
+// Atualizar insights (botão)
+function refreshAIInsights() {
+    updateAIPage();
+    showNotification('🤖 Análises atualizadas!', 'success');
+}
+
+console.log('🤖 Assistente IA carregado!');
+
+// ========== EXPORTAÇÃO DE RELATÓRIOS EM PDF ==========
+
+// Abrir modal de período personalizado
+function openCustomPeriodModal() {
+    const modal = document.getElementById('customPeriodModal');
+    if (!modal) return;
+    
+    // Definir data final como hoje
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('reportEndDate').value = today;
+    
+    // Definir data inicial como 30 dias atrás
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    document.getElementById('reportStartDate').value = startDate.toISOString().split('T')[0];
+    
+    // Adicionar listeners para calcular dias
+    const startInput = document.getElementById('reportStartDate');
+    const endInput = document.getElementById('reportEndDate');
+    
+    const calculateDays = () => {
+        const start = new Date(startInput.value);
+        const end = new Date(endInput.value);
+        const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        document.getElementById('periodDays').textContent = days + ' dias';
+    };
+    
+    startInput.addEventListener('change', calculateDays);
+    endInput.addEventListener('change', calculateDays);
+    calculateDays();
+    
+    modal.classList.add('active');
+}
+
+// Exportar relatório com período personalizado
+function exportCustomPeriodPDF(event) {
+    event.preventDefault();
+    
+    const startDate = document.getElementById('reportStartDate').value;
+    const endDate = document.getElementById('reportEndDate').value;
+    
+    if (!startDate || !endDate) {
+        showNotification('❌ Selecione as datas', 'info');
+        return;
+    }
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (start > end) {
+        showNotification('❌ Data inicial deve ser anterior à data final', 'info');
+        return;
+    }
+    
+    closeModal('customPeriod');
+    generatePDFReport(startDate, endDate);
+}
+
+// Exportar relatório em PDF (7, 15 ou 30 dias)
+function exportReportPDF(days) {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days + 1);
+    
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
+    generatePDFReport(startDateStr, endDateStr);
+}
+
+// Gerar relatório PDF completo
+async function generatePDFReport(startDate, endDate) {
+    showNotification('📄 Gerando relatório em PDF...', 'info');
+    
+    try {
+        // Coletar dados do período
+        const reportData = collectReportData(startDate, endDate);
+        
+        // Criar PDF com jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        
+        let yPos = 20;
+        const pageWidth = 210;
+        const margin = 20;
+        const contentWidth = pageWidth - (margin * 2);
+        
+        // ========== CABEÇALHO ==========
+        doc.setFillColor(30, 136, 229); // Azul do logo
+        doc.rect(0, 0, pageWidth, 45, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(28);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Driver Finance', margin, 20);
+        
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Relatorio Financeiro Completo', margin, 30);
+        
+        doc.setFontSize(11);
+        doc.text('Periodo: ' + formatDateBR(startDate) + ' a ' + formatDateBR(endDate), margin, 38);
+        
+        yPos = 55;
+        
+        // ========== RESUMO FINANCEIRO ==========
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('RESUMO FINANCEIRO', margin, yPos);
+        yPos += 10;
+        
+        // Box de resumo com grid
+        doc.setFillColor(245, 250, 255);
+        doc.roundedRect(margin, yPos, contentWidth, 50, 3, 3, 'F');
+        doc.setDrawColor(30, 136, 229);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(margin, yPos, contentWidth, 50, 3, 3, 'S');
+        
+        // Coluna 1
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Receita Total:', margin + 5, yPos + 10);
+        doc.setFontSize(16);
+        doc.setTextColor(76, 175, 80);
+        doc.text(formatCurrency(reportData.totalRevenue), margin + 5, yPos + 18);
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Despesa Total:', margin + 5, yPos + 28);
+        doc.setFontSize(16);
+        doc.setTextColor(244, 67, 54);
+        doc.text(formatCurrency(reportData.totalExpense), margin + 5, yPos + 36);
+        
+        // Coluna 2
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Lucro Liquido:', margin + 70, yPos + 10);
+        doc.setFontSize(16);
+        doc.setTextColor(30, 136, 229);
+        doc.text(formatCurrency(reportData.profit), margin + 70, yPos + 18);
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Media Diaria:', margin + 70, yPos + 28);
+        doc.setFontSize(16);
+        doc.setTextColor(38, 166, 154);
+        doc.text(formatCurrency(reportData.avgDaily), margin + 70, yPos + 36);
+        
+        // Coluna 3
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Total de Corridas:', margin + 135, yPos + 10);
+        doc.setFontSize(20);
+        doc.setTextColor(30, 136, 229);
+        doc.text(reportData.totalTrips.toString(), margin + 135, yPos + 20);
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Dias Trabalhados:', margin + 135, yPos + 32);
+        doc.setFontSize(20);
+        doc.setTextColor(38, 166, 154);
+        doc.text(reportData.daysWorked.toString(), margin + 135, yPos + 42);
+        
+        yPos += 60;
+        
+        // ========== ANÁLISE POR APP ==========
+        if (reportData.appStats.length > 0) {
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('ANALISE POR APLICATIVO', margin, yPos);
+            yPos += 8;
+            
+            // Tabela de apps
+            doc.setFillColor(250, 250, 250);
+            doc.rect(margin, yPos, contentWidth, 8, 'F');
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('App', margin + 3, yPos + 5);
+            doc.text('Corridas', margin + 50, yPos + 5);
+            doc.text('Faturamento', margin + 85, yPos + 5);
+            doc.text('Media/Corrida', margin + 130, yPos + 5);
+            yPos += 8;
+            
+            reportData.appStats.forEach((app, index) => {
+                if (index % 2 === 0) {
+                    doc.setFillColor(255, 255, 255);
+                } else {
+                    doc.setFillColor(248, 248, 248);
+                }
+                doc.rect(margin, yPos, contentWidth, 7, 'F');
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text(app.name, margin + 3, yPos + 5);
+                doc.text(app.trips.toString(), margin + 50, yPos + 5);
+                doc.text(formatCurrency(app.revenue), margin + 85, yPos + 5);
+                doc.text(formatCurrency(app.avg), margin + 130, yPos + 5);
+                yPos += 7;
+            });
+            
+            yPos += 8;
+        }
+        
+        // Verificar se precisa de nova página
+        if (yPos > 240) {
+            doc.addPage();
+            yPos = 20;
+        }
+        
+        // ========== DESPESAS POR CATEGORIA ==========
+        if (reportData.expensesByCategory.length > 0) {
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 0, 0);
+            doc.text('DESPESAS POR CATEGORIA', margin, yPos);
+            yPos += 8;
+            
+            // Tabela de categorias
+            doc.setFillColor(250, 250, 250);
+            doc.rect(margin, yPos, contentWidth, 8, 'F');
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Categoria', margin + 3, yPos + 5);
+            doc.text('Valor', margin + 100, yPos + 5);
+            doc.text('Percentual', margin + 140, yPos + 5);
+            yPos += 8;
+            
+            reportData.expensesByCategory.forEach((cat, index) => {
+                if (index % 2 === 0) {
+                    doc.setFillColor(255, 255, 255);
+                } else {
+                    doc.setFillColor(248, 248, 248);
+                }
+                doc.rect(margin, yPos, contentWidth, 7, 'F');
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text(cat.name, margin + 3, yPos + 5);
+                doc.text(formatCurrency(cat.amount), margin + 100, yPos + 5);
+                doc.text(cat.percent + '%', margin + 140, yPos + 5);
+                yPos += 7;
+            });
+            
+            yPos += 8;
+        }
+        
+        // Verificar se precisa de nova página
+        if (yPos > 240) {
+            doc.addPage();
+            yPos = 20;
+        }
+        
+        // ========== QUILOMETRAGEM ==========
+        if (reportData.kmData.totalKm > 0) {
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 0, 0);
+            doc.text('QUILOMETRAGEM', margin, yPos);
+            yPos += 8;
+            
+            doc.setFillColor(245, 250, 255);
+            doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, 'F');
+            doc.setDrawColor(30, 136, 229);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, 'S');
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 0, 0);
+            doc.text('KM Rodado:', margin + 5, yPos + 8);
+            doc.setFont('helvetica', 'normal');
+            doc.text(reportData.kmData.totalKm.toFixed(1) + ' km', margin + 35, yPos + 8);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Eficiencia:', margin + 5, yPos + 16);
+            doc.setFont('helvetica', 'normal');
+            doc.text(formatCurrency(reportData.kmData.efficiency) + '/km', margin + 35, yPos + 16);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Combustivel:', margin + 100, yPos + 8);
+            doc.setFont('helvetica', 'normal');
+            doc.text(formatCurrency(reportData.kmData.fuelCost), margin + 135, yPos + 8);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('% do Faturamento:', margin + 100, yPos + 16);
+            doc.setFont('helvetica', 'normal');
+            doc.text(reportData.kmData.fuelPercent + '%', margin + 145, yPos + 16);
+            
+            yPos += 33;
+        }
+        
+        // ========== MANUTENÇÕES ==========
+        if (reportData.maintenances.length > 0) {
+            // Verificar se precisa de nova página
+            if (yPos > 220) {
+                doc.addPage();
+                yPos = 20;
+            }
+            
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 0, 0);
+            doc.text('MANUTENCOES REALIZADAS', margin, yPos);
+            yPos += 8;
+            
+            // Tabela de manutenções
+            doc.setFillColor(250, 250, 250);
+            doc.rect(margin, yPos, contentWidth, 8, 'F');
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Tipo', margin + 3, yPos + 5);
+            doc.text('Data', margin + 80, yPos + 5);
+            doc.text('Custo', margin + 130, yPos + 5);
+            yPos += 8;
+            
+            reportData.maintenances.forEach((m, index) => {
+                if (index % 2 === 0) {
+                    doc.setFillColor(255, 255, 255);
+                } else {
+                    doc.setFillColor(248, 248, 248);
+                }
+                doc.rect(margin, yPos, contentWidth, 7, 'F');
+                
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text(m.name, margin + 3, yPos + 5);
+                doc.text(formatDateBR(m.date), margin + 80, yPos + 5);
+                doc.text(formatCurrency(m.cost), margin + 130, yPos + 5);
+                yPos += 7;
+            });
+        }
+        
+        // ========== RODAPÉ ==========
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            
+            // Linha separadora
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.5);
+            doc.line(margin, 280, pageWidth - margin, 280);
+            
+            doc.setFontSize(8);
+            doc.setTextColor(128, 128, 128);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Gerado em ' + new Date().toLocaleString('pt-BR'), margin, 285);
+            doc.text('Driver Finance - Gestao Financeira para Motoristas', pageWidth / 2, 285, { align: 'center' });
+            doc.text('Pagina ' + i + ' de ' + pageCount, pageWidth - margin, 285, { align: 'right' });
+        }
+        
+        // Salvar PDF
+        const fileName = `relatorio_${startDate}_a_${endDate}.pdf`;
+        doc.save(fileName);
+        
+        showNotification('✅ Relatório PDF gerado com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        showNotification('❌ Erro ao gerar relatório: ' + error.message, 'info');
+    }
+}
+
+// Coletar dados para o relatório
+function collectReportData(startDate, endDate) {
+    const start = new Date(startDate + 'T00:00:00');
+    const end = new Date(endDate + 'T23:59:59');
+    
+    // Filtrar transações do período
+    const periodTransactions = transactions.filter(t => {
+        const tDate = new Date(t.date + 'T00:00:00');
+        return tDate >= start && tDate <= end;
+    });
+    
+    const revenues = periodTransactions.filter(t => t.type === 'revenue');
+    const expenses = periodTransactions.filter(t => t.type === 'expense');
+    
+    const totalRevenue = revenues.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const totalExpense = expenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const profit = totalRevenue - totalExpense;
+    const totalTrips = revenues.reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
+    
+    // Dias trabalhados
+    const uniqueDays = [...new Set(revenues.map(t => t.date))];
+    const daysWorked = uniqueDays.length;
+    const avgDaily = daysWorked > 0 ? totalRevenue / daysWorked : 0;
+    
+    // Análise por app
+    const appStats = {};
+    revenues.forEach(t => {
+        const app = t.app || 'Não especificado';
+        if (!appStats[app]) {
+            appStats[app] = { name: app, revenue: 0, trips: 0 };
+        }
+        appStats[app].revenue += parseFloat(t.amount);
+        appStats[app].trips += parseInt(t.trips) || 1;
+    });
+    
+    const appStatsArray = Object.values(appStats).map(app => ({
+        ...app,
+        avg: app.trips > 0 ? app.revenue / app.trips : 0
+    })).sort((a, b) => b.revenue - a.revenue);
+    
+    // Despesas por categoria
+    const categoryNames = {
+        gas: { name: 'Combustível', icon: '⛽' },
+        maintenance: { name: 'Manutenção', icon: '🔧' },
+        app: { name: 'Taxas de App', icon: '📱' },
+        food: { name: 'Alimentação', icon: '🍔' },
+        other: { name: 'Outros', icon: '📦' }
+    };
+    
+    const expensesByCategory = {};
+    expenses.forEach(e => {
+        const cat = e.category || 'other';
+        if (!expensesByCategory[cat]) {
+            expensesByCategory[cat] = 0;
+        }
+        expensesByCategory[cat] += parseFloat(e.amount);
+    });
+    
+    const expensesByCategoryArray = Object.entries(expensesByCategory).map(([cat, amount]) => ({
+        name: categoryNames[cat]?.name || 'Outros',
+        icon: categoryNames[cat]?.icon || '📦',
+        amount,
+        percent: totalExpense > 0 ? ((amount / totalExpense) * 100).toFixed(1) : 0
+    })).sort((a, b) => b.amount - a.amount);
+    
+    // KM rodado
+    const periodKm = kmData.filter(item => {
+        const itemDate = new Date(item.date + 'T00:00:00');
+        return itemDate >= start && itemDate <= end;
+    });
+    
+    const totalKm = periodKm.reduce((sum, item) => sum + item.kmRodado, 0);
+    const efficiency = totalKm > 0 ? totalRevenue / totalKm : 0;
+    
+    const fuelExpenses = expenses.filter(e => e.category === 'gas');
+    const fuelCost = fuelExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    const fuelPercent = totalRevenue > 0 ? ((fuelCost / totalRevenue) * 100).toFixed(1) : 0;
+    
+    // Manutenções
+    const maintenanceTypes = {
+        'oil': { name: 'Troca de Óleo', icon: '🛢️' },
+        'oil-filter': { name: 'Filtro de Óleo', icon: '🔧' },
+        'air-filter': { name: 'Filtro de Ar', icon: '💨' },
+        'fuel-filter': { name: 'Filtro de Combustível', icon: '⛽' },
+        'cabin-filter': { name: 'Filtro de Cabine', icon: '🌬️' },
+        'tires': { name: 'Pneus', icon: '🛞' },
+        'brakes': { name: 'Freios', icon: '🛑' },
+        'battery': { name: 'Bateria', icon: '🔋' },
+        'alignment': { name: 'Alinhamento', icon: '📐' },
+        'balancing': { name: 'Balanceamento', icon: '⚖️' },
+        'suspension': { name: 'Suspensão', icon: '🔩' },
+        'other': { name: 'Outros', icon: '🔧' }
+    };
+    
+    const periodMaintenances = maintenanceData.filter(m => {
+        const mDate = new Date(m.date + 'T00:00:00');
+        return mDate >= start && mDate <= end;
+    }).map(m => ({
+        name: maintenanceTypes[m.type]?.name || 'Outros',
+        icon: maintenanceTypes[m.type]?.icon || '🔧',
+        date: m.date,
+        cost: m.cost
+    }));
+    
+    return {
+        totalRevenue,
+        totalExpense,
+        profit,
+        totalTrips,
+        daysWorked,
+        avgDaily,
+        appStats: appStatsArray,
+        expensesByCategory: expensesByCategoryArray,
+        kmData: {
+            totalKm,
+            efficiency,
+            fuelCost,
+            fuelPercent
+        },
+        maintenances: periodMaintenances
+    };
+}
+
+// Formatar data para BR
+function formatDateBR(dateStr) {
+    const date = new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('pt-BR');
+}
+
+console.log('📄 Sistema de Exportação de Relatórios carregado!');
 
 // ========== EXPORTAÇÃO ==========
 
@@ -2262,149 +3771,6 @@ document.addEventListener('keydown', (e) => {
 console.log('⌨️ Atalho: Ctrl+Shift+A para adição rápida');
 
 
-// ========== NOTIFICAÇÃO PERSISTENTE COM BOTÕES DE AÇÃO ==========
-
-let driverModeActive = localStorage.getItem('driverModeActive') === 'true';
-
-// Ativar/Desativar Modo Motorista
-async function toggleDriverMode() {
-    const button = document.getElementById('driverModeButton');
-    
-    if (!driverModeActive) {
-        // Ativar
-        if (button) button.disabled = true;
-        await activateDriverMode();
-        if (button) button.disabled = false;
-        
-        // Atualizar botão se ativou com sucesso
-        if (driverModeActive && button) {
-            button.textContent = '🛑 Desativar Modo Motorista';
-            button.style.background = 'var(--accent-red)';
-        }
-    } else {
-        // Desativar
-        if (button) button.disabled = true;
-        await deactivateDriverMode();
-        if (button) button.disabled = false;
-        
-        // Atualizar botão
-        if (!driverModeActive && button) {
-            button.textContent = '🚗 Ativar Modo Motorista';
-            button.style.background = 'var(--accent-green)';
-        }
-    }
-}
-
-// Ativar Modo Motorista
-async function activateDriverMode() {
-    console.log('🚗 Ativando Modo Motorista...');
-    
-    // Verificar permissão de notificações
-    if (Notification.permission !== 'granted') {
-        const permission = await Notification.requestPermission();
-        if (permission !== 'granted') {
-            showNotification('❌ Permissão de notificação negada', 'error');
-            driverModeActive = false;
-            const checkbox = document.getElementById('driverModeToggle');
-            if (checkbox) checkbox.checked = false;
-            return;
-        }
-    }
-    
-    // Verificar se o Service Worker suporta notificações persistentes
-    if (!('serviceWorker' in navigator) || !('showNotification' in ServiceWorkerRegistration.prototype)) {
-        showNotification('❌ Notificações persistentes não suportadas neste navegador', 'error');
-        driverModeActive = false;
-        const checkbox = document.getElementById('driverModeToggle');
-        if (checkbox) checkbox.checked = false;
-        return;
-    }
-    
-    try {
-        const registration = await navigator.serviceWorker.ready;
-        
-        // Criar notificação persistente com botões de ação
-        await registration.showNotification('🚗 Modo Motorista Ativo', {
-            body: 'Toque nos botões para adicionar corridas rapidamente',
-            icon: './img/logotipo.png',
-            badge: './img/logotipo.png',
-            tag: 'driver-mode',
-            requireInteraction: true,
-            actions: [
-                {
-                    action: 'add-15',
-                    title: '+ R$ 15'
-                },
-                {
-                    action: 'add-25',
-                    title: '+ R$ 25'
-                },
-                {
-                    action: 'add-30',
-                    title: '+ R$ 30'
-                }
-            ]
-        });
-        
-        localStorage.setItem('driverModeActive', 'true');
-        driverModeActive = true;
-        
-        showNotification('✅ Modo Motorista ativado! Use os botões na notificação', 'success');
-        
-        console.log('✅ Modo Motorista ativado com sucesso!');
-        
-    } catch (error) {
-        console.error('❌ Erro ao ativar Modo Motorista:', error);
-        showNotification('❌ Erro: ' + error.message, 'error');
-        driverModeActive = false;
-        const checkbox = document.getElementById('driverModeToggle');
-        if (checkbox) checkbox.checked = false;
-    }
-}
-
-// Desativar Modo Motorista
-async function deactivateDriverMode() {
-    console.log('🛑 Desativando Modo Motorista...');
-    
-    try {
-        const registration = await navigator.serviceWorker.ready;
-        const notifications = await registration.getNotifications({ tag: 'driver-mode' });
-        
-        notifications.forEach(notification => notification.close());
-        
-        localStorage.setItem('driverModeActive', 'false');
-        driverModeActive = false;
-        
-        showNotification('🛑 Modo Motorista desativado', 'info');
-        
-        console.log('✅ Modo Motorista desativado com sucesso!');
-        
-    } catch (error) {
-        console.error('❌ Erro ao desativar Modo Motorista:', error);
-        driverModeActive = false;
-    }
-}
-
-// Atualizar botão de Modo Motorista na interface
-function updateDriverModeButton() {
-    const button = document.getElementById('driverModeButton');
-    if (button) {
-        if (driverModeActive) {
-            button.textContent = '🛑 Desativar Modo Motorista';
-            button.style.background = 'var(--accent-red)';
-        } else {
-            button.textContent = '🚗 Ativar Modo Motorista';
-            button.style.background = 'var(--accent-green)';
-        }
-    }
-}
-
-// Processar ações da notificação (no service worker)
-// Esta função será chamada quando o usuário clicar nos botões da notificação
-
-console.log('🚗 Sistema de Modo Motorista carregado!');
-console.log('💡 Ative o Modo Motorista para adicionar corridas pela notificação');
-
 // ========== ATALHOS RÁPIDOS DA URL ==========
 
 // Detectar se foi aberto por um atalho rápido
@@ -2720,6 +4086,116 @@ function viewKmHistory() {
     }
     
     modal.classList.add('active');
+}
+
+// Abrir modal de adicionar registro de KM
+function openAddKmModal() {
+    const modal = document.getElementById('addKmModal');
+    if (!modal) return;
+    
+    // Definir data de hoje como padrão
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('kmRecordDate');
+    if (dateInput) {
+        dateInput.value = today;
+    }
+    
+    // Limpar campos
+    document.getElementById('kmRecordInicial').value = '';
+    document.getElementById('kmRecordFinal').value = '';
+    document.getElementById('kmRecordCalculated').textContent = '0 km';
+    
+    // Adicionar listeners para calcular automaticamente
+    const kmInicialInput = document.getElementById('kmRecordInicial');
+    const kmFinalInput = document.getElementById('kmRecordFinal');
+    
+    const calculateKm = () => {
+        const inicial = parseFloat(kmInicialInput.value) || 0;
+        const final = parseFloat(kmFinalInput.value) || 0;
+        const rodado = final > inicial ? final - inicial : 0;
+        document.getElementById('kmRecordCalculated').textContent = rodado.toFixed(1) + ' km';
+    };
+    
+    kmInicialInput.addEventListener('input', calculateKm);
+    kmFinalInput.addEventListener('input', calculateKm);
+    
+    modal.classList.add('active');
+}
+
+// Salvar registro de KM
+function saveKmRecord(event) {
+    event.preventDefault();
+    
+    const date = document.getElementById('kmRecordDate').value;
+    const kmInicial = parseFloat(document.getElementById('kmRecordInicial').value);
+    const kmFinal = parseFloat(document.getElementById('kmRecordFinal').value);
+    
+    // Validações
+    if (!date) {
+        showNotification('❌ Data não informada', 'info');
+        return;
+    }
+    
+    if (isNaN(kmInicial) || kmInicial < 0) {
+        showNotification('❌ KM inicial inválido', 'info');
+        return;
+    }
+    
+    if (isNaN(kmFinal) || kmFinal < 0) {
+        showNotification('❌ KM final inválido', 'info');
+        return;
+    }
+    
+    if (kmFinal <= kmInicial) {
+        showNotification('❌ KM final deve ser maior que o inicial', 'info');
+        return;
+    }
+    
+    const kmRodado = kmFinal - kmInicial;
+    
+    // Criar registro
+    const record = {
+        date: date,
+        kmInicial: kmInicial,
+        kmFinal: kmFinal,
+        kmRodado: kmRodado,
+        startTime: new Date(date + 'T00:00:00').toISOString(),
+        endTime: new Date(date + 'T23:59:59').toISOString()
+    };
+    
+    // Verificar se já existe registro para esta data
+    const existingIndex = kmData.findIndex(item => item.date === date);
+    
+    if (existingIndex >= 0) {
+        // Perguntar se quer substituir
+        if (confirm(`Já existe um registro para ${new Date(date + 'T00:00:00').toLocaleDateString('pt-BR')}. Deseja substituir?`)) {
+            kmData[existingIndex] = record;
+        } else {
+            return;
+        }
+    } else {
+        kmData.push(record);
+    }
+    
+    // Ordenar por data (mais recente primeiro)
+    kmData.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Salvar no localStorage
+    localStorage.setItem('kmData', JSON.stringify(kmData));
+    
+    // Fechar modal
+    closeModal('addKm');
+    
+    // Atualizar interface
+    updateKmInterface();
+    updateKmDisplay();
+    
+    // Atualizar manutenção
+    if (typeof updateMaintenanceDisplay === 'function') {
+        updateMaintenanceDisplay();
+    }
+    
+    showNotification(`✅ Registro salvo! ${kmRodado.toFixed(1)} km rodados`, 'success');
 }
 
 // Inicializar KM ao carregar

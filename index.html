@@ -674,6 +674,861 @@
             display: none;
         }
 
+        /* ========== HOME SIMPLIFICADA - PREMIUM ========== */
+
+        /* Saudação */
+        .greeting-section {
+            margin-bottom: 24px;
+            padding: 0 4px;
+        }
+
+        .greeting-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .greeting-date {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* CARD HERO - Lucro Líquido */
+        .hero-card {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            border-radius: 24px;
+            padding: 32px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.25);
+            color: white;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .hero-value {
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: -3px;
+            line-height: 1;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .hero-comparison {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.95;
+            margin-bottom: 24px;
+        }
+
+        .comparison-icon {
+            font-size: 16px;
+        }
+
+        .hero-meta {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .meta-label {
+            opacity: 0.9;
+        }
+
+        .meta-value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .progress-container {
+            margin-top: 12px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 999px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.95;
+        }
+
+        /* MINI CARDS - Métricas Secundárias */
+        .mini-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .mini-card-new {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .mini-card-new:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+
+        .mini-card-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .mini-card-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .mini-card-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* AÇÕES RÁPIDAS */
+        .quick-actions-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding: 0 4px;
+        }
+
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .quick-action-btn {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--primary);
+            background: var(--bg-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(14, 165, 233, 0.15);
+        }
+
+        .quick-action-btn:active {
+            transform: scale(0.97);
+        }
+
+        .quick-action-icon {
+            font-size: 32px;
+        }
+
+        .quick-action-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* INSIGHT CARD */
+        .insight-card-new {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+        }
+
+        .insight-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .insight-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1E40AF;
+            font-weight: 500;
+        }
+
+        /* GRÁFICO SEMANAL SIMPLES */
+        .weekly-chart-simple {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .chart-header-simple {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .chart-best {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .chart-wrapper-simple {
+            height: 180px;
+            position: relative;
+        }
+
+        /* ========== MELHORIAS PREMIUM - ANIMAÇÕES E INTERAÇÕES ========== */
+        
+        /* Animações de entrada em cascata */
+        .greeting-section {
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .hero-card {
+            animation: fadeInUp 0.7s ease-out 0.1s backwards;
+        }
+
+        .mini-cards-grid {
+            animation: fadeInUp 0.7s ease-out 0.2s backwards;
+        }
+
+        .mini-card-new:nth-child(1) {
+            animation: fadeInUp 0.6s ease-out 0.3s backwards;
+        }
+
+        .mini-card-new:nth-child(2) {
+            animation: fadeInUp 0.6s ease-out 0.4s backwards;
+        }
+
+        .mini-card-new:nth-child(3) {
+            animation: fadeInUp 0.6s ease-out 0.5s backwards;
+        }
+
+        .quick-actions-section {
+            animation: fadeInUp 0.7s ease-out 0.6s backwards;
+        }
+
+        .insight-card-new {
+            animation: fadeInUp 0.7s ease-out 0.7s backwards;
+        }
+
+        .weekly-chart-simple {
+            animation: fadeInUp 0.7s ease-out 0.8s backwards;
+        }
+
+        /* Micro-interações nos mini cards */
+        .mini-card-new {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mini-card-new::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .mini-card-new:hover::before {
+            left: 100%;
+        }
+
+        .mini-card-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .mini-card-new:hover .mini-card-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .mini-card-value {
+            transition: color 0.3s ease;
+        }
+
+        .mini-card-new:hover .mini-card-value {
+            color: var(--primary);
+        }
+
+        /* Animação de pulso no hero card quando meta é atingida */
+        .hero-card.goal-achieved {
+            animation: pulse-success 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-success {
+            0%, 100% {
+                box-shadow: 0 20px 40px rgba(16, 185, 129, 0.25);
+            }
+            50% {
+                box-shadow: 0 25px 50px rgba(16, 185, 129, 0.4);
+            }
+        }
+
+        /* Animação da barra de progresso */
+        .progress-fill {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer-progress 2s infinite;
+        }
+
+        @keyframes shimmer-progress {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* Efeito ripple nos botões de ação rápida */
+        .quick-action-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(14, 165, 233, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .quick-action-btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Animação do ícone nos botões */
+        .quick-action-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .quick-action-btn:hover .quick-action-icon {
+            transform: scale(1.15);
+        }
+
+        .quick-action-btn:active .quick-action-icon {
+            transform: scale(0.95);
+        }
+
+        /* Insight card com borda animada */
+        .insight-card-new {
+            position: relative;
+        }
+
+        .insight-card-new::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 100%);
+            animation: pulse-border 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        /* Hover no gráfico */
+        .weekly-chart-simple {
+            position: relative;
+        }
+
+        .weekly-chart-simple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        /* ========== RESPONSIVIDADE MOBILE APRIMORADA ========== */
+        
+        /* Tablets e Mobile Grande (768px - 1024px) */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 20px;
+            }
+
+            .hero-card {
+                padding: 28px 20px;
+                min-height: 240px;
+            }
+
+            .hero-value {
+                font-size: 52px;
+            }
+        }
+
+        /* Mobile Médio (481px - 767px) */
+        @media (max-width: 767px) {
+            .container {
+                padding: 16px;
+            }
+
+            .greeting-title {
+                font-size: 26px;
+            }
+
+            .hero-card {
+                padding: 24px 20px;
+                min-height: 220px;
+                margin-bottom: 16px;
+            }
+
+            .hero-value {
+                font-size: 48px;
+                letter-spacing: -2px;
+            }
+
+            .hero-label {
+                font-size: 11px;
+            }
+
+            .mini-cards-grid {
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .mini-card-new {
+                padding: 18px 14px;
+            }
+
+            .mini-card-icon {
+                font-size: 26px;
+                margin-bottom: 10px;
+            }
+
+            .mini-card-value {
+                font-size: 18px;
+            }
+
+            .quick-actions-grid {
+                gap: 10px;
+            }
+
+            .quick-action-btn {
+                padding: 18px 14px;
+            }
+
+            .quick-action-icon {
+                font-size: 30px;
+            }
+
+            .weekly-chart-simple {
+                padding: 20px;
+            }
+
+            .chart-wrapper-simple {
+                height: 160px;
+            }
+        }
+
+        /* Mobile Pequeno (361px - 480px) */
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+
+            .greeting-section {
+                margin-bottom: 20px;
+            }
+
+            .greeting-title {
+                font-size: 24px;
+            }
+
+            .greeting-date {
+                font-size: 13px;
+            }
+
+            .hero-card {
+                padding: 20px 16px;
+                min-height: 200px;
+                margin-bottom: 12px;
+                border-radius: 20px;
+            }
+
+            .hero-value {
+                font-size: 44px;
+                letter-spacing: -2px;
+                margin-bottom: 10px;
+            }
+
+            .hero-label {
+                font-size: 10px;
+                margin-bottom: 10px;
+            }
+
+            .hero-comparison {
+                font-size: 13px;
+                margin-bottom: 20px;
+            }
+
+            .hero-meta {
+                padding: 14px;
+            }
+
+            .meta-info {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+
+            .meta-value {
+                font-size: 15px;
+            }
+
+            .progress-text {
+                font-size: 11px;
+            }
+
+            .mini-cards-grid {
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+
+            .mini-card-new {
+                padding: 16px 12px;
+                border-radius: 14px;
+            }
+
+            .mini-card-icon {
+                font-size: 24px;
+                margin-bottom: 8px;
+            }
+
+            .mini-card-value {
+                font-size: 17px;
+                margin-bottom: 4px;
+            }
+
+            .mini-card-label {
+                font-size: 10px;
+            }
+
+            .section-title {
+                font-size: 15px;
+                margin-bottom: 14px;
+            }
+
+            .quick-actions-grid {
+                gap: 8px;
+            }
+
+            .quick-action-btn {
+                padding: 16px 12px;
+                border-radius: 14px;
+            }
+
+            .quick-action-icon {
+                font-size: 28px;
+            }
+
+            .quick-action-text {
+                font-size: 13px;
+            }
+
+            .insight-card-new {
+                padding: 16px;
+                margin-bottom: 16px;
+                border-radius: 14px;
+            }
+
+            .insight-icon {
+                font-size: 24px;
+            }
+
+            .insight-text {
+                font-size: 13px;
+            }
+
+            .weekly-chart-simple {
+                padding: 16px;
+                margin-bottom: 16px;
+                border-radius: 16px;
+            }
+
+            .chart-header-simple {
+                margin-bottom: 16px;
+            }
+
+            .chart-title {
+                font-size: 15px;
+            }
+
+            .chart-best {
+                font-size: 11px;
+            }
+
+            .chart-wrapper-simple {
+                height: 150px;
+            }
+        }
+
+        /* Mobile Muito Pequeno (< 360px) */
+        @media (max-width: 360px) {
+            .container {
+                padding: 10px;
+            }
+
+            .greeting-title {
+                font-size: 22px;
+            }
+
+            .greeting-date {
+                font-size: 12px;
+            }
+
+            .hero-card {
+                padding: 18px 14px;
+                min-height: 180px;
+            }
+
+            .hero-value {
+                font-size: 38px;
+                letter-spacing: -1.5px;
+            }
+
+            .hero-label {
+                font-size: 9px;
+            }
+
+            .hero-comparison {
+                font-size: 12px;
+            }
+
+            .hero-meta {
+                padding: 12px;
+            }
+
+            .meta-info {
+                font-size: 12px;
+            }
+
+            .meta-value {
+                font-size: 14px;
+            }
+
+            .mini-cards-grid {
+                gap: 6px;
+            }
+
+            .mini-card-new {
+                padding: 14px 10px;
+            }
+
+            .mini-card-icon {
+                font-size: 22px;
+            }
+
+            .mini-card-value {
+                font-size: 16px;
+            }
+
+            .mini-card-label {
+                font-size: 9px;
+            }
+
+            .quick-action-btn {
+                padding: 14px 10px;
+            }
+
+            .quick-action-icon {
+                font-size: 26px;
+            }
+
+            .quick-action-text {
+                font-size: 12px;
+            }
+
+            .insight-card-new {
+                padding: 14px;
+                gap: 12px;
+            }
+
+            .insight-icon {
+                font-size: 22px;
+            }
+
+            .insight-text {
+                font-size: 12px;
+            }
+
+            .weekly-chart-simple {
+                padding: 14px;
+            }
+
+            .chart-wrapper-simple {
+                height: 140px;
+            }
+        }
+
+        /* Landscape Mode - Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .hero-card {
+                min-height: auto;
+                padding: 16px;
+            }
+
+            .hero-value {
+                font-size: 36px;
+            }
+
+            .mini-cards-grid {
+                margin-bottom: 12px;
+            }
+
+            .chart-wrapper-simple {
+                height: 120px;
+            }
+        }
+
+        /* Touch Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .quick-action-btn {
+                min-height: 48px;
+            }
+
+            .mini-card-new {
+                min-height: 100px;
+            }
+
+            /* Aumentar área de toque */
+            .quick-action-btn,
+            .mini-card-new {
+                -webkit-tap-highlight-color: rgba(14, 165, 233, 0.1);
+            }
+        }
+
+        /* Modo escuro - Preparação para futuro */
+        @media (prefers-color-scheme: dark) {
+            /* Será implementado quando adicionar toggle de tema */
+        }
+
+        /* Reduzir animações para usuários que preferem */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
         .period-selector {
             display: flex;
             gap: 8px;
@@ -4555,6 +5410,55 @@
                 font-size: 10px;
             }
 
+            /* HOME SIMPLIFICADA - RESPONSIVO */
+            .hero-value {
+                font-size: 48px;
+                letter-spacing: -2px;
+            }
+            
+            .greeting-title {
+                font-size: 24px;
+            }
+            
+            .mini-cards-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            
+            .mini-card-new {
+                padding: 16px 12px;
+            }
+            
+            .mini-card-icon {
+                font-size: 24px;
+                margin-bottom: 8px;
+            }
+            
+            .mini-card-value {
+                font-size: 16px;
+            }
+            
+            .mini-card-label {
+                font-size: 10px;
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .quick-action-btn {
+                padding: 16px 12px;
+            }
+            
+            .quick-action-icon {
+                font-size: 28px;
+            }
+            
+            .quick-action-text {
+                font-size: 13px;
+            }
+
             .featured-card-value {
                 font-size: 30px;
                 line-height: 1.1;
@@ -5366,136 +6270,101 @@
     <div class="container">
         <!-- Página Dashboard -->
         <div id="page-dashboard" class="page active">
-            <!-- Card Principal Destacado -->
-            <div class="featured-card">
-                <div class="featured-card-content">
-                    <div class="featured-card-label">💰 FATURAMENTO</div>
-                    <div class="featured-card-value">R$ 0,00</div>
-                    <div class="featured-card-subtitle">Atualizado em tempo real</div>
+            
+            <!-- Saudação -->
+            <div class="greeting-section">
+                <div class="greeting-text">
+                    <div class="greeting-title" id="greetingTitle">Bom dia</div>
+                    <div class="greeting-date" id="greetingDate">Quinta, 7 de Maio</div>
                 </div>
-                <div class="featured-card-icon">💎</div>
             </div>
 
-        <!-- Seletor de Período -->
-        <div class="period-selector">
-            <button class="period-btn active" onclick="changePeriod('today')">HOJE</button>
-            <button class="period-btn" onclick="changePeriod('week')">SEMANA</button>
-            <button class="period-btn" onclick="changePeriod('month')">MÊS</button>
-        </div>
-
-        <!-- Cards Circulares de Progresso -->
-        <div class="circular-cards">
-            <div class="circular-card">
-                <div class="circular-progress">
-                    <svg width="120" height="120">
-                        <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
-                        <circle id="revenueCircle" class="circular-progress-fill green" cx="60" cy="60" r="52" 
-                                stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
-                    </svg>
-                    <div class="circular-progress-text">
-                        <div id="revenuePercent" class="circular-progress-percent">0%</div>
-                        <div class="circular-progress-label">Meta</div>
+            <!-- CARD HERO - LUCRO LÍQUIDO -->
+            <div class="hero-card">
+                <div class="hero-label">💰 LUCRO LÍQUIDO HOJE</div>
+                <div class="hero-value" id="heroProfit">R$ 0,00</div>
+                <div class="hero-comparison" id="heroComparison">
+                    <span class="comparison-icon">📊</span>
+                    <span class="comparison-text">Comparado com ontem</span>
+                </div>
+                
+                <div class="hero-meta">
+                    <div class="meta-info">
+                        <span class="meta-label">Meta diária:</span>
+                        <span class="meta-value" id="metaValue">R$ 400,00</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="heroProgressFill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progressPercent">0%</span>
+                            <span id="progressRemaining">Faltam R$ 400,00</span>
+                        </div>
                     </div>
                 </div>
-                <div class="circular-card-title">💵 RECEITAS</div>
-                <div class="circular-card-value" id="circularRevenue">R$ 0,00</div>
             </div>
 
-            <div class="circular-card">
-                <div class="circular-progress">
-                    <svg width="120" height="120">
-                        <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
-                        <circle id="expenseCircle" class="circular-progress-fill red" cx="60" cy="60" r="52" 
-                                stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
-                    </svg>
-                    <div class="circular-progress-text">
-                        <div id="expensePercent" class="circular-progress-percent">0%</div>
-                        <div class="circular-progress-label">Gastos</div>
-                    </div>
+            <!-- MINI CARDS - MÉTRICAS SECUNDÁRIAS -->
+            <div class="mini-cards-grid">
+                <div class="mini-card-new">
+                    <div class="mini-card-icon">⏱️</div>
+                    <div class="mini-card-value" id="miniHours">0h</div>
+                    <div class="mini-card-label">Horas</div>
                 </div>
-                <div class="circular-card-title">💸 GASTOS</div>
-                <div class="circular-card-value" id="circularExpense">R$ 0,00</div>
-            </div>
-
-            <div class="circular-card">
-                <div class="circular-progress">
-                    <svg width="120" height="120">
-                        <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
-                        <circle id="profitCircle" class="circular-progress-fill blue" cx="60" cy="60" r="52" 
-                                stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
-                    </svg>
-                    <div class="circular-progress-text">
-                        <div id="profitPercent" class="circular-progress-percent">0%</div>
-                        <div class="circular-progress-label">Lucro</div>
-                    </div>
+                <div class="mini-card-new">
+                    <div class="mini-card-icon">🚗</div>
+                    <div class="mini-card-value" id="miniKm">0 km</div>
+                    <div class="mini-card-label">Rodados</div>
                 </div>
-                <div class="circular-card-title">📈 LUCRO LÍQUIDO</div>
-                <div class="circular-card-value" id="circularProfit">R$ 0,00</div>
-            </div>
-
-            <div class="circular-card">
-                <div class="circular-progress">
-                    <svg width="120" height="120">
-                        <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
-                        <circle id="tripsCircle" class="circular-progress-fill yellow" cx="60" cy="60" r="52" 
-                                stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
-                    </svg>
-                    <div class="circular-progress-text">
-                        <div id="tripsPercent" class="circular-progress-percent">0%</div>
-                        <div class="circular-progress-label">Meta</div>
-                    </div>
+                <div class="mini-card-new">
+                    <div class="mini-card-icon">⛽</div>
+                    <div class="mini-card-value" id="miniFuel">R$ 0</div>
+                    <div class="mini-card-label">Combustível</div>
                 </div>
-                <div class="circular-card-title">🚕 CORRIDAS</div>
-                <div class="circular-card-value" id="circularTrips">0</div>
             </div>
-        </div>
 
-        <!-- Mini Stats Grid -->
-        <div class="mini-stats-grid">
-            <div class="mini-stat-card">
-                <div class="mini-stat-icon">⛽</div>
-                <div class="mini-stat-value" id="miniGas">R$ 0</div>
-                <div class="mini-stat-label">Combustível</div>
+            <!-- AÇÕES RÁPIDAS -->
+            <div class="quick-actions-section">
+                <div class="section-title">Ações Rápidas</div>
+                <div class="quick-actions-grid">
+                    <button class="quick-action-btn" onclick="openModal('revenue')">
+                        <span class="quick-action-icon">💵</span>
+                        <span class="quick-action-text">Corrida</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="openModal('revenue')">
+                        <span class="quick-action-icon">💰</span>
+                        <span class="quick-action-text">Ganho</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="openModal('expense')">
+                        <span class="quick-action-icon">⛽</span>
+                        <span class="quick-action-text">Abasteci</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="openModal('expense')">
+                        <span class="quick-action-icon">💸</span>
+                        <span class="quick-action-text">Gasto</span>
+                    </button>
+                </div>
             </div>
-            <div class="mini-stat-card">
-                <div class="mini-stat-icon">🔧</div>
-                <div class="mini-stat-value" id="miniMaintenance">R$ 0</div>
-                <div class="mini-stat-label">Manutenção</div>
-            </div>
-            <div class="mini-stat-card">
-                <div class="mini-stat-icon">📱</div>
-                <div class="mini-stat-value" id="miniApp">R$ 0</div>
-                <div class="mini-stat-label">App</div>
-            </div>
-            <div class="mini-stat-card">
-                <div class="mini-stat-icon">🍔</div>
-                <div class="mini-stat-value" id="miniFood">R$ 0</div>
-                <div class="mini-stat-label">Alimentação</div>
-            </div>
-        </div>
 
-        <!-- Ações Rápidas -->
-        <div class="actions">
-            <button class="btn btn-primary" onclick="openModal('revenue')">
-                <span>💵</span> Receita
-            </button>
-            <button class="btn btn-danger" onclick="openModal('expense')">
-                <span>💸</span> Despesa
-            </button>
-            <button class="btn btn-secondary" onclick="openExportMenu()">
-                <span>📄</span> Exportar
-            </button>
-        </div>
+            <!-- INSIGHT ÚNICO -->
+            <div class="insight-card-new">
+                <div class="insight-icon">💡</div>
+                <div class="insight-text" id="dailyInsight">
+                    Seu melhor horário começa às 18h. Considere trabalhar agora.
+                </div>
+            </div>
 
-        <!-- Gráfico de Barras -->
-        <div class="chart-container">
-            <div class="chart-header">
-                <span>📊</span> Evolução Semanal
+            <!-- GRÁFICO SEMANAL SIMPLES -->
+            <div class="weekly-chart-simple">
+                <div class="chart-header-simple">
+                    <span class="chart-title">📊 Semana</span>
+                    <span class="chart-best" id="chartBest">Melhor: Quinta (R$ 450)</span>
+                </div>
+                <div class="chart-wrapper-simple">
+                    <canvas id="weeklyChartSimple"></canvas>
+                </div>
             </div>
-            <div class="chart-wrapper">
-                <canvas id="weeklyChart"></canvas>
-            </div>
-        </div>
 
         </div>
         <!-- Fim da Página Dashboard -->

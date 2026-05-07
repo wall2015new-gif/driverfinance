@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
         applyTheme(currentTheme);
         updateHomePage();
         initializeForms();
-        createWeeklyChart();
+        // Não precisa chamar createWeeklyChart aqui, updateHomePage já chama createWeeklyChartSimple
         
         console.log('✅ Driver Finance carregado com sucesso!');
     } catch (error) {
@@ -57,6 +57,9 @@ function closeFAB() {
 function updateHomePage() {
     console.log('🔄 Atualizando página inicial premium...');
     
+    // Atualizar saudação
+    updateGreeting();
+    
     // Filtrar transações de hoje
     const today = new Date().toISOString().split('T')[0];
     const todayTransactions = transactions.filter(t => t.date === today);
@@ -83,81 +86,135 @@ function updateHomePage() {
     const fuelExpenses = expenses.filter(e => e.category === 'gas');
     const totalFuel = fuelExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
     
-    // Atualizar Hero Card
+    // KM rodados (se houver registro)
+    const kmData = JSON.parse(localStorage.getItem('kmToday')) || null;
+    let kmRodados = 0;
+    if (kmData && kmData.kmInicial && kmData.kmFinal) {
+        kmRodados = kmData.kmFinal - kmData.kmInicial;
+    }
+    
+    // Atualizar Hero Card - Lucro Líquido
     const heroProfit = document.getElementById('heroProfit');
-    const heroProgressBar = document.getElementById('heroProgressBar');
-    const heroSubtitle = document.getElementById('heroSubtitle');
+    const heroProgressFill = document.getElementById('heroProgressFill');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressRemaining = document.getElementById('progressRemaining');
+    const metaValue = document.getElementById('metaValue');
+    const heroCard = document.querySelector('.hero-card');
     
     if (heroProfit) {
         heroProfit.textContent = formatCurrency(profit);
     }
     
     // Calcular progresso da meta
-    const dailyGoal = goals.daily || 200;
+    const dailyGoal = goals.daily || 400;
     const progress = dailyGoal > 0 ? Math.min((profit / dailyGoal) * 100, 100) : 0;
     
-    if (heroProgressBar) {
-        heroProgressBar.style.width = progress + '%';
+    if (metaValue) {
+        metaValue.textContent = formatCurrency(dailyGoal);
     }
     
-    if (heroSubtitle) {
+    if (heroProgressFill) {
+        heroProgressFill.style.width = progress + '%';
+    }
+    
+    if (progressPercent) {
+        progressPercent.textContent = Math.round(progress) + '%';
+    }
+    
+    if (progressRemaining) {
         if (profit >= dailyGoal) {
-            heroSubtitle.textContent = '🎉 Parabéns! Você bateu sua meta!';
-        } else if (profit > 0) {
+            progressRemaining.textContent = '🎉 Meta atingida!';
+        } else {
             const remaining = dailyGoal - profit;
-            heroSubtitle.textContent = `Faltam ${formatCurrency(remaining)} para sua meta`;
-        } else {
-            heroSubtitle.textContent = 'Comece a registrar suas corridas';
+            progressRemaining.textContent = `Faltam ${formatCurrency(remaining)}`;
         }
     }
     
-    // Atualizar Quick Metrics
-    const metricRevenue = document.getElementById('metricRevenue');
-    const metricTime = document.getElementById('metricTime');
-    const metricFuel = document.getElementById('metricFuel');
-    
-    if (metricRevenue) {
-        metricRevenue.textContent = formatCurrency(totalRevenue);
+    // Adicionar animação quando meta é atingida
+    if (heroCard) {
+        if (profit >= dailyGoal && dailyGoal > 0) {
+            heroCard.classList.add('goal-achieved');
+        } else {
+            heroCard.classList.remove('goal-achieved');
+        }
     }
     
-    if (metricTime) {
+    // Atualizar Mini Cards
+    const miniHours = document.getElementById('miniHours');
+    const miniKm = document.getElementById('miniKm');
+    const miniFuel = document.getElementById('miniFuel');
+    
+    if (miniHours) {
         if (totalMinutes > 0) {
-            metricTime.textContent = `${hours}h${minutes > 0 ? minutes + 'm' : ''}`;
+            miniHours.textContent = `${hours}h${minutes > 0 ? minutes + 'm' : ''}`;
         } else {
-            metricTime.textContent = '0h';
+            miniHours.textContent = '0h';
         }
     }
     
-    if (metricFuel) {
-        metricFuel.textContent = formatCurrency(totalFuel);
+    if (miniKm) {
+        if (kmRodados > 0) {
+            miniKm.textContent = kmRodados.toFixed(1) + ' km';
+        } else {
+            miniKm.textContent = '0 km';
+        }
     }
     
-    // Atualizar Insights
-    updateInsights(totalRevenue, profit, dailyGoal, revenues.length);
+    if (miniFuel) {
+        miniFuel.textContent = formatCurrency(totalFuel);
+    }
     
-    // Atualizar gráfico
-    createWeeklyChart();
+    // Atualizar Insight
+    updateDailyInsight(totalRevenue, profit, dailyGoal, revenues.length);
+    
+    // Atualizar gráfico semanal
+    createWeeklyChartSimple();
     
     console.log('✅ Página inicial atualizada!');
 }
 
-function updateInsights(revenue, profit, goal, trips) {
-    const insightsCard = document.getElementById('insightsCard');
-    const insightsTitle = document.getElementById('insightsTitle');
-    const insightsText = document.getElementById('insightsText');
+// Atualizar saudação com hora do dia
+function updateGreeting() {
+    const greetingTitle = document.getElementById('greetingTitle');
+    const greetingDate = document.getElementById('greetingDate');
     
-    if (!insightsCard || !insightsTitle || !insightsText) return;
+    if (!greetingTitle || !greetingDate) return;
     
-    // Se não tem dados suficientes, esconder
-    if (transactions.length < 5) {
-        insightsCard.style.display = 'none';
-        return;
+    const now = new Date();
+    const hour = now.getHours();
+    
+    let greeting = 'Bom dia';
+    if (hour >= 12 && hour < 18) {
+        greeting = 'Boa tarde';
+    } else if (hour >= 18) {
+        greeting = 'Boa noite';
     }
     
-    insightsCard.style.display = 'block';
+    greetingTitle.textContent = greeting;
     
-    // Calcular insights
-    const percentOfGoal = goal > 0 ? Math.round((profit / goal) * 100) : 0;
+    // Formatar data
+    const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    
+    const dayName = days[now.getDay()];
+    const day = now.getDate();
+    const month = months[now.getMonth()];
+    
+    greetingDate.textContent = `${dayName}, ${day} de ${month}`;
+}
+
+// Atualizar insight diário
+function updateDailyInsight(revenue, profit, goal, trips) {
+    const dailyInsight = document.getElementById('dailyInsight');
+    
+    if (!dailyInsight) return;
+    
+    // Se não tem dados suficientes
+    if (transactions.length < 3) {
+        dailyInsight.textContent = 'Comece a registrar suas corridas para receber insights personalizados.';
+        return;
+    }
     
     // Calcular média dos últimos 7 dias
     const last7Days = [];
@@ -179,20 +236,170 @@ function updateInsights(revenue, profit, goal, trips) {
     const avgProfit = last7Days.length > 0 ? last7Days.reduce((a, b) => a + b, 0) / last7Days.length : 0;
     
     // Gerar insight
+    const percentOfGoal = goal > 0 ? Math.round((profit / goal) * 100) : 0;
+    
     if (percentOfGoal >= 100) {
-        insightsTitle.textContent = '🎉 Meta Batida!';
-        insightsText.textContent = `Você já atingiu ${percentOfGoal}% da sua meta diária. Continue assim!`;
+        dailyInsight.textContent = `🎉 Parabéns! Você já atingiu ${percentOfGoal}% da sua meta diária. Continue assim!`;
     } else if (profit > avgProfit && avgProfit > 0) {
         const percentAbove = Math.round(((profit - avgProfit) / avgProfit) * 100);
-        insightsTitle.textContent = '📈 Acima da Média';
-        insightsText.textContent = `Você está ${percentAbove}% acima da sua média dos últimos 7 dias!`;
+        dailyInsight.textContent = `📈 Você está ${percentAbove}% acima da sua média dos últimos 7 dias. Excelente trabalho!`;
     } else if (trips > 0) {
         const avgPerTrip = revenue / trips;
-        insightsTitle.textContent = '💡 Análise de Corridas';
-        insightsText.textContent = `Média de ${formatCurrency(avgPerTrip)} por corrida hoje. ${trips} corridas realizadas.`;
+        dailyInsight.textContent = `💡 Média de ${formatCurrency(avgPerTrip)} por corrida hoje. ${trips} corridas realizadas.`;
+    } else if (avgProfit > 0) {
+        dailyInsight.textContent = `💪 Sua média dos últimos 7 dias é ${formatCurrency(avgProfit)}. Vamos buscar esse valor hoje!`;
     } else {
-        insightsTitle.textContent = '💪 Vamos Começar!';
-        insightsText.textContent = `Sua meta é ${formatCurrency(goal)}. Registre suas corridas para acompanhar o progresso.`;
+        const hour = new Date().getHours();
+        if (hour >= 17 && hour < 22) {
+            dailyInsight.textContent = 'Seu melhor horário começa às 18h. Considere trabalhar agora.';
+        } else if (hour >= 6 && hour < 10) {
+            dailyInsight.textContent = 'Bom dia! Horário de pico matinal. Ótimo momento para trabalhar.';
+        } else {
+            dailyInsight.textContent = `Sua meta é ${formatCurrency(goal)}. Registre suas corridas para acompanhar o progresso.`;
+        }
+    }
+}
+
+// Criar gráfico semanal simplificado
+function createWeeklyChartSimple() {
+    console.log('📊 Criando gráfico semanal simplificado...');
+    
+    const canvas = document.getElementById('weeklyChartSimple');
+    if (!canvas) {
+        console.warn('⚠️ Canvas weeklyChartSimple não encontrado!');
+        return;
+    }
+    
+    console.log('✅ Canvas encontrado:', canvas);
+    
+    // Verificar se Chart.js está disponível
+    if (typeof Chart === 'undefined') {
+        console.error('❌ Chart.js não está carregado!');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Destruir gráfico anterior se existir E se for uma instância válida do Chart
+    if (window.weeklyChartSimple && typeof window.weeklyChartSimple.destroy === 'function') {
+        window.weeklyChartSimple.destroy();
+    }
+    
+    // Preparar dados dos últimos 7 dias
+    const labels = [];
+    const data = [];
+    let bestDay = { name: '', value: 0 };
+    
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        // Nome do dia
+        const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        const dayName = dayNames[date.getDay()];
+        labels.push(dayName);
+        
+        // Calcular lucro do dia
+        const dayRevenues = transactions.filter(t => t.type === 'revenue' && t.date === dateStr);
+        const dayExpenses = transactions.filter(t => t.type === 'expense' && t.date === dateStr);
+        const dayProfit = dayRevenues.reduce((sum, t) => sum + parseFloat(t.amount), 0) - 
+                         dayExpenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        
+        data.push(dayProfit);
+        
+        // Verificar se é o melhor dia
+        if (dayProfit > bestDay.value) {
+            bestDay = { name: dayName, value: dayProfit };
+        }
+    }
+    
+    console.log('📊 Dados do gráfico:', { labels, data, bestDay });
+    
+    // Atualizar melhor dia
+    const chartBest = document.getElementById('chartBest');
+    if (chartBest && bestDay.value > 0) {
+        chartBest.textContent = `Melhor: ${bestDay.name} (${formatCurrency(bestDay.value)})`;
+    } else if (chartBest) {
+        chartBest.textContent = 'Sem dados ainda';
+    }
+    
+    // Criar gráfico
+    try {
+        window.weeklyChartSimple = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Lucro',
+                    data: data,
+                    backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    barThickness: 32
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        padding: 12,
+                        borderColor: 'rgba(16, 185, 129, 0.5)',
+                        borderWidth: 1,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return formatCurrency(context.parsed.y);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(226, 232, 240, 0.5)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#94A3B8',
+                            font: {
+                                size: 11,
+                                weight: '600'
+                            },
+                            callback: function(value) {
+                                return 'R$ ' + value;
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#475569',
+                            font: {
+                                size: 12,
+                                weight: '700'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        console.log('✅ Gráfico criado com sucesso!');
+    } catch (error) {
+        console.error('❌ Erro ao criar gráfico:', error);
     }
 }
 

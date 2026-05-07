@@ -1892,16 +1892,30 @@ function updateSmartCalculator() {
     const workingDaysInMonth = 26;
     const workingDaysLeft = Math.max(1, workingDaysInMonth - currentDay);
     
-    // Meta diária necessária = (Total de contas + Combustível estimado) / Dias restantes
-    const estimatedFuelRemaining = avgFuelPerDay * workingDaysLeft;
+    // Verificar se o usuário definiu dias customizados
+    const customDaysInput = document.getElementById('customWorkingDays');
+    let daysToWork = workingDaysLeft; // Padrão: dias úteis restantes
+    let isCustomDays = false;
+    
+    if (customDaysInput && customDaysInput.value && parseInt(customDaysInput.value) > 0) {
+        daysToWork = parseInt(customDaysInput.value);
+        isCustomDays = true;
+    } else if (customDaysInput && !customDaysInput.value) {
+        // Se o campo está vazio, usar o padrão e preencher o campo
+        customDaysInput.value = workingDaysLeft;
+    }
+    
+    // Meta diária necessária = (Total de contas + Combustível estimado) / Dias de trabalho
+    const estimatedFuelRemaining = avgFuelPerDay * daysToWork;
     const totalNeeded = totalBills + estimatedFuelRemaining;
-    const dailyTargetNeeded = totalNeeded / workingDaysLeft;
+    const dailyTargetNeeded = totalNeeded / daysToWork;
     
     // Atualizar interface
     const totalBillsEl = document.getElementById('totalBills');
     const avgFuelPerDayEl = document.getElementById('avgFuelPerDay');
     const workingDaysLeftEl = document.getElementById('workingDaysLeft');
     const dailyTargetNeededEl = document.getElementById('dailyTargetNeeded');
+    const explanationEl = document.getElementById('calculatorExplanation');
     
     // Atualizar com informação detalhada
     if (totalBillsEl) {
@@ -1920,6 +1934,15 @@ function updateSmartCalculator() {
     if (avgFuelPerDayEl) avgFuelPerDayEl.textContent = formatCurrency(avgFuelPerDay);
     if (workingDaysLeftEl) workingDaysLeftEl.textContent = workingDaysLeft;
     if (dailyTargetNeededEl) dailyTargetNeededEl.textContent = formatCurrency(dailyTargetNeeded);
+    
+    // Atualizar explicação
+    if (explanationEl) {
+        if (isCustomDays) {
+            explanationEl.innerHTML = `💡 Trabalhando <strong>${daysToWork} dias</strong>, você precisa fazer <strong>${formatCurrency(dailyTargetNeeded)}/dia</strong> para pagar tudo!`;
+        } else {
+            explanationEl.innerHTML = `💡 Nos próximos <strong>${daysToWork} dias úteis</strong>, você precisa fazer <strong>${formatCurrency(dailyTargetNeeded)}/dia</strong>`;
+        }
+    }
 }
 
 // Inicializar contas ao carregar a página de metas

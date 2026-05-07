@@ -6189,7 +6189,7 @@
                 </div>
                 <div class="calculator-content">
                     <div class="calculator-row">
-                        <span class="calc-label">💰 Total de Contas do Mês:</span>
+                        <span class="calc-label">💰 Total de Contas (Atual + Futuras):</span>
                         <span class="calc-value" id="totalBills">R$ 0,00</span>
                     </div>
                     <div class="calculator-row">
@@ -6200,13 +6200,26 @@
                         <span class="calc-label">📅 Dias Úteis Restantes no Mês:</span>
                         <span class="calc-value" id="workingDaysLeft">0</span>
                     </div>
+                    <div class="calculator-row" style="margin-top: 12px; background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 8px;">
+                        <span class="calc-label">🗓️ Quantos dias você vai trabalhar?</span>
+                        <input 
+                            type="number" 
+                            id="customWorkingDays" 
+                            class="calc-input-days" 
+                            min="1" 
+                            max="365" 
+                            placeholder="Ex: 30"
+                            onchange="updateSmartCalculator()"
+                            style="width: 80px; padding: 8px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; background: rgba(255,255,255,0.2); color: white; font-weight: 700; font-size: 16px; text-align: center;"
+                        >
+                    </div>
                     <div class="calculator-divider"></div>
                     <div class="calculator-row highlight">
                         <span class="calc-label">🎯 Meta Diária Necessária:</span>
                         <span class="calc-value-big" id="dailyTargetNeeded">R$ 0,00</span>
                     </div>
                     <div class="calculator-explanation">
-                        <small>💡 Valor que você precisa fazer por dia para pagar todas as contas + combustível</small>
+                        <small id="calculatorExplanation">💡 Valor que você precisa fazer por dia para pagar todas as contas + combustível</small>
                     </div>
                 </div>
             </div>

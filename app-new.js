@@ -48,9 +48,9 @@ function closeFAB() {
     const bottomSheet = document.getElementById('bottomSheet');
     const backdrop = document.getElementById('backdrop');
     
-    fab.classList.remove('active');
-    bottomSheet.classList.remove('active');
-    backdrop.classList.remove('active');
+    if (fab) fab.classList.remove('active');
+    if (bottomSheet) bottomSheet.classList.remove('active');
+    if (backdrop) backdrop.classList.remove('active');
 }
 
 // ========== HOME PAGE - Premium Update ==========

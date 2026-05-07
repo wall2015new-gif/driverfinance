@@ -5095,6 +5095,70 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal Combustível -->
+    <div id="fuelModal" class="modal" onclick="closeModalOnOutsideClick(event, 'fuel')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">⛽ Abastecimento</div>
+                <button class="modal-close" onclick="closeModal('fuel')">✕</button>
+            </div>
+            <form onsubmit="addFuel(event)">
+                <div class="form-group">
+                    <label class="form-label">Valor</label>
+                    <input type="number" class="form-input" id="fuelValue" step="0.01" required placeholder="0,00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Litros (Opcional)</label>
+                    <input type="number" class="form-input" id="fuelLiters" step="0.01" placeholder="0,00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <input type="text" class="form-input" id="fuelDesc" placeholder="Ex: Posto Shell">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data</label>
+                    <input type="date" class="form-input" id="fuelDate" required>
+                </div>
+                <button type="submit" class="btn btn-success btn-full">Adicionar Abastecimento</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Manutenção -->
+    <div id="maintenanceModal" class="modal" onclick="closeModalOnOutsideClick(event, 'maintenance')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">🔧 Manutenção</div>
+                <button class="modal-close" onclick="closeModal('maintenance')">✕</button>
+            </div>
+            <form onsubmit="addMaintenance(event)">
+                <div class="form-group">
+                    <label class="form-label">Valor</label>
+                    <input type="number" class="form-input" id="maintenanceValue" step="0.01" required placeholder="0,00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" id="maintenanceType" required>
+                        <option value="oil">🛢️ Troca de Óleo</option>
+                        <option value="tire">🛞 Pneus</option>
+                        <option value="brake">🔴 Freios</option>
+                        <option value="filter">🌬️ Filtros</option>
+                        <option value="other">🔧 Outros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <input type="text" class="form-input" id="maintenanceDesc" required placeholder="Ex: Troca de óleo 5W30">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data</label>
+                    <input type="date" class="form-input" id="maintenanceDate" required>
+                </div>
+                <button type="submit" class="btn btn-success btn-full">Adicionar Manutenção</button>
+            </form>
+        </div>
+    </div>
                     <div class="form-group">
                         <label class="form-label">⏰ Início</label>
                         <input type="time" class="form-input" id="revenueStartTime" onchange="calculateWorkTime()">
@@ -5394,65 +5458,6 @@
         </div>
     </div>
 
-    <!-- Modal de Notificações -->
-    <div id="notificationsModal" class="modal" onclick="closeModalOnOutsideClick(event, 'notifications')">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span>🔔</span> Configurar Notificações
-            </div>
-            <div class="notification-settings">
-                <div class="notification-item">
-                    <div class="notification-info">
-                        <div class="notification-title">Lembrete Diário</div>
-                        <div class="notification-desc">Receba um lembrete para registrar suas corridas</div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="dailyReminder" onchange="toggleNotification('daily')">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="notification-item">
-                    <div class="notification-info">
-                        <div class="notification-title">Meta Atingida</div>
-                        <div class="notification-desc">Notificação quando atingir suas metas</div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="goalNotification" onchange="toggleNotification('goal')" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="notification-item">
-                    <div class="notification-info">
-                        <div class="notification-title">Resumo Semanal</div>
-                        <div class="notification-desc">Receba um resumo toda segunda-feira</div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="weeklyReport" onchange="toggleNotification('weekly')">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-            
-            
-            <div class="danger-zone">
-                <div class="danger-zone-header">⚠️ Zona de Perigo</div>
-                <button class="btn-danger-action" onclick="resetAllData()">
-                    🗑️ Zerar Todos os Dados
-                </button>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-primary" onclick="requestNotificationPermission()">Ativar Notificações</button>
-                <button type="button" class="btn btn-secondary" onclick="closeModal('notifications')">Fechar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Botão Flutuante de Notificações -->
-    <button class="fab" onclick="openModal('notifications')" title="Notificações">
-        🔔
-    </button>
-
-    <!-- Modal de Adição Rápida -->
     <script src="app-new.js"></script>
 </body>
 </html>

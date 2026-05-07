@@ -812,6 +812,64 @@ function addExpense(event) {
     updateHomePage();
     renderTransactions();
     
+    showNotification('✅ Despesa adicionada com sucesso!', 'success');
+}
+
+// ========== FUEL & MAINTENANCE ==========
+function addFuel(event) {
+    event.preventDefault();
+    
+    const transaction = {
+        id: Date.now(),
+        type: 'expense',
+        amount: document.getElementById('fuelValue').value,
+        description: document.getElementById('fuelDesc').value || 'Abastecimento',
+        date: document.getElementById('fuelDate').value,
+        category: 'gas',
+        liters: document.getElementById('fuelLiters').value || null
+    };
+    
+    transactions.push(transaction);
+    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+    
+    closeModal('fuel');
+    event.target.reset();
+    initializeForms();
+    
+    updateHomePage();
+    renderTransactions();
+    
+    showNotification('⛽ Abastecimento registrado!', 'success');
+}
+
+function addMaintenance(event) {
+    event.preventDefault();
+    
+    const transaction = {
+        id: Date.now(),
+        type: 'expense',
+        amount: document.getElementById('maintenanceValue').value,
+        description: document.getElementById('maintenanceDesc').value,
+        date: document.getElementById('maintenanceDate').value,
+        category: 'maintenance',
+        maintenanceType: document.getElementById('maintenanceType').value
+    };
+    
+    transactions.push(transaction);
+    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+    
+    closeModal('maintenance');
+    event.target.reset();
+    initializeForms();
+    
+    updateHomePage();
+    renderTransactions();
+    
+    showNotification('🔧 Manutenção registrada!', 'success');
+}
+    
     // Feedback visual
     showNotification('✅ Despesa adicionada com sucesso!', 'success');
 }

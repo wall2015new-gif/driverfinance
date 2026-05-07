@@ -567,6 +567,7 @@ function switchPage(pageName) {
     } else if (pageName === 'goals') {
         console.log('📊 Atualizando metas...');
         updateGoals();
+        updateMonthDisplay();
         renderBills();
         updateSmartCalculator();
     } else if (pageName === 'ai') {
@@ -990,14 +991,21 @@ function formatDate(dateString) {
 }
 
 // ========== NOTIFICAÇÕES ==========
-function showNotification(message, type = 'info') {
+function showNotification(message, type = 'info', duration = 3000) {
     // Criar elemento de notificação
     const notification = document.createElement('div');
+    
+    // Definir cores baseadas no tipo
+    let bgColor = '#4267f5'; // info (azul)
+    if (type === 'success') bgColor = '#00c853'; // verde
+    if (type === 'warning') bgColor = '#FFA726'; // laranja
+    if (type === 'danger' || type === 'error') bgColor = '#EF4444'; // vermelho
+    
     notification.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: ${type === 'success' ? '#00c853' : '#4267f5'};
+        background: ${bgColor};
         color: white;
         padding: 16px 24px;
         border-radius: 12px;
@@ -1006,16 +1014,18 @@ function showNotification(message, type = 'info') {
         z-index: 10000;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         animation: slideInRight 0.3s ease-out;
+        max-width: 400px;
+        line-height: 1.5;
     `;
     notification.textContent = message;
     
     document.body.appendChild(notification);
     
-    // Remover após 3 segundos
+    // Remover após a duração especificada
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease-out';
         setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    }, duration);
 }
 
 // ========== EXPORTAR PDF ==========

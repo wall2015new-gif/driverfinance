@@ -1247,200 +1247,256 @@ function renderAchievements() {
 let expensePieChart = null;
 let monthlyLineChart = null;
 
-function updateReports() {
-    const revenues = transactions.filter(t => t.type === 'revenue');
-    const expenses = transactions.filter(t => t.type === 'expense');
-    
-    const totalRevenue = revenues.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    const totalExpense = expenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    const profit = totalRevenue - totalExpense;
-    
-    // Atualizar resumo
-    const reportRevenue = document.getElementById('reportRevenue');
-    const reportExpense = document.getElementById('reportExpense');
-    const reportProfit = document.getElementById('reportProfit');
-    
-    if (reportRevenue) reportRevenue.textContent = formatCurrency(totalRevenue);
-    if (reportExpense) reportExpense.textContent = formatCurrency(totalExpense);
-    if (reportProfit) reportProfit.textContent = formatCurrency(profit);
-    
-    // Atualizar análise
-    const avgDaily = totalRevenue / Math.max(1, revenues.length);
-    // Somar a quantidade de corridas de cada receita
-    const totalTrips = revenues.reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
-    const avgTicket = totalRevenue / Math.max(1, totalTrips);
-    
-    const avgDailyEl = document.getElementById('avgDaily');
-    const totalTripsEl = document.getElementById('totalTrips');
-    const avgTicketEl = document.getElementById('avgTicket');
-    
-    if (avgDailyEl) avgDailyEl.textContent = formatCurrency(avgDaily);
-    if (totalTripsEl) totalTripsEl.textContent = totalTrips;
-    if (avgTicketEl) avgTicketEl.textContent = formatCurrency(avgTicket);
-    
-    // Criar gráficos
-    createExpensePieChart();
-    createMonthlyLineChart();
+// ========== RELATÓRIOS ==========
+let currentReportPeriod = 'month';
+
+function setReportPeriod(period, btn) {
+    currentReportPeriod = period;
+    document.querySelectorAll('.report-period-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    updateReports();
 }
 
-function createExpensePieChart() {
+function getReportTransactions() {
+    const now = new Date();
+    let startDate;
+
+    if (currentReportPeriod === 'week') {
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - now.getDay());
+        startDate.setHours(0,0,0,0);
+    } else if (currentReportPeriod === '30days') {
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - 29);
+        startDate.setHours(0,0,0,0);
+    } else if (currentReportPeriod === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    } else {
+        startDate = null; // all
+    }
+
+    return transactions.filter(t => {
+        if (!startDate) return true;
+        return new Date(t.date + 'T00:00:00') >= startDate;
+    });
+}
+
+function updateReports() {
+    const filtered = getReportTransactions();
+    const revenues = filtered.filter(t => t.type === 'revenue');
+    const expenses = filtered.filter(t => t.type === 'expense');
+
+    const totalRevenue = revenues.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    const totalExpense = expenses.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    const profit = totalRevenue - totalExpense;
+    const margin = totalRevenue > 0 ? ((profit / totalRevenue) * 100).toFixed(1) : 0;
+    const totalTrips = revenues.reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
+    const avgTicket = totalTrips > 0 ? totalRevenue / totalTrips : 0;
+
+    // Dias trabalhados (dias únicos com receita)
+    const workDays = new Set(revenues.map(t => t.date)).size;
+    const avgDaily = workDays > 0 ? totalRevenue / workDays : 0;
+
+    // Melhor dia
+    const revenueByDay = {};
+    revenues.forEach(t => {
+        revenueByDay[t.date] = (revenueByDay[t.date] || 0) + parseFloat(t.amount || 0);
+    });
+    const bestDayEntry = Object.entries(revenueByDay).sort((a,b) => b[1]-a[1])[0];
+    const bestDayStr = bestDayEntry
+        ? new Date(bestDayEntry[0] + 'T00:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}) + ' (' + formatCurrency(bestDayEntry[1]) + ')'
+        : '-';
+
+    // Horas trabalhadas
+    let totalMinutes = 0;
+    revenues.forEach(r => {
+        if (r.workTime && r.workTime.totalMinutes) totalMinutes += r.workTime.totalMinutes;
+    });
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remainMinutes = totalMinutes % 60;
+    const hoursStr = totalMinutes > 0 ? totalHours + 'h ' + remainMinutes + 'm' : '—';
+    const revenuePerHour = totalMinutes > 0 ? totalRevenue / (totalMinutes / 60) : 0;
+
+    // KM rodado (do localStorage kmData)
+    const kmData = JSON.parse(localStorage.getItem('kmData')) || [];
+    const filteredKm = kmData.filter(k => {
+        if (!currentReportPeriod || currentReportPeriod === 'all') return true;
+        const now = new Date();
+        let startDate;
+        if (currentReportPeriod === 'week') { startDate = new Date(now); startDate.setDate(now.getDate() - now.getDay()); }
+        else if (currentReportPeriod === '30days') { startDate = new Date(now); startDate.setDate(now.getDate() - 29); }
+        else { startDate = new Date(now.getFullYear(), now.getMonth(), 1); }
+        return new Date(k.date + 'T00:00:00') >= startDate;
+    });
+    const totalKm = filteredKm.reduce((sum, k) => sum + (parseFloat(k.kmRodado) || 0), 0);
+    const revenuePerKm = totalKm > 0 ? totalRevenue / totalKm : 0;
+
+    // Combustível
+    const fuelExpenses = expenses.filter(t => t.category === 'gas');
+    const fuelCost = fuelExpenses.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    const fuelLiters = fuelExpenses.reduce((sum, t) => sum + parseFloat(t.liters || 0), 0);
+    const fuelPerKm = totalKm > 0 ? fuelCost / totalKm : 0;
+    const fuelPercent = totalRevenue > 0 ? ((fuelCost / totalRevenue) * 100).toFixed(1) : 0;
+
+    // Manutenções
+    const maintenanceExpenses = expenses.filter(t => t.category === 'maintenance');
+    const maintenanceCost = maintenanceExpenses.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+
+    // Receita por app
+    const appRevenue = {};
+    revenues.forEach(r => {
+        const app = r.app || 'Outros';
+        appRevenue[app] = (appRevenue[app] || 0) + parseFloat(r.amount || 0);
+    });
+
+    // ---- Atualizar DOM ----
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+    set('reportRevenue', formatCurrency(totalRevenue));
+    set('reportRevenueDays', workDays + ' dia' + (workDays !== 1 ? 's' : '') + ' trabalhado' + (workDays !== 1 ? 's' : ''));
+    set('reportExpense', formatCurrency(totalExpense));
+    set('reportExpenseCount', expenses.length + ' lançamento' + (expenses.length !== 1 ? 's' : ''));
+    set('reportProfit', formatCurrency(profit));
+    set('reportMargin', 'Margem: ' + margin + '%');
+    set('reportTrips', totalTrips);
+    set('reportAvgTicket', 'Ticket médio: ' + formatCurrency(avgTicket));
+    set('reportAvgDaily', formatCurrency(avgDaily));
+    set('reportBestDay', bestDayStr);
+    set('reportTotalHours', hoursStr);
+    set('reportRevenuePerHour', totalMinutes > 0 ? formatCurrency(revenuePerHour) : '—');
+    set('reportTotalKm', totalKm > 0 ? totalKm.toFixed(1) + ' km' : '—');
+    set('reportRevenuePerKm', totalKm > 0 ? formatCurrency(revenuePerKm) : '—');
+    set('reportFuelCost', formatCurrency(fuelCost));
+    set('reportFuelLiters', fuelLiters > 0 ? fuelLiters.toFixed(1) + ' L' : '—');
+    set('reportFuelPerKm', totalKm > 0 ? formatCurrency(fuelPerKm) : '—');
+    set('reportFuelPercent', fuelPercent + '%');
+    set('reportMaintenanceCost', formatCurrency(maintenanceCost));
+    set('reportMaintenanceCount', maintenanceExpenses.length);
+
+    // Lista de manutenções
+    const maintList = document.getElementById('reportMaintenanceList');
+    if (maintList) {
+        if (maintenanceExpenses.length === 0) {
+            maintList.innerHTML = '<div style="color:var(--text-tertiary);font-size:13px;text-align:center;padding:8px">Nenhuma manutenção no período</div>';
+        } else {
+            maintList.innerHTML = maintenanceExpenses.slice(0,5).map(m => {
+                const d = new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR');
+                return `<div class="report-maintenance-item">
+                    <div>
+                        <div class="rmi-type">${m.description || m.maintenanceType || 'Manutenção'}</div>
+                        <div class="rmi-date">${d}</div>
+                    </div>
+                    <div class="rmi-cost">${formatCurrency(parseFloat(m.amount || 0))}</div>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    // Barras de apps
+    const appDiv = document.getElementById('reportAppBreakdown');
+    if (appDiv) {
+        const maxApp = Math.max(...Object.values(appRevenue), 1);
+        if (Object.keys(appRevenue).length === 0) {
+            appDiv.innerHTML = '<div style="color:var(--text-tertiary);font-size:13px;text-align:center;padding:8px">Nenhuma receita no período</div>';
+        } else {
+            appDiv.innerHTML = Object.entries(appRevenue)
+                .sort((a,b) => b[1]-a[1])
+                .map(([app, val]) => `
+                    <div class="report-app-bar">
+                        <div class="report-app-name">${app}</div>
+                        <div class="report-app-track"><div class="report-app-fill" style="width:${(val/maxApp*100).toFixed(1)}%"></div></div>
+                        <div class="report-app-value">${formatCurrency(val)}</div>
+                    </div>`).join('');
+        }
+    }
+
+    // Gráficos
+    createExpensePieChart(expenses);
+    createMonthlyLineChart(filtered);
+}
+
+function createExpensePieChart(expenses) {
     const ctx = document.getElementById('expensePieChart');
     if (!ctx) return;
-    
-    if (expensePieChart) {
-        expensePieChart.destroy();
-    }
-    
-    const expenses = transactions.filter(t => t.type === 'expense');
-    const expensesByCategory = {
-        'Combustível': 0,
-        'Manutenção': 0,
-        'Taxas de App': 0,
-        'Alimentação': 0,
-        'Outros': 0
-    };
-    
-    expenses.forEach(expense => {
-        const categoryMap = {
-            gas: 'Combustível',
-            maintenance: 'Manutenção',
-            app: 'Taxas de App',
-            food: 'Alimentação',
-            other: 'Outros'
-        };
-        const category = categoryMap[expense.category] || 'Outros';
-        expensesByCategory[category] += parseFloat(expense.amount);
+    if (expensePieChart) expensePieChart.destroy();
+
+    const categoryMap = { gas: 'Combustível', maintenance: 'Manutenção', app: 'Taxas App', food: 'Alimentação', other: 'Outros' };
+    const colors = { 'Combustível': '#f44336', 'Manutenção': '#ffc107', 'Taxas App': '#4267f5', 'Alimentação': '#00c853', 'Outros': '#9c27b0' };
+    const byCategory = {};
+    (expenses || transactions.filter(t => t.type === 'expense')).forEach(e => {
+        const cat = categoryMap[e.category] || 'Outros';
+        byCategory[cat] = (byCategory[cat] || 0) + parseFloat(e.amount || 0);
     });
-    
+
+    const labels = Object.keys(byCategory).filter(k => byCategory[k] > 0);
+    const data = labels.map(k => byCategory[k]);
+    const bgColors = labels.map(k => colors[k] || '#9c27b0');
+    const total = data.reduce((a,b) => a+b, 0);
+
+    // Legenda customizada
+    const legend = document.getElementById('expenseLegend');
+    if (legend) {
+        legend.innerHTML = labels.map((l, i) => `
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:${bgColors[i]};flex-shrink:0"></div>
+                <span style="color:var(--text-secondary);flex:1">${l}</span>
+                <span style="font-weight:700;color:var(--text-primary)">${total > 0 ? ((byCategory[l]/total)*100).toFixed(0) : 0}%</span>
+            </div>`).join('');
+    }
+
     const isDark = currentTheme === 'dark';
-    const textColor = isDark ? '#a0a0a0' : '#65676b';
-    
     expensePieChart = new Chart(ctx, {
         type: 'doughnut',
-        data: {
-            labels: Object.keys(expensesByCategory),
-            datasets: [{
-                data: Object.values(expensesByCategory),
-                backgroundColor: [
-                    '#f44336',
-                    '#ffc107',
-                    '#4267f5',
-                    '#00c853',
-                    '#9c27b0'
-                ],
-                borderWidth: 0
-            }]
-        },
+        data: { labels, datasets: [{ data, backgroundColor: bgColors, borderWidth: 0 }] },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        color: textColor,
-                        font: {
-                            size: 12,
-                            family: 'Inter'
-                        },
-                        padding: 15
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((context.parsed / total) * 100).toFixed(1);
-                            return context.label + ': ' + formatCurrency(context.parsed) + ' (' + percentage + '%)';
-                        }
-                    }
-                }
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ctx.label + ': ' + formatCurrency(ctx.parsed) + ' (' + ((ctx.parsed/total)*100).toFixed(1) + '%)' } }
             }
         }
     });
 }
 
-function createMonthlyLineChart() {
+function createMonthlyLineChart(filtered) {
     const ctx = document.getElementById('monthlyLineChart');
     if (!ctx) return;
-    
-    if (monthlyLineChart) {
-        monthlyLineChart.destroy();
-    }
-    
-    // Pegar últimos 30 dias
-    const last30Days = [];
-    const revenueData = [];
-    
+    if (monthlyLineChart) monthlyLineChart.destroy();
+
+    const src = filtered || transactions;
+    const last30Days = [], revenueData = [], expenseData = [];
     for (let i = 29; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
         const dateStr = date.toISOString().split('T')[0];
-        
         last30Days.push(date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
-        
-        const dayRevenue = transactions
-            .filter(t => t.type === 'revenue' && t.date === dateStr)
-            .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-        
-        revenueData.push(dayRevenue);
+        revenueData.push(src.filter(t => t.type === 'revenue' && t.date === dateStr).reduce((s,t) => s + parseFloat(t.amount||0), 0));
+        expenseData.push(src.filter(t => t.type === 'expense' && t.date === dateStr).reduce((s,t) => s + parseFloat(t.amount||0), 0));
     }
-    
+
     const isDark = currentTheme === 'dark';
     const gridColor = isDark ? '#2a2a2a' : '#e4e6eb';
     const textColor = isDark ? '#a0a0a0' : '#65676b';
-    
+
     monthlyLineChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: last30Days,
-            datasets: [{
-                label: 'Receita Diária',
-                data: revenueData,
-                borderColor: '#4267f5',
-                backgroundColor: 'rgba(66, 103, 245, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-            }]
+            datasets: [
+                { label: 'Receita', data: revenueData, borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.08)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 2 },
+                { label: 'Despesa', data: expenseData, borderColor: '#EF4444', backgroundColor: 'rgba(239,68,68,0.08)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 2 }
+            ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
             plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'Receita: ' + formatCurrency(context.parsed.y);
-                        }
-                    }
-                }
+                legend: { position: 'top', labels: { color: textColor, font: { size: 11, family: 'Inter' }, padding: 12, boxWidth: 12 } },
+                tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + formatCurrency(ctx.parsed.y) } }
             },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: gridColor
-                    },
-                    ticks: {
-                        color: textColor,
-                        callback: function(value) {
-                            return 'R$ ' + value.toFixed(0);
-                        }
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: textColor,
-                        maxTicksLimit: 10
-                    }
-                }
+                y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, callback: v => 'R$' + v.toFixed(0) } },
+                x: { grid: { display: false }, ticks: { color: textColor, maxTicksLimit: 8 } }
             }
         }
     });

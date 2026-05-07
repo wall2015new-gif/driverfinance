@@ -3716,6 +3716,113 @@
             margin-top: 12px;
         }
 
+        /* Relatórios - Novos estilos */
+        .report-period-filter {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .report-period-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .report-period-btn.active,
+        .report-period-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .report-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .report-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+
+        .report-summary-card.green::before { background: var(--success); }
+        .report-summary-card.red::before   { background: var(--error); }
+        .report-summary-card.blue::before  { background: var(--primary); }
+        .report-summary-card.purple::before{ background: var(--accent); }
+
+        .rsc-icon { font-size: 22px; margin-bottom: 6px; }
+        .rsc-label { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .rsc-value { font-size: 20px; font-weight: 900; color: var(--text-primary); margin-bottom: 2px; }
+        .rsc-sub   { font-size: 10px; color: var(--text-tertiary); }
+
+        .report-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .report-metric {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .rm-icon  { font-size: 20px; margin-bottom: 4px; }
+        .rm-value { font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 2px; }
+        .rm-label { font-size: 9px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.3px; }
+
+        .report-app-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .report-app-name { font-size: 13px; font-weight: 700; color: var(--text-primary); width: 70px; flex-shrink: 0; }
+        .report-app-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+        .report-app-fill  { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width 0.6s ease; }
+        .report-app-value { font-size: 12px; font-weight: 700; color: var(--text-primary); width: 70px; text-align: right; flex-shrink: 0; }
+
+        .report-maintenance-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .report-maintenance-item .rmi-type { font-weight: 700; color: var(--text-primary); }
+        .report-maintenance-item .rmi-date { font-size: 11px; color: var(--text-tertiary); }
+        .report-maintenance-item .rmi-cost { font-weight: 800; color: var(--error); }
+
         /* Relatórios */
         .report-summary {
             display: grid;
@@ -6034,118 +6141,172 @@
     <div id="page-reports" class="page">
         <div class="page-header">
             <h2>📈 Relatórios</h2>
-            <p>Análises detalhadas do seu desempenho</p>
+            <p>Análise completa do seu desempenho</p>
         </div>
 
-        <!-- Exportação de Relatórios -->
-        <div class="export-reports-section">
-            <div class="section-header">
-                <span>📄</span> Exportar Relatório em PDF
-            </div>
-            <div class="export-options">
-                <div class="export-period-buttons">
-                    <button class="btn-export-period" onclick="exportReportPDF(7)">
-                        <span>📅</span> Últimos 7 Dias
-                    </button>
-                    <button class="btn-export-period" onclick="exportReportPDF(15)">
-                        <span>📅</span> Últimos 15 Dias
-                    </button>
-                    <button class="btn-export-period" onclick="exportReportPDF(30)">
-                        <span>📅</span> Últimos 30 Dias
-                    </button>
-                    <button class="btn-export-period custom" onclick="openCustomPeriodModal()">
-                        <span>🗓️</span> Período Personalizado
-                    </button>
-                </div>
-                <div class="export-info">
-                    <small>💡 O relatório incluirá: receitas, despesas, lucro, gráficos, análise de apps, KM rodado, manutenções e muito mais!</small>
-                </div>
-            </div>
+        <!-- Filtro de período -->
+        <div class="report-period-filter">
+            <button class="report-period-btn active" onclick="setReportPeriod('month', this)">Este Mês</button>
+            <button class="report-period-btn" onclick="setReportPeriod('week', this)">Esta Semana</button>
+            <button class="report-period-btn" onclick="setReportPeriod('30days', this)">30 Dias</button>
+            <button class="report-period-btn" onclick="setReportPeriod('all', this)">Tudo</button>
         </div>
 
-        <!-- Resumo do Período -->
-        <div class="report-summary">
-            <div class="summary-card">
-                <div class="summary-icon">💰</div>
-                <div class="summary-info">
-                    <div class="summary-label">Receita Total</div>
-                    <div class="summary-value green" id="reportRevenue">R$ 0,00</div>
-                </div>
+        <!-- Cards de resumo principal -->
+        <div class="report-summary-grid">
+            <div class="report-summary-card green">
+                <div class="rsc-icon">💰</div>
+                <div class="rsc-label">Receita Total</div>
+                <div class="rsc-value" id="reportRevenue">R$ 0,00</div>
+                <div class="rsc-sub" id="reportRevenueDays">0 dias trabalhados</div>
             </div>
-            <div class="summary-card">
-                <div class="summary-icon">💸</div>
-                <div class="summary-info">
-                    <div class="summary-label">Despesa Total</div>
-                    <div class="summary-value red" id="reportExpense">R$ 0,00</div>
-                </div>
+            <div class="report-summary-card red">
+                <div class="rsc-icon">💸</div>
+                <div class="rsc-label">Despesa Total</div>
+                <div class="rsc-value" id="reportExpense">R$ 0,00</div>
+                <div class="rsc-sub" id="reportExpenseCount">0 lançamentos</div>
             </div>
-            <div class="summary-card">
-                <div class="summary-icon">📊</div>
-                <div class="summary-info">
-                    <div class="summary-label">Lucro Líquido</div>
-                    <div class="summary-value blue" id="reportProfit">R$ 0,00</div>
-                </div>
+            <div class="report-summary-card blue">
+                <div class="rsc-icon">📊</div>
+                <div class="rsc-label">Lucro Líquido</div>
+                <div class="rsc-value" id="reportProfit">R$ 0,00</div>
+                <div class="rsc-sub" id="reportMargin">Margem: 0%</div>
+            </div>
+            <div class="report-summary-card purple">
+                <div class="rsc-icon">🚕</div>
+                <div class="rsc-label">Total de Corridas</div>
+                <div class="rsc-value" id="reportTrips">0</div>
+                <div class="rsc-sub" id="reportAvgTicket">Ticket médio: R$ 0,00</div>
             </div>
         </div>
 
-        <!-- Gráfico de Pizza - Despesas por Categoria -->
+        <!-- Métricas de performance -->
         <div class="chart-container">
-            <div class="chart-header">
-                <span>🥧</span> Despesas por Categoria
-            </div>
-            <div class="chart-wrapper" style="height: 300px;">
-                <canvas id="expensePieChart"></canvas>
+            <div class="chart-header"><span>⚡</span> Performance</div>
+            <div class="report-metrics-grid">
+                <div class="report-metric">
+                    <div class="rm-icon">📅</div>
+                    <div class="rm-value" id="reportAvgDaily">R$ 0,00</div>
+                    <div class="rm-label">Média por dia</div>
+                </div>
+                <div class="report-metric">
+                    <div class="rm-icon">🏆</div>
+                    <div class="rm-value" id="reportBestDay">-</div>
+                    <div class="rm-label">Melhor dia</div>
+                </div>
+                <div class="report-metric">
+                    <div class="rm-icon">⏱️</div>
+                    <div class="rm-value" id="reportTotalHours">0h</div>
+                    <div class="rm-label">Horas trabalhadas</div>
+                </div>
+                <div class="report-metric">
+                    <div class="rm-icon">💵</div>
+                    <div class="rm-value" id="reportRevenuePerHour">R$ 0,00</div>
+                    <div class="rm-label">Por hora</div>
+                </div>
+                <div class="report-metric">
+                    <div class="rm-icon">🛣️</div>
+                    <div class="rm-value" id="reportTotalKm">0 km</div>
+                    <div class="rm-label">KM rodado</div>
+                </div>
+                <div class="report-metric">
+                    <div class="rm-icon">📍</div>
+                    <div class="rm-value" id="reportRevenuePerKm">R$ 0,00</div>
+                    <div class="rm-label">Por km</div>
+                </div>
             </div>
         </div>
 
-        <!-- Gráfico de Linha - Evolução Mensal -->
+        <!-- Gráfico evolução 30 dias -->
         <div class="chart-container">
-            <div class="chart-header">
-                <span>�</span> Evolução Mensal
-            </div>
-            <div class="chart-wrapper" style="height: 300px;">
+            <div class="chart-header"><span>📈</span> Evolução de Receita e Despesa</div>
+            <div class="chart-wrapper" style="height: 260px;">
                 <canvas id="monthlyLineChart"></canvas>
             </div>
         </div>
 
-        <!-- Análise Detalhada -->
-        <div class="analysis-section">
-            <div class="section-header">
-                <span>🔍</span> Análise Detalhada
+        <!-- Despesas por categoria -->
+        <div class="chart-container">
+            <div class="chart-header"><span>🥧</span> Despesas por Categoria</div>
+            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                <div class="chart-wrapper" style="height: 220px; flex: 1; min-width: 180px;">
+                    <canvas id="expensePieChart"></canvas>
+                </div>
+                <div id="expenseLegend" style="flex: 1; min-width: 140px; display: flex; flex-direction: column; gap: 8px;"></div>
             </div>
-            <div class="analysis-grid">
-                <div class="analysis-card">
-                    <div class="analysis-label">Média Diária</div>
-                    <div class="analysis-value" id="avgDaily">R$ 0,00</div>
+        </div>
+
+        <!-- Análise por app -->
+        <div class="chart-container">
+            <div class="chart-header"><span>📱</span> Receita por Aplicativo</div>
+            <div id="reportAppBreakdown" style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;"></div>
+        </div>
+
+        <!-- Combustível e KM -->
+        <div class="chart-container">
+            <div class="chart-header"><span>⛽</span> Combustível e Eficiência</div>
+            <div class="report-metrics-grid">
+                <div class="report-metric">
+                    <div class="rm-icon">⛽</div>
+                    <div class="rm-value" id="reportFuelCost">R$ 0,00</div>
+                    <div class="rm-label">Gasto combustível</div>
                 </div>
-                <div class="analysis-card">
-                    <div class="analysis-label">Melhor Dia</div>
-                    <div class="analysis-value" id="bestDay">-</div>
+                <div class="report-metric">
+                    <div class="rm-icon">🔢</div>
+                    <div class="rm-value" id="reportFuelLiters">0 L</div>
+                    <div class="rm-label">Litros abastecidos</div>
                 </div>
-                <div class="analysis-card">
-                    <div class="analysis-label">Total de Viagens</div>
-                    <div class="analysis-value" id="totalTrips">0</div>
+                <div class="report-metric">
+                    <div class="rm-icon">💲</div>
+                    <div class="rm-value" id="reportFuelPerKm">R$ 0,00</div>
+                    <div class="rm-label">Custo por km</div>
                 </div>
-                <div class="analysis-card">
-                    <div class="analysis-label">Ticket Médio</div>
-                    <div class="analysis-value" id="avgTicket">R$ 0,00</div>
+                <div class="report-metric">
+                    <div class="rm-icon">📊</div>
+                    <div class="rm-value" id="reportFuelPercent">0%</div>
+                    <div class="rm-label">% da receita</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Manutenções -->
+        <div class="chart-container">
+            <div class="chart-header"><span>🔧</span> Manutenções no Período</div>
+            <div class="report-metrics-grid" style="margin-bottom: 12px;">
+                <div class="report-metric">
+                    <div class="rm-icon">🔧</div>
+                    <div class="rm-value" id="reportMaintenanceCost">R$ 0,00</div>
+                    <div class="rm-label">Gasto total</div>
+                </div>
+                <div class="report-metric">
+                    <div class="rm-icon">🔢</div>
+                    <div class="rm-value" id="reportMaintenanceCount">0</div>
+                    <div class="rm-label">Serviços realizados</div>
+                </div>
+            </div>
+            <div id="reportMaintenanceList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+
+        <!-- Exportar PDF -->
+        <div class="chart-container">
+            <div class="chart-header"><span>📄</span> Exportar Relatório PDF</div>
+            <div class="export-period-buttons">
+                <button class="btn-export-period" onclick="exportReportPDF(7)"><span>📅</span> 7 Dias</button>
+                <button class="btn-export-period" onclick="exportReportPDF(15)"><span>📅</span> 15 Dias</button>
+                <button class="btn-export-period" onclick="exportReportPDF(30)"><span>📅</span> 30 Dias</button>
+                <button class="btn-export-period custom" onclick="openCustomPeriodModal()"><span>🗓️</span> Personalizado</button>
             </div>
         </div>
 
         <!-- Calendário -->
         <div class="calendar-section">
-            <div class="section-header">
-                <span>📅</span> Calendário de Atividades
-            </div>
+            <div class="section-header"><span>📅</span> Calendário de Atividades</div>
             <div class="calendar-controls">
                 <button class="btn-calendar" onclick="previousMonth()">◀</button>
                 <div class="calendar-month" id="calendarMonth">Janeiro 2024</div>
                 <button class="btn-calendar" onclick="nextMonth()">▶</button>
             </div>
-            <div class="calendar-grid" id="calendarGrid">
-                <!-- Calendário será inserido aqui -->
-            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
         </div>
     </div>
 

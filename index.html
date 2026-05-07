@@ -3196,6 +3196,71 @@
             box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
 
+        /* Navegação de Mês */
+        .bills-month-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .bills-month-display {
+            flex: 1;
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .btn-month-nav {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+        }
+
+        .btn-month-nav:hover {
+            background: var(--logo-turquoise);
+            color: white;
+            border-color: var(--logo-turquoise);
+            transform: scale(1.05);
+        }
+
+        .btn-current-month {
+            background: var(--logo-blue);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-current-month:hover {
+            background: var(--logo-turquoise);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+
         .smart-calculator {
             background: linear-gradient(135deg, var(--logo-blue) 0%, var(--logo-turquoise) 100%);
             border-radius: 16px;
@@ -6098,6 +6163,22 @@
                 <span>💳</span> Contas a Pagar
                 <button class="btn-add-bill" onclick="openAddBillModal()">
                     <span>➕</span> Adicionar Conta
+                </button>
+            </div>
+
+            <!-- Navegação de Mês -->
+            <div class="bills-month-navigation">
+                <button class="btn-month-nav" onclick="previousMonth()" title="Mês Anterior">
+                    ◀️
+                </button>
+                <div id="billsMonthDisplay" class="bills-month-display">
+                    <!-- Mês será inserido aqui -->
+                </div>
+                <button class="btn-month-nav" onclick="nextMonth()" title="Próximo Mês">
+                    ▶️
+                </button>
+                <button class="btn-current-month" onclick="currentMonth()" title="Voltar para o Mês Atual">
+                    📅 Hoje
                 </button>
             </div>
 

@@ -1653,6 +1653,9 @@ function saveBill(event) {
     renderBills();
     updateSmartCalculator();
     
+    // Calcular e mostrar orientação da IA
+    showBillsAIGuidance();
+    
     showNotification('✅ Conta salva com sucesso!', 'success');
 }
 
@@ -1685,7 +1688,12 @@ function payBill(id) {
     renderBills();
     updateSmartCalculator();
     
-    showNotification('✅ Conta marcada como paga!', 'success');
+    showNotification(`✅ Conta "${bill.name}" marcada como paga!`, 'success');
+    
+    // Mostrar orientação atualizada da IA
+    setTimeout(() => {
+        showBillsAIGuidance();
+    }, 1500);
 }
 
 // Deletar conta
@@ -1701,18 +1709,69 @@ function deleteBill(id) {
     showNotification('✅ Conta excluída!', 'success');
 }
 
+// Variável global para controlar o mês/ano visualizado
+let selectedMonth = new Date().getMonth();
+let selectedYear = new Date().getFullYear();
+
+// Navegar para o mês anterior
+function previousMonth() {
+    selectedMonth--;
+    if (selectedMonth < 0) {
+        selectedMonth = 11;
+        selectedYear--;
+    }
+    updateMonthDisplay();
+    renderBills();
+    updateSmartCalculator();
+}
+
+// Navegar para o próximo mês
+function nextMonth() {
+    selectedMonth++;
+    if (selectedMonth > 11) {
+        selectedMonth = 0;
+        selectedYear++;
+    }
+    updateMonthDisplay();
+    renderBills();
+    updateSmartCalculator();
+}
+
+// Voltar para o mês atual
+function currentMonth() {
+    selectedMonth = new Date().getMonth();
+    selectedYear = new Date().getFullYear();
+    updateMonthDisplay();
+    renderBills();
+    updateSmartCalculator();
+}
+
+// Atualizar exibição do mês
+function updateMonthDisplay() {
+    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const displayEl = document.getElementById('billsMonthDisplay');
+    if (displayEl) {
+        const isCurrentMonth = selectedMonth === new Date().getMonth() && 
+                              selectedYear === new Date().getFullYear();
+        displayEl.innerHTML = `
+            <span style="font-weight: 700; font-size: 16px;">
+                ${monthNames[selectedMonth]} ${selectedYear}
+                ${isCurrentMonth ? '<span style="color: var(--logo-turquoise); font-size: 12px; margin-left: 8px;">● Mês Atual</span>' : ''}
+            </span>
+        `;
+    }
+}
+
 // Renderizar lista de contas
 function renderBills() {
     const container = document.getElementById('billsList');
     if (!container) return;
     
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    
-    // Filtrar contas do mês atual
+    // Filtrar contas do mês selecionado
     const monthBills = bills.filter(bill => {
         const billDate = new Date(bill.dueDate);
-        return billDate.getMonth() === currentMonth && billDate.getFullYear() === currentYear;
+        return billDate.getMonth() === selectedMonth && billDate.getFullYear() === selectedYear;
     });
     
     if (monthBills.length === 0) {
@@ -1787,36 +1846,40 @@ function renderBills() {
 
 // Atualizar calculadora inteligente
 function updateSmartCalculator() {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    
-    // Total de contas não pagas do mês
+    // Total de contas não pagas do mês selecionado
     const monthBills = bills.filter(bill => {
         const billDate = new Date(bill.dueDate);
-        return billDate.getMonth() === currentMonth && 
-               billDate.getFullYear() === currentYear &&
+        return billDate.getMonth() === selectedMonth && 
+               billDate.getFullYear() === selectedYear &&
                !bill.paid;
     });
     
     const totalBills = monthBills.reduce((sum, bill) => sum + bill.amount, 0);
     
     // Calcular gasto médio com combustível por dia
-    const monthStart = new Date(currentYear, currentMonth, 1);
+    const monthStart = new Date(selectedYear, selectedMonth, 1);
+    const monthEnd = new Date(selectedYear, selectedMonth + 1, 0);
     const fuelExpenses = transactions.filter(t => {
         const transDate = new Date(t.date);
         return t.type === 'expense' && 
                t.category === 'gas' && 
-               transDate >= monthStart;
+               transDate >= monthStart &&
+               transDate <= monthEnd;
     });
     
     const totalFuel = fuelExpenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const currentDay = new Date().getDate();
+    const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+    
+    // Se for o mês atual, usar dia atual; senão, usar todos os dias do mês
+    const today = new Date();
+    const isCurrentMonth = selectedMonth === today.getMonth() && selectedYear === today.getFullYear();
+    const currentDay = isCurrentMonth ? today.getDate() : daysInMonth;
+    
     const avgFuelPerDay = currentDay > 0 ? totalFuel / currentDay : 0;
     
     // Dias úteis restantes no mês (considerando 26 dias úteis por mês)
     const workingDaysInMonth = 26;
-    const workingDaysLeft = Math.max(0, workingDaysInMonth - currentDay);
+    const workingDaysLeft = isCurrentMonth ? Math.max(0, workingDaysInMonth - currentDay) : workingDaysInMonth;
     
     // Meta diária necessária = (Total de contas + Combustível estimado) / Dias restantes
     const estimatedFuelRemaining = avgFuelPerDay * workingDaysLeft;
@@ -1837,9 +1900,86 @@ function updateSmartCalculator() {
 
 // Inicializar contas ao carregar a página de metas
 document.addEventListener('DOMContentLoaded', function() {
+    updateMonthDisplay();
     renderBills();
     updateSmartCalculator();
 });
+
+// Mostrar orientação da IA sobre contas
+function showBillsAIGuidance() {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    // Filtrar contas não pagas do mês atual
+    const unpaidBills = bills.filter(bill => {
+        const billDate = new Date(bill.dueDate);
+        return billDate.getMonth() === currentMonth && 
+               billDate.getFullYear() === currentYear &&
+               !bill.paid;
+    });
+    
+    if (unpaidBills.length === 0) {
+        showNotification('🎉 Você não tem contas pendentes este mês!', 'success');
+        return;
+    }
+    
+    const totalBills = unpaidBills.reduce((sum, b) => sum + b.amount, 0);
+    const today = new Date();
+    const workingDaysInMonth = 26;
+    const currentDay = today.getDate();
+    const workingDaysLeft = Math.max(1, workingDaysInMonth - currentDay);
+    
+    // Calcular gasto médio com combustível
+    const monthStart = new Date(currentYear, currentMonth, 1);
+    const fuelExpenses = transactions.filter(t => {
+        const transDate = new Date(t.date);
+        return t.type === 'expense' && 
+               t.category === 'gas' && 
+               transDate >= monthStart;
+    });
+    const totalFuel = fuelExpenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const avgFuelPerDay = currentDay > 0 ? totalFuel / currentDay : 0;
+    const estimatedFuelRemaining = avgFuelPerDay * workingDaysLeft;
+    
+    // Total necessário
+    const totalNeeded = totalBills + estimatedFuelRemaining;
+    const dailyNeeded = totalNeeded / workingDaysLeft;
+    
+    // Criar mensagem personalizada
+    let message = '';
+    let icon = '';
+    let type = 'info';
+    
+    if (unpaidBills.length === 1) {
+        message = `🤖 IA: Você tem 1 conta de ${formatCurrency(totalBills)}. `;
+    } else {
+        message = `🤖 IA: Você tem ${unpaidBills.length} contas totalizando ${formatCurrency(totalBills)}. `;
+    }
+    
+    if (estimatedFuelRemaining > 0) {
+        message += `Somando o combustível estimado (${formatCurrency(estimatedFuelRemaining)}), você precisa fazer ${formatCurrency(dailyNeeded)}/dia nos próximos ${workingDaysLeft} dias úteis para cobrir tudo! 💪`;
+    } else {
+        message += `Você precisa fazer ${formatCurrency(dailyNeeded)}/dia nos próximos ${workingDaysLeft} dias úteis para pagar tudo! 💪`;
+    }
+    
+    // Verificar se tem contas vencendo em breve
+    const urgentBills = unpaidBills.filter(bill => {
+        const billDate = new Date(bill.dueDate + 'T00:00:00');
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0);
+        const daysUntil = Math.ceil((billDate - todayDate) / (1000 * 60 * 60 * 24));
+        return daysUntil >= 0 && daysUntil <= 3;
+    });
+    
+    if (urgentBills.length > 0) {
+        type = 'warning';
+        const urgentTotal = urgentBills.reduce((sum, b) => sum + b.amount, 0);
+        message += ` ⚠️ ATENÇÃO: ${urgentBills.length} conta(s) vencem em até 3 dias (${formatCurrency(urgentTotal)})!`;
+    }
+    
+    // Mostrar notificação com a orientação
+    showNotification(message, type, 8000); // 8 segundos para ler
+}
 
 console.log('💳 Sistema de Contas a Pagar carregado!');
 
@@ -1991,23 +2131,65 @@ const AIAssistant = {
             }
         }
         
-        // Insight 3: Contas a vencer
-        const upcomingBills = bills.filter(bill => {
-            const billDate = new Date(bill.dueDate + 'T00:00:00');
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const daysUntil = Math.ceil((billDate - today) / (1000 * 60 * 60 * 24));
-            return daysUntil >= 0 && daysUntil <= 7 && !bill.paid;
+        // Insight 3: Contas a pagar - Orientação diária
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const unpaidBills = bills.filter(bill => {
+            const billDate = new Date(bill.dueDate);
+            return billDate.getMonth() === currentMonth && 
+                   billDate.getFullYear() === currentYear &&
+                   !bill.paid;
         });
         
-        if (upcomingBills.length > 0) {
-            const totalUpcoming = upcomingBills.reduce((sum, b) => sum + b.amount, 0);
-            insights.push({
-                type: 'warning',
-                icon: '💳',
-                message: `${upcomingBills.length} conta(s) vencem nos próximos 7 dias`,
-                detail: `Total de ${formatCurrency(totalUpcoming)} a pagar`
+        if (unpaidBills.length > 0) {
+            const totalBills = unpaidBills.reduce((sum, b) => sum + b.amount, 0);
+            const today = new Date();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const workingDaysInMonth = 26; // Dias úteis estimados
+            const currentDay = today.getDate();
+            const workingDaysLeft = Math.max(1, workingDaysInMonth - currentDay);
+            
+            // Calcular gasto médio com combustível
+            const monthStart = new Date(currentYear, currentMonth, 1);
+            const fuelExpenses = transactions.filter(t => {
+                const transDate = new Date(t.date);
+                return t.type === 'expense' && 
+                       t.category === 'gas' && 
+                       transDate >= monthStart;
             });
+            const totalFuel = fuelExpenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            const avgFuelPerDay = currentDay > 0 ? totalFuel / currentDay : 0;
+            const estimatedFuelRemaining = avgFuelPerDay * workingDaysLeft;
+            
+            // Total necessário = Contas + Combustível estimado
+            const totalNeeded = totalBills + estimatedFuelRemaining;
+            const dailyNeeded = totalNeeded / workingDaysLeft;
+            
+            // Verificar contas próximas do vencimento
+            const upcomingBills = unpaidBills.filter(bill => {
+                const billDate = new Date(bill.dueDate + 'T00:00:00');
+                const todayDate = new Date();
+                todayDate.setHours(0, 0, 0, 0);
+                const daysUntil = Math.ceil((billDate - todayDate) / (1000 * 60 * 60 * 24));
+                return daysUntil >= 0 && daysUntil <= 7;
+            });
+            
+            if (upcomingBills.length > 0) {
+                const totalUpcoming = upcomingBills.reduce((sum, b) => sum + b.amount, 0);
+                insights.push({
+                    type: 'warning',
+                    icon: '💳',
+                    message: `${upcomingBills.length} conta(s) vencem nos próximos 7 dias!`,
+                    detail: `Total de ${formatCurrency(totalUpcoming)} a pagar. Você precisa fazer ${formatCurrency(dailyNeeded)}/dia para cobrir todas as contas + combustível`
+                });
+            } else {
+                insights.push({
+                    type: 'info',
+                    icon: '💰',
+                    message: `Você tem ${formatCurrency(totalBills)} em contas este mês`,
+                    detail: `Para pagar tudo + combustível, faça ${formatCurrency(dailyNeeded)}/dia nos próximos ${workingDaysLeft} dias úteis`
+                });
+            }
         }
         
         // Insight 4: Eficiência
@@ -2045,6 +2227,53 @@ const AIAssistant = {
             recommendations.push(
                 `Você está no caminho certo! Mantendo este ritmo, vai faturar ${formatCurrency(projected)} este mês.`
             );
+        }
+        
+        // Recomendação 1.5: Contas a pagar
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const unpaidBills = bills.filter(bill => {
+            const billDate = new Date(bill.dueDate);
+            return billDate.getMonth() === currentMonth && 
+                   billDate.getFullYear() === currentYear &&
+                   !bill.paid;
+        });
+        
+        if (unpaidBills.length > 0) {
+            const totalBills = unpaidBills.reduce((sum, b) => sum + b.amount, 0);
+            const today = new Date();
+            const workingDaysInMonth = 26;
+            const currentDay = today.getDate();
+            const workingDaysLeft = Math.max(1, workingDaysInMonth - currentDay);
+            
+            // Calcular combustível estimado
+            const monthStart = new Date(currentYear, currentMonth, 1);
+            const fuelExpenses = transactions.filter(t => {
+                const transDate = new Date(t.date);
+                return t.type === 'expense' && 
+                       t.category === 'gas' && 
+                       transDate >= monthStart;
+            });
+            const totalFuel = fuelExpenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            const avgFuelPerDay = currentDay > 0 ? totalFuel / currentDay : 0;
+            const estimatedFuelRemaining = avgFuelPerDay * workingDaysLeft;
+            
+            const totalNeeded = totalBills + estimatedFuelRemaining;
+            const dailyNeeded = totalNeeded / workingDaysLeft;
+            
+            // Comparar com a meta atual
+            const targetDaily = data.goals.daily || 200;
+            
+            if (dailyNeeded > targetDaily) {
+                const difference = dailyNeeded - targetDaily;
+                recommendations.push(
+                    `💳 IMPORTANTE: Suas contas (${formatCurrency(totalBills)}) + combustível estimado (${formatCurrency(estimatedFuelRemaining)}) exigem ${formatCurrency(dailyNeeded)}/dia. Isso é ${formatCurrency(difference)} a mais que sua meta atual! Considere aumentar sua meta diária ou reduzir gastos.`
+                );
+            } else {
+                recommendations.push(
+                    `💳 Suas contas (${formatCurrency(totalBills)}) + combustível estimado (${formatCurrency(estimatedFuelRemaining)}) exigem ${formatCurrency(dailyNeeded)}/dia. Sua meta atual de ${formatCurrency(targetDaily)}/dia é suficiente para cobrir tudo!`
+                );
+            }
         }
         
         // Recomendação 2: Melhor dia da semana
@@ -2665,304 +2894,182 @@ function exportReportPDF(days) {
 
 // Gerar relatório PDF completo
 async function generatePDFReport(startDate, endDate) {
-    showNotification('📄 Gerando relatório em PDF...', 'info');
+    showNotification('📄 Gerando relatorio PDF...', 'info');
     
     try {
-        // Coletar dados do período
-        const reportData = collectReportData(startDate, endDate);
-        
-        // Criar PDF com jsPDF
+        const d = collectReportData(startDate, endDate);
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
-        
-        let yPos = 20;
-        const pageWidth = 210;
-        const margin = 20;
-        const contentWidth = pageWidth - (margin * 2);
-        
-        // ========== CABEÇALHO ==========
-        doc.setFillColor(30, 136, 229); // Azul do logo
-        doc.rect(0, 0, pageWidth, 45, 'F');
-        
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(28);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Driver Finance', margin, 20);
-        
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Relatorio Financeiro Completo', margin, 30);
-        
-        doc.setFontSize(11);
-        doc.text('Periodo: ' + formatDateBR(startDate) + ' a ' + formatDateBR(endDate), margin, 38);
-        
-        yPos = 55;
-        
-        // ========== RESUMO FINANCEIRO ==========
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(18);
-        doc.setFont('helvetica', 'bold');
-        doc.text('RESUMO FINANCEIRO', margin, yPos);
-        yPos += 10;
-        
-        // Box de resumo com grid
-        doc.setFillColor(245, 250, 255);
-        doc.roundedRect(margin, yPos, contentWidth, 50, 3, 3, 'F');
-        doc.setDrawColor(30, 136, 229);
-        doc.setLineWidth(0.5);
-        doc.roundedRect(margin, yPos, contentWidth, 50, 3, 3, 'S');
-        
-        // Coluna 1
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('Receita Total:', margin + 5, yPos + 10);
-        doc.setFontSize(16);
-        doc.setTextColor(76, 175, 80);
-        doc.text(formatCurrency(reportData.totalRevenue), margin + 5, yPos + 18);
-        
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('Despesa Total:', margin + 5, yPos + 28);
-        doc.setFontSize(16);
-        doc.setTextColor(244, 67, 54);
-        doc.text(formatCurrency(reportData.totalExpense), margin + 5, yPos + 36);
-        
-        // Coluna 2
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('Lucro Liquido:', margin + 70, yPos + 10);
-        doc.setFontSize(16);
-        doc.setTextColor(30, 136, 229);
-        doc.text(formatCurrency(reportData.profit), margin + 70, yPos + 18);
-        
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('Media Diaria:', margin + 70, yPos + 28);
-        doc.setFontSize(16);
-        doc.setTextColor(38, 166, 154);
-        doc.text(formatCurrency(reportData.avgDaily), margin + 70, yPos + 36);
-        
-        // Coluna 3
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('Total de Corridas:', margin + 135, yPos + 10);
-        doc.setFontSize(20);
-        doc.setTextColor(30, 136, 229);
-        doc.text(reportData.totalTrips.toString(), margin + 135, yPos + 20);
-        
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('Dias Trabalhados:', margin + 135, yPos + 32);
-        doc.setFontSize(20);
-        doc.setTextColor(38, 166, 154);
-        doc.text(reportData.daysWorked.toString(), margin + 135, yPos + 42);
-        
-        yPos += 60;
-        
-        // ========== ANÁLISE POR APP ==========
-        if (reportData.appStats.length > 0) {
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(16);
-            doc.setFont('helvetica', 'bold');
-            doc.text('ANALISE POR APLICATIVO', margin, yPos);
-            yPos += 8;
-            
-            // Tabela de apps
-            doc.setFillColor(250, 250, 250);
-            doc.rect(margin, yPos, contentWidth, 8, 'F');
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'bold');
-            doc.text('App', margin + 3, yPos + 5);
-            doc.text('Corridas', margin + 50, yPos + 5);
-            doc.text('Faturamento', margin + 85, yPos + 5);
-            doc.text('Media/Corrida', margin + 130, yPos + 5);
-            yPos += 8;
-            
-            reportData.appStats.forEach((app, index) => {
-                if (index % 2 === 0) {
-                    doc.setFillColor(255, 255, 255);
-                } else {
-                    doc.setFillColor(248, 248, 248);
-                }
-                doc.rect(margin, yPos, contentWidth, 7, 'F');
-                
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(0, 0, 0);
-                doc.text(app.name, margin + 3, yPos + 5);
-                doc.text(app.trips.toString(), margin + 50, yPos + 5);
-                doc.text(formatCurrency(app.revenue), margin + 85, yPos + 5);
-                doc.text(formatCurrency(app.avg), margin + 130, yPos + 5);
-                yPos += 7;
-            });
-            
-            yPos += 8;
+        const W = 210, M = 15, CW = W - M * 2;
+        let y = 0;
+
+        function newPage() {
+            doc.addPage(); y = 20;
+            doc.setFillColor(14, 165, 233); doc.rect(0, 0, 4, 297, 'F');
         }
-        
-        // Verificar se precisa de nova página
-        if (yPos > 240) {
-            doc.addPage();
-            yPos = 20;
+        function checkPage(n) { if (y + n > 275) newPage(); }
+        function sectionTitle(title) {
+            checkPage(14);
+            doc.setFillColor(14, 165, 233); doc.rect(M, y, CW, 8, 'F');
+            doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold');
+            doc.text(title, M+3, y+5.5); y += 11; doc.setTextColor(30,30,30);
         }
-        
-        // ========== DESPESAS POR CATEGORIA ==========
-        if (reportData.expensesByCategory.length > 0) {
-            doc.setFontSize(16);
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(0, 0, 0);
-            doc.text('DESPESAS POR CATEGORIA', margin, yPos);
-            yPos += 8;
-            
-            // Tabela de categorias
-            doc.setFillColor(250, 250, 250);
-            doc.rect(margin, yPos, contentWidth, 8, 'F');
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Categoria', margin + 3, yPos + 5);
-            doc.text('Valor', margin + 100, yPos + 5);
-            doc.text('Percentual', margin + 140, yPos + 5);
-            yPos += 8;
-            
-            reportData.expensesByCategory.forEach((cat, index) => {
-                if (index % 2 === 0) {
-                    doc.setFillColor(255, 255, 255);
-                } else {
-                    doc.setFillColor(248, 248, 248);
-                }
-                doc.rect(margin, yPos, contentWidth, 7, 'F');
-                
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(0, 0, 0);
-                doc.text(cat.name, margin + 3, yPos + 5);
-                doc.text(formatCurrency(cat.amount), margin + 100, yPos + 5);
-                doc.text(cat.percent + '%', margin + 140, yPos + 5);
-                yPos += 7;
-            });
-            
-            yPos += 8;
-        }
-        
-        // Verificar se precisa de nova página
-        if (yPos > 240) {
-            doc.addPage();
-            yPos = 20;
-        }
-        
-        // ========== QUILOMETRAGEM ==========
-        if (reportData.kmData.totalKm > 0) {
-            doc.setFontSize(16);
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(0, 0, 0);
-            doc.text('QUILOMETRAGEM', margin, yPos);
-            yPos += 8;
-            
-            doc.setFillColor(245, 250, 255);
-            doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, 'F');
-            doc.setDrawColor(30, 136, 229);
-            doc.setLineWidth(0.5);
-            doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, 'S');
-            
-            doc.setFontSize(11);
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(0, 0, 0);
-            doc.text('KM Rodado:', margin + 5, yPos + 8);
-            doc.setFont('helvetica', 'normal');
-            doc.text(reportData.kmData.totalKm.toFixed(1) + ' km', margin + 35, yPos + 8);
-            
-            doc.setFont('helvetica', 'bold');
-            doc.text('Eficiencia:', margin + 5, yPos + 16);
-            doc.setFont('helvetica', 'normal');
-            doc.text(formatCurrency(reportData.kmData.efficiency) + '/km', margin + 35, yPos + 16);
-            
-            doc.setFont('helvetica', 'bold');
-            doc.text('Combustivel:', margin + 100, yPos + 8);
-            doc.setFont('helvetica', 'normal');
-            doc.text(formatCurrency(reportData.kmData.fuelCost), margin + 135, yPos + 8);
-            
-            doc.setFont('helvetica', 'bold');
-            doc.text('% do Faturamento:', margin + 100, yPos + 16);
-            doc.setFont('helvetica', 'normal');
-            doc.text(reportData.kmData.fuelPercent + '%', margin + 145, yPos + 16);
-            
-            yPos += 33;
-        }
-        
-        // ========== MANUTENÇÕES ==========
-        if (reportData.maintenances.length > 0) {
-            // Verificar se precisa de nova página
-            if (yPos > 220) {
-                doc.addPage();
-                yPos = 20;
+        function row(l, v, l2, v2) {
+            checkPage(8);
+            doc.setFillColor(252,252,252); doc.rect(M, y, CW, 7, 'F');
+            doc.setDrawColor(220,220,220); doc.setLineWidth(0.2); doc.rect(M, y, CW, 7, 'S');
+            doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80);
+            doc.text(l, M+3, y+4.8);
+            doc.setFont('helvetica','normal'); doc.setTextColor(20,20,20);
+            doc.text(String(v), M+55, y+4.8);
+            if (l2) {
+                doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80); doc.text(l2, M+95, y+4.8);
+                doc.setFont('helvetica','normal'); doc.setTextColor(20,20,20); doc.text(String(v2), M+150, y+4.8);
             }
-            
-            doc.setFontSize(16);
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(0, 0, 0);
-            doc.text('MANUTENCOES REALIZADAS', margin, yPos);
-            yPos += 8;
-            
-            // Tabela de manutenções
-            doc.setFillColor(250, 250, 250);
-            doc.rect(margin, yPos, contentWidth, 8, 'F');
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Tipo', margin + 3, yPos + 5);
-            doc.text('Data', margin + 80, yPos + 5);
-            doc.text('Custo', margin + 130, yPos + 5);
-            yPos += 8;
-            
-            reportData.maintenances.forEach((m, index) => {
-                if (index % 2 === 0) {
-                    doc.setFillColor(255, 255, 255);
-                } else {
-                    doc.setFillColor(248, 248, 248);
-                }
-                doc.rect(margin, yPos, contentWidth, 7, 'F');
-                
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(0, 0, 0);
-                doc.text(m.name, margin + 3, yPos + 5);
-                doc.text(formatDateBR(m.date), margin + 80, yPos + 5);
-                doc.text(formatCurrency(m.cost), margin + 130, yPos + 5);
-                yPos += 7;
+            y += 7;
+        }
+        function tableHeader(cols) {
+            checkPage(8);
+            doc.setFillColor(30,30,30); doc.rect(M, y, CW, 7, 'F');
+            doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+            cols.forEach(c => doc.text(c.text, M+c.x, y+5)); y += 7;
+        }
+        function tableRow(cols, even) {
+            checkPage(7);
+            doc.setFillColor(even?255:248, even?255:248, even?255:248); doc.rect(M, y, CW, 6.5, 'F');
+            doc.setDrawColor(230,230,230); doc.setLineWidth(0.15); doc.line(M, y+6.5, M+CW, y+6.5);
+            doc.setTextColor(30,30,30); doc.setFontSize(8.5); doc.setFont('helvetica','normal');
+            cols.forEach(c => doc.text(String(c.text||''), M+c.x, y+4.5)); y += 6.5;
+        }
+
+        // CAPA
+        doc.setFillColor(14,165,233); doc.rect(0,0,W,55,'F');
+        doc.setFillColor(20,184,166); doc.rect(0,42,W,13,'F');
+        doc.setFillColor(14,165,233); doc.rect(0,0,4,297,'F');
+        doc.setTextColor(255,255,255);
+        doc.setFontSize(26); doc.setFont('helvetica','bold'); doc.text('DRIVER FINANCE', M, 20);
+        doc.setFontSize(13); doc.setFont('helvetica','normal'); doc.text('Relatorio Financeiro Completo', M, 30);
+        doc.setFontSize(10);
+        doc.text('Periodo: '+formatDateBR(startDate)+' a '+formatDateBR(endDate), M, 39);
+        doc.text('Gerado em: '+new Date().toLocaleString('pt-BR'), M, 47);
+        y = 65;
+
+        // 1. RESUMO EXECUTIVO
+        sectionTitle('1. RESUMO EXECUTIVO');
+        const cardW = (CW-9)/4;
+        const cards = [
+            {label:'RECEITA TOTAL', value:formatCurrency(d.totalRevenue), color:[16,185,129]},
+            {label:'DESPESA TOTAL', value:formatCurrency(d.totalExpense), color:[239,68,68]},
+            {label:'LUCRO LIQUIDO', value:formatCurrency(d.profit), color:[14,165,233]},
+            {label:'MARGEM', value:d.margin+'%', color:d.profit>=0?[16,185,129]:[239,68,68]}
+        ];
+        checkPage(28);
+        cards.forEach((c,i) => {
+            const cx = M + i*(cardW+3);
+            doc.setFillColor(248,250,252); doc.roundedRect(cx,y,cardW,22,2,2,'F');
+            doc.setDrawColor(...c.color); doc.setLineWidth(0.8); doc.line(cx,y,cx+cardW,y);
+            doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(100,100,100); doc.text(c.label, cx+2, y+6);
+            doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.setTextColor(...c.color); doc.text(c.value, cx+2, y+15);
+        });
+        y += 27;
+
+        // 2. PERFORMANCE
+        sectionTitle('2. METRICAS DE PERFORMANCE');
+        row('Dias Trabalhados', d.daysWorked+' dias', 'Total de Corridas', d.totalTrips);
+        row('Media Diaria', formatCurrency(d.avgDaily), 'Ticket Medio', formatCurrency(d.avgTicket));
+        row('Horas Trabalhadas', d.hoursStr, 'Receita por Hora', d.revenuePerHour>0?formatCurrency(d.revenuePerHour):'—');
+        row('KM Rodado', d.totalKm>0?d.totalKm.toFixed(1)+' km':'—', 'Receita por KM', d.revenuePerKm>0?formatCurrency(d.revenuePerKm):'—');
+        row('Melhor Dia', d.bestDayStr, 'Pior Dia', d.worstDayStr);
+        y += 4;
+
+        // 3. APPS
+        if (d.appStats.length > 0) {
+            checkPage(20); sectionTitle('3. ANALISE POR APLICATIVO');
+            tableHeader([{text:'Aplicativo',x:2},{text:'Corridas',x:65},{text:'Faturamento',x:95},{text:'Ticket Medio',x:135},{text:'% Receita',x:165}]);
+            d.appStats.forEach((app,i) => {
+                const pct = d.totalRevenue>0?((app.revenue/d.totalRevenue)*100).toFixed(1):'0';
+                tableRow([{text:app.name,x:2},{text:String(app.trips),x:65},{text:formatCurrency(app.revenue),x:95},{text:formatCurrency(app.avg),x:135},{text:pct+'%',x:165}], i%2===0);
             });
+            y += 4;
         }
-        
-        // ========== RODAPÉ ==========
+
+        // 4. DESPESAS
+        if (d.expensesByCategory.length > 0) {
+            checkPage(20); sectionTitle('4. DESPESAS POR CATEGORIA');
+            tableHeader([{text:'Categoria',x:2},{text:'Valor',x:80},{text:'% Despesas',x:120},{text:'% Receita',x:162}]);
+            d.expensesByCategory.forEach((cat,i) => {
+                const pctRec = d.totalRevenue>0?((cat.amount/d.totalRevenue)*100).toFixed(1):'0';
+                tableRow([{text:cat.name,x:2},{text:formatCurrency(cat.amount),x:80},{text:cat.percent+'%',x:120},{text:pctRec+'%',x:162}], i%2===0);
+            });
+            y += 4;
+        }
+
+        // 5. COMBUSTIVEL
+        checkPage(20); sectionTitle('5. COMBUSTIVEL E EFICIENCIA');
+        row('Gasto com Combustivel', formatCurrency(d.fuelCost), 'Litros Abastecidos', d.fuelLiters>0?d.fuelLiters.toFixed(1)+' L':'—');
+        row('Custo por KM', d.totalKm>0?formatCurrency(d.fuelCost/d.totalKm):'—', '% da Receita', d.fuelPercent+'%');
+        y += 4;
+
+        // 6. MANUTENCOES
+        if (d.maintenances.length > 0) {
+            checkPage(20); sectionTitle('6. MANUTENCOES REALIZADAS');
+            tableHeader([{text:'Servico',x:2},{text:'Data',x:90},{text:'Custo',x:130},{text:'KM',x:162}]);
+            d.maintenances.forEach((m,i) => tableRow([{text:m.name,x:2},{text:formatDateBR(m.date),x:90},{text:formatCurrency(m.cost),x:130},{text:m.km?String(m.km):'—',x:162}], i%2===0));
+            checkPage(8);
+            doc.setFillColor(240,240,240); doc.rect(M,y,CW,7,'F');
+            doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(30,30,30);
+            doc.text('TOTAL MANUTENCOES', M+3, y+4.8);
+            doc.text(formatCurrency(d.maintenances.reduce((s,m)=>s+m.cost,0)), M+130, y+4.8);
+            y += 11;
+        }
+
+        // 7. TRANSACOES
+        checkPage(20); sectionTitle('7. TRANSACOES DO PERIODO ('+d.allTransactions.length+' registros)');
+        tableHeader([{text:'Data',x:2},{text:'Tipo',x:22},{text:'Descricao',x:50},{text:'App/Cat.',x:115},{text:'Corridas',x:148},{text:'Valor',x:165}]);
+        d.allTransactions.slice(0,80).forEach((t,i) => {
+            tableRow([
+                {text:formatDateBR(t.date),x:2},
+                {text:t.type==='revenue'?'Receita':'Despesa',x:22},
+                {text:(t.description||'').substring(0,30),x:50},
+                {text:t.type==='revenue'?(t.app||'—'):(t.category||'—'),x:115},
+                {text:t.type==='revenue'?String(parseInt(t.trips)||1):'—',x:148},
+                {text:formatCurrency(parseFloat(t.amount||0)),x:165}
+            ], i%2===0);
+        });
+        if (d.allTransactions.length>80) { checkPage(8); doc.setFontSize(8); doc.setTextColor(120,120,120); doc.text('... e mais '+(d.allTransactions.length-80)+' transacoes.', M+3, y+4); y+=8; }
+        y += 4;
+
+        // 8. RESUMO FINAL
+        checkPage(40); sectionTitle('8. RESUMO FINAL');
+        checkPage(30);
+        doc.setFillColor(14,165,233); doc.roundedRect(M,y,CW,28,3,3,'F');
+        doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
+        const c3 = CW/3;
+        ['RECEITA','DESPESA','LUCRO LIQUIDO'].forEach((l,i) => doc.text(l, M+c3*i+5, y+7));
+        doc.setFontSize(13);
+        [formatCurrency(d.totalRevenue), formatCurrency(d.totalExpense), formatCurrency(d.profit)].forEach((v,i) => doc.text(v, M+c3*i+5, y+18));
+        doc.setFontSize(8); doc.setFont('helvetica','normal');
+        [d.daysWorked+' dias trabalhados', d.expensesByCategory.length+' categorias', 'Margem: '+d.margin+'%'].forEach((s,i) => doc.text(s, M+c3*i+5, y+24));
+        y += 33;
+
+        // RODAPE
         const pageCount = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= pageCount; i++) {
+        for (let i=1; i<=pageCount; i++) {
             doc.setPage(i);
-            
-            // Linha separadora
-            doc.setDrawColor(200, 200, 200);
-            doc.setLineWidth(0.5);
-            doc.line(margin, 280, pageWidth - margin, 280);
-            
-            doc.setFontSize(8);
-            doc.setTextColor(128, 128, 128);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Gerado em ' + new Date().toLocaleString('pt-BR'), margin, 285);
-            doc.text('Driver Finance - Gestao Financeira para Motoristas', pageWidth / 2, 285, { align: 'center' });
-            doc.text('Pagina ' + i + ' de ' + pageCount, pageWidth - margin, 285, { align: 'right' });
+            doc.setFillColor(14,165,233); doc.rect(0,0,4,297,'F');
+            doc.setDrawColor(200,200,200); doc.setLineWidth(0.3); doc.line(M,282,W-M,282);
+            doc.setFontSize(7.5); doc.setTextColor(130,130,130); doc.setFont('helvetica','normal');
+            doc.text('Gerado em '+new Date().toLocaleString('pt-BR'), M, 287);
+            doc.text('Driver Finance — Gestao Financeira para Motoristas', W/2, 287, {align:'center'});
+            doc.text('Pag. '+i+' / '+pageCount, W-M, 287, {align:'right'});
         }
-        
-        // Salvar PDF
-        const fileName = `relatorio_${startDate}_a_${endDate}.pdf`;
-        doc.save(fileName);
-        
-        showNotification('✅ Relatório PDF gerado com sucesso!', 'success');
-        
+
+        doc.save('relatorio_'+startDate+'_a_'+endDate+'.pdf');
+        showNotification('✅ Relatorio PDF gerado!', 'success');
+
     } catch (error) {
         console.error('Erro ao gerar PDF:', error);
-        showNotification('❌ Erro ao gerar relatório: ' + error.message, 'info');
+        showNotification('❌ Erro: ' + error.message, 'info');
     }
 }
 
@@ -2970,12 +3077,115 @@ async function generatePDFReport(startDate, endDate) {
 function collectReportData(startDate, endDate) {
     const start = new Date(startDate + 'T00:00:00');
     const end = new Date(endDate + 'T23:59:59');
-    
-    // Filtrar transações do período
+
     const periodTransactions = transactions.filter(t => {
         const tDate = new Date(t.date + 'T00:00:00');
         return tDate >= start && tDate <= end;
     });
+
+    const revenues = periodTransactions.filter(t => t.type === 'revenue');
+    const expenses = periodTransactions.filter(t => t.type === 'expense');
+
+    const totalRevenue = revenues.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    const totalExpense = expenses.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    const profit = totalRevenue - totalExpense;
+    const margin = totalRevenue > 0 ? ((profit / totalRevenue) * 100).toFixed(1) : '0';
+    const totalTrips = revenues.reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
+    const avgTicket = totalTrips > 0 ? totalRevenue / totalTrips : 0;
+
+    // Dias trabalhados
+    const uniqueDays = [...new Set(revenues.map(t => t.date))];
+    const daysWorked = uniqueDays.length;
+    const avgDaily = daysWorked > 0 ? totalRevenue / daysWorked : 0;
+
+    // Melhor e pior dia
+    const revenueByDay = {};
+    revenues.forEach(t => { revenueByDay[t.date] = (revenueByDay[t.date] || 0) + parseFloat(t.amount || 0); });
+    const dayEntries = Object.entries(revenueByDay).sort((a, b) => b[1] - a[1]);
+    const bestDayEntry = dayEntries[0];
+    const worstDayEntry = dayEntries[dayEntries.length - 1];
+    const fmtDay = e => e ? new Date(e[0] + 'T00:00:00').toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit'}) + ' (' + formatCurrency(e[1]) + ')' : '—';
+    const bestDayStr = fmtDay(bestDayEntry);
+    const worstDayStr = fmtDay(worstDayEntry);
+
+    // Horas trabalhadas
+    let totalMinutes = 0;
+    revenues.forEach(r => { if (r.workTime && r.workTime.totalMinutes) totalMinutes += r.workTime.totalMinutes; });
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remMin = totalMinutes % 60;
+    const hoursStr = totalMinutes > 0 ? totalHours + 'h ' + remMin + 'm' : '—';
+    const revenuePerHour = totalMinutes > 0 ? totalRevenue / (totalMinutes / 60) : 0;
+
+    // KM
+    const allKmData = JSON.parse(localStorage.getItem('kmData')) || [];
+    const periodKm = allKmData.filter(item => {
+        const d = new Date(item.date + 'T00:00:00');
+        return d >= start && d <= end;
+    });
+    const totalKm = periodKm.reduce((sum, item) => sum + (parseFloat(item.kmRodado) || 0), 0);
+    const revenuePerKm = totalKm > 0 ? totalRevenue / totalKm : 0;
+
+    // Combustível
+    const fuelExpenses = expenses.filter(e => e.category === 'gas');
+    const fuelCost = fuelExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+    const fuelLiters = fuelExpenses.reduce((sum, e) => sum + parseFloat(e.liters || 0), 0);
+    const fuelPercent = totalRevenue > 0 ? ((fuelCost / totalRevenue) * 100).toFixed(1) : '0';
+
+    // Apps
+    const appStatsMap = {};
+    revenues.forEach(t => {
+        const app = t.app || 'Nao especificado';
+        if (!appStatsMap[app]) appStatsMap[app] = { name: app, revenue: 0, trips: 0 };
+        appStatsMap[app].revenue += parseFloat(t.amount || 0);
+        appStatsMap[app].trips += parseInt(t.trips) || 1;
+    });
+    const appStats = Object.values(appStatsMap).map(a => ({ ...a, avg: a.trips > 0 ? a.revenue / a.trips : 0 })).sort((a, b) => b.revenue - a.revenue);
+
+    // Despesas por categoria
+    const categoryNames = { gas: 'Combustivel', maintenance: 'Manutencao', app: 'Taxas de App', food: 'Alimentacao', other: 'Outros' };
+    const expCatMap = {};
+    expenses.forEach(e => {
+        const cat = e.category || 'other';
+        expCatMap[cat] = (expCatMap[cat] || 0) + parseFloat(e.amount || 0);
+    });
+    const expensesByCategory = Object.entries(expCatMap).map(([cat, amount]) => ({
+        name: categoryNames[cat] || 'Outros',
+        amount,
+        percent: totalExpense > 0 ? ((amount / totalExpense) * 100).toFixed(1) : '0'
+    })).sort((a, b) => b.amount - a.amount);
+
+    // Manutenções
+    const allMaintData = JSON.parse(localStorage.getItem('maintenanceData')) || [];
+    const maintenanceTypes = {
+        'oil':'Troca de Oleo','oil-filter':'Filtro de Oleo','air-filter':'Filtro de Ar',
+        'fuel-filter':'Filtro Combustivel','cabin-filter':'Filtro Cabine','tires':'Pneus',
+        'brakes':'Freios','battery':'Bateria','alignment':'Alinhamento',
+        'balancing':'Balanceamento','suspension':'Suspensao','other':'Outros'
+    };
+    const maintenances = allMaintData.filter(m => {
+        const d = new Date(m.date + 'T00:00:00');
+        return d >= start && d <= end;
+    }).map(m => ({
+        name: maintenanceTypes[m.type] || m.description || 'Manutencao',
+        date: m.date,
+        cost: parseFloat(m.cost || 0),
+        km: m.currentKm || null
+    }));
+
+    // Todas as transações ordenadas por data
+    const allTransactions = [...periodTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    return {
+        totalRevenue, totalExpense, profit, margin,
+        totalTrips, avgTicket, daysWorked, avgDaily,
+        bestDayStr, worstDayStr,
+        hoursStr, revenuePerHour,
+        totalKm, revenuePerKm,
+        fuelCost, fuelLiters, fuelPercent,
+        appStats, expensesByCategory, maintenances,
+        allTransactions
+    };
+}
     
     const revenues = periodTransactions.filter(t => t.type === 'revenue');
     const expenses = periodTransactions.filter(t => t.type === 'expense');

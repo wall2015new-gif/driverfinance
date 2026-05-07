@@ -2,14 +2,14 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Driver Finance</title>
+    <title>Driver Finance - Gestão Financeira</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -23,116 +23,94 @@
     <link rel="apple-touch-icon" href="./img/logotipo.png">
     <link rel="icon" type="image/png" href="./img/logotipo.png">
     <style>
-        /* ========== RESET & BASE ========== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
-            /* Premium Color System - Logo Colors */
-            --primary-green: #4CAF50;
-            --primary-green-light: #6BBF59;
-            --primary-turquoise: #26A69A;
-            --primary-blue: #1E88E5;
-            --primary-blue-light: #42a5f5;
+            /* Cores do Logotipo */
+            --logo-green-light: #6BBF59;
+            --logo-green: #4CAF50;
+            --logo-turquoise: #26A69A;
+            --logo-blue: #1E88E5;
+            --logo-blue-dark: #1A3A52;
             
-            /* Neutral Colors */
-            --text-primary: #1A3A52;
-            --text-secondary: #5a6c7d;
-            --text-tertiary: #8b9aa8;
-            --text-light: #a8b3bf;
-            
-            /* Background Colors */
+            /* Backgrounds - Tema Claro Moderno */
             --bg-primary: #f5f7fa;
             --bg-secondary: #ffffff;
             --bg-tertiary: #e8eef5;
+            --bg-card: #ffffff;
+            --border: #e0e6ed;
+            --border-light: #f0f3f7;
             
-            /* Semantic Colors */
-            --success: #4CAF50;
-            --warning: #ffa726;
-            --error: #ef5350;
-            --info: #1E88E5;
+            /* Textos */
+            --text-primary: #1A3A52;
+            --text-secondary: #5a6c7d;
+            --text-tertiary: #8b9aa8;
             
-            /* Borders */
-            --border-light: #e0e6ed;
-            --border-medium: #d1d9e0;
+            /* Cores de Destaque - Baseadas no Logo */
+            --accent-blue: #1E88E5;
+            --accent-blue-light: #42a5f5;
+            --accent-green: #4CAF50;
+            --accent-green-light: #6BBF59;
+            --accent-turquoise: #26A69A;
+            --accent-red: #ef5350;
+            --accent-yellow: #ffa726;
+            --accent-purple: #ab47bc;
+            --accent-orange: #ff7043;
             
-            /* Shadows - Premium Elevation System */
-            --shadow-sm: 0 2px 8px rgba(26, 58, 82, 0.06);
-            --shadow-md: 0 4px 16px rgba(26, 58, 82, 0.08);
-            --shadow-lg: 0 8px 24px rgba(26, 58, 82, 0.12);
-            --shadow-xl: 0 12px 32px rgba(26, 58, 82, 0.16);
-            
-            /* Glows */
-            --glow-green: rgba(76, 175, 80, 0.25);
-            --glow-turquoise: rgba(38, 166, 154, 0.25);
-            --glow-blue: rgba(30, 136, 229, 0.25);
-            
-            /* Spacing - 8px Grid System */
-            --space-xs: 8px;
-            --space-sm: 16px;
-            --space-md: 24px;
-            --space-lg: 32px;
-            --space-xl: 48px;
-            
-            /* Border Radius */
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 20px;
-            --radius-2xl: 24px;
-            
-            /* Typography Scale */
-            --font-xs: 11px;
-            --font-sm: 13px;
-            --font-base: 14px;
-            --font-md: 16px;
-            --font-lg: 20px;
-            --font-xl: 24px;
-            --font-2xl: 32px;
-            --font-3xl: 48px;
-            
-            /* Z-index Scale */
-            --z-base: 1;
-            --z-dropdown: 100;
-            --z-sticky: 200;
-            --z-fixed: 300;
-            --z-modal-backdrop: 400;
-            --z-modal: 500;
-            --z-popover: 600;
-            --z-tooltip: 700;
+            /* Sombras e Glows */
+            --shadow: rgba(26, 58, 82, 0.08);
+            --shadow-hover: rgba(26, 58, 82, 0.15);
+            --glow-blue: rgba(30, 136, 229, 0.2);
+            --glow-green: rgba(76, 175, 80, 0.2);
+            --glow-turquoise: rgba(38, 166, 154, 0.2);
+            --glow-green-light: rgba(107, 191, 89, 0.2);
         }
 
-        /* ========== BODY & LAYOUT ========== */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
             padding-bottom: 80px;
             position: relative;
             overflow-x: hidden;
-            font-size: var(--font-base);
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Safe area for notch devices */
-        @supports (padding: max(0px)) {
-            body {
-                padding-bottom: max(80px, env(safe-area-inset-bottom));
-            }
+        /* Grid background pattern - Sutil */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        /* ========== ANIMATIONS - Premium & Subtle ========== */
-        @keyframes fadeInUp {
+        /* Glow effect - Muito sutil */
+        body::after {
+            display: none;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -140,15 +118,10 @@
             }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes scaleIn {
+        @keyframes fadeInScale {
             from {
                 opacity: 0;
-                transform: scale(0.95);
+                transform: scale(0.9);
             }
             to {
                 opacity: 1;
@@ -156,241 +129,348 @@
             }
         }
 
-        @keyframes shimmer {
-            0% {
-                background-position: -1000px 0;
-            }
-            100% {
-                background-position: 1000px 0;
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(100%);
-            }
-            to {
-                transform: translateY(0);
-            }
-        }
-
-        /* ========== HEADER - Minimal & Clean ========== */
         .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-light);
-            padding: var(--space-sm) var(--space-md);
+            background: linear-gradient(135deg, var(--logo-blue) 0%, var(--logo-turquoise) 100%);
+            border-bottom: none;
+            box-shadow: 0 2px 12px rgba(30, 136, 229, 0.15);
+            color: white;
+            padding: 20px;
+            text-align: center;
             position: sticky;
             top: 0;
-            z-index: var(--z-sticky);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.95);
+            z-index: 100;
+            backdrop-filter: blur(10px);
         }
 
-        .header-content {
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .header-title {
-            font-size: var(--font-lg);
+        .header h1 {
+            font-size: 24px;
             font-weight: 800;
-            color: var(--text-primary);
+            margin-bottom: 4px;
+            color: #ffffff;
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .header-subtitle {
-            font-size: var(--font-xs);
-            color: var(--text-tertiary);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
+        .header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
-        /* ========== CONTAINER ========== */
         .container {
-            max-width: 600px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: var(--space-md) var(--space-sm);
+            padding: 20px;
             position: relative;
-            z-index: var(--z-base);
+            z-index: 1;
         }
 
-        /* ========== HERO CARD - Lucro Líquido ========== */
-        .hero-card {
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
-            border-radius: var(--radius-xl);
-            padding: var(--space-lg);
-            margin-bottom: var(--space-md);
-            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(76, 175, 80, 0.1);
+        /* Card principal destacado */
+        .featured-card {
+            background: linear-gradient(135deg, var(--logo-green) 0%, var(--logo-green-light) 100%);
+            border: none;
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
             position: relative;
             overflow: hidden;
-            animation: fadeInUp 0.6s ease-out;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.2);
+            color: white;
         }
 
-        .hero-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+        .featured-card::before {
+            display: none;
         }
 
-        .hero-label {
-            font-size: var(--font-xs);
-            font-weight: 700;
+        .featured-card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .featured-card-label {
+            font-size: 13px;
             color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 12px;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: var(--space-xs);
         }
 
-        .hero-value {
-            font-size: var(--font-3xl);
+        .featured-card-value {
+            font-size: 48px;
             font-weight: 900;
             color: #ffffff;
+            margin-bottom: 8px;
             letter-spacing: -2px;
-            margin-bottom: var(--space-sm);
-            line-height: 1;
         }
 
-        .hero-progress {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.25);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: var(--space-sm);
+        .featured-card-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
         }
 
-        .hero-progress-fill {
-            height: 100%;
-            background: #ffffff;
-            border-radius: 10px;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        .featured-card-icon {
+            display: none;
         }
 
-        .hero-subtitle {
-            font-size: var(--font-sm);
-            color: rgba(255, 255, 255, 0.95);
-            font-weight: 600;
+        .period-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: var(--bg-card);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
-        /* ========== QUICK METRICS - 3 Cards Horizontais ========== */
-        .quick-metrics {
+        .period-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .period-btn.active {
+            background: var(--logo-turquoise);
+            color: #ffffff;
+            box-shadow: 0 2px 8px var(--glow-turquoise);
+        }
+
+        .period-btn:hover:not(.active) {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        /* Cards circulares de progresso */
+        .circular-cards {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: var(--space-sm);
-            margin-bottom: var(--space-md);
-            animation: fadeInUp 0.6s ease-out 0.1s both;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+            overflow: visible;
         }
 
-        .metric-card {
-            background: var(--bg-secondary);
-            border-radius: var(--radius-md);
-            padding: var(--space-sm);
+        .circular-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: visible;
+            animation: fadeInScale 0.5s ease-out;
+            box-shadow: 0 2px 12px var(--shadow);
+        }
+
+        .circular-card::before {
+            display: none;
+        }
+
+        .circular-card:hover {
+            border-color: var(--border-light);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow-hover);
+        }
+
+        .circular-card:nth-child(1) { animation-delay: 0.1s; }
+        .circular-card:nth-child(2) { animation-delay: 0.2s; }
+        .circular-card:nth-child(3) { animation-delay: 0.3s; }
+        .circular-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .circular-card:nth-child(1):hover {
+            box-shadow: 0 4px 16px var(--glow-green);
+        }
+
+        .circular-card:nth-child(2):hover {
+            box-shadow: 0 4px 16px rgba(239, 83, 80, 0.3);
+        }
+
+        .circular-card:nth-child(3):hover {
+            box-shadow: 0 4px 16px var(--glow-blue);
+        }
+
+        .circular-card:nth-child(4):hover {
+            box-shadow: 0 4px 16px var(--glow-turquoise);
+        }
+
+        .circular-progress {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 16px;
+            padding: 4px;
+        }
+
+        .circular-progress svg {
+            transform: rotate(-90deg);
+            overflow: visible;
+        }
+
+        .circular-progress-bg {
+            fill: none;
+            stroke: var(--bg-tertiary);
+            stroke-width: 8;
+        }
+
+        .circular-progress-fill {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .circular-progress-fill.green {
+            stroke: url(#gradient-green);
+            filter: drop-shadow(0 0 10px var(--glow-green));
+        }
+
+        .circular-progress-fill.red {
+            stroke: url(#gradient-red);
+            filter: drop-shadow(0 0 10px rgba(239, 83, 80, 0.5));
+        }
+
+        .circular-progress-fill.blue {
+            stroke: url(#gradient-blue);
+            filter: drop-shadow(0 0 10px var(--glow-blue));
+        }
+
+        .circular-progress-fill.yellow {
+            stroke: url(#gradient-turquoise);
+            filter: drop-shadow(0 0 10px var(--glow-turquoise));
+        }
+
+        .circular-progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             text-align: center;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-light);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .metric-card:active {
-            transform: scale(0.96);
+        .circular-progress-percent {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
         }
 
-        .metric-icon {
+        .circular-progress-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .circular-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .circular-card-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        /* Mini Stats Grid */
+        .mini-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .mini-stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .mini-stat-card:hover {
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-hover);
+        }
+
+        .mini-stat-card:nth-child(1) {
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .mini-stat-card:nth-child(1):hover {
+            border-color: var(--accent-blue);
+        }
+
+        .mini-stat-card:nth-child(2) {
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .mini-stat-card:nth-child(2):hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .mini-stat-card:nth-child(3) {
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .mini-stat-card:nth-child(3):hover {
+            border-color: var(--accent-purple);
+        }
+
+        .mini-stat-card:nth-child(4) {
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .mini-stat-card:nth-child(4):hover {
+            border-color: var(--accent-orange);
+        }
+
+        .mini-stat-icon {
             font-size: 24px;
-            margin-bottom: var(--space-xs);
-            display: block;
+            margin-bottom: 8px;
         }
 
-        .metric-value {
-            font-size: var(--font-xl);
-            font-weight: 800;
+        .mini-stat-value {
+            font-size: 20px;
+            font-weight: 900;
             color: var(--text-primary);
             margin-bottom: 4px;
-            letter-spacing: -0.5px;
         }
 
-        .metric-label {
-            font-size: var(--font-xs);
-            font-weight: 600;
-            color: var(--text-tertiary);
+        .mini-stat-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        /* ========== CHART SECTION - Minimalista ========== */
-        .chart-section {
-            background: var(--bg-secondary);
-            border-radius: var(--radius-lg);
-            padding: var(--space-md);
-            margin-bottom: var(--space-md);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-light);
-            animation: fadeInUp 0.6s ease-out 0.2s both;
-        }
-
-        .section-title {
-            font-size: var(--font-md);
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: var(--space-sm);
-            letter-spacing: -0.3px;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 200px;
-            width: 100%;
-        }
-
-        /* ========== INSIGHTS CARD - Inteligente ========== */
-        .insights-card {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-turquoise) 100%);
-            border-radius: var(--radius-lg);
-            padding: var(--space-md);
-            margin-bottom: var(--space-md);
-            box-shadow: var(--shadow-md);
-            color: white;
-            animation: fadeInUp 0.6s ease-out 0.3s both;
-        }
-
-        .insights-icon {
-            font-size: 32px;
-            margin-bottom: var(--space-xs);
-        }
-
-        .insights-title {
-            font-size: var(--font-md);
-            font-weight: 700;
-            margin-bottom: var(--space-xs);
-            color: rgba(255, 255, 255, 0.95);
-        }
-
-        .insights-text {
-            font-size: var(--font-sm);
-            color: rgba(255, 255, 255, 0.9);
-            line-height: 1.6;
+            letter-spacing: 0.5px;
         }
 
         /* Controle de Quilometragem */
@@ -1717,197 +1797,148 @@
         }
 
         /* Bottom Navigation */
-        /* ========== BOTTOM NAVIGATION - Premium Mobile-First ========== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-light);
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
-            align-items: center;
-            padding: var(--space-xs) 0;
-            z-index: var(--z-fixed);
-            box-shadow: 0 -4px 20px rgba(26, 58, 82, 0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-
-        @supports (padding: max(0px)) {
-            .bottom-nav {
-                padding-bottom: max(var(--space-xs), env(safe-area-inset-bottom));
-            }
+            padding: 12px 0;
+            z-index: 100;
+            box-shadow: 0 -2px 12px var(--shadow);
         }
 
         .nav-item {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: var(--space-xs);
-            color: var(--text-tertiary);
+            text-align: center;
+            padding: 10px;
+            color: var(--text-secondary);
             text-decoration: none;
-            font-size: var(--font-xs);
+            font-size: 10px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 600;
-            letter-spacing: 0.2px;
-            position: relative;
-            min-height: 56px;
-        }
-
-        .nav-item:active {
-            transform: scale(0.92);
+            transition: all 0.3s;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
         }
 
         .nav-item.active {
-            color: var(--primary-turquoise);
+            color: var(--logo-turquoise);
         }
 
         .nav-icon {
             font-size: 24px;
-            margin-bottom: 4px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 6px;
         }
 
         .nav-item.active .nav-icon {
-            transform: translateY(-2px);
+            filter: drop-shadow(0 0 6px var(--glow-turquoise));
         }
 
-        /* FAB - Floating Action Button */
-        .fab-container {
-            position: relative;
-            flex: 0 0 auto;
-            margin: 0 var(--space-sm);
+        /* Gráficos */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
         }
 
-        .fab {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-turquoise) 0%, var(--primary-blue) 100%);
-            color: white;
-            border: none;
-            font-size: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 20px var(--glow-turquoise);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            top: -20px;
-        }
-
-        .fab:active {
-            transform: scale(0.92);
-        }
-
-        .fab.active {
-            transform: rotate(45deg);
-            background: linear-gradient(135deg, var(--error) 0%, #ff6b6b 100%);
-        }
-
-        /* Bottom Sheet - Ações Rápidas */
-        .bottom-sheet {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
-            padding: var(--space-md);
-            padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
-            z-index: var(--z-modal);
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 -8px 32px rgba(26, 58, 82, 0.2);
-        }
-
-        .bottom-sheet.active {
-            transform: translateY(0);
-        }
-
-        .bottom-sheet-handle {
-            width: 40px;
-            height: 4px;
-            background: var(--border-medium);
-            border-radius: 10px;
-            margin: 0 auto var(--space-md);
-        }
-
-        .bottom-sheet-title {
-            font-size: var(--font-lg);
+        .chart-header {
+            font-size: 16px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: var(--space-md);
-            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .quick-actions {
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+        }
+
+        /* Seções */
+        .stats-section, .detail-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .section-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-detail-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: var(--space-sm);
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
 
-        .quick-action-btn {
+        .stat-detail-card {
+            text-align: center;
+            padding: 16px;
             background: var(--bg-tertiary);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            padding: var(--space-md);
+            border-radius: 12px;
+        }
+
+        .stat-detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .stat-detail-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+
+        .detail-list {
             display: flex;
             flex-direction: column;
+            gap: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: var(--space-xs);
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            min-height: 100px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
         }
 
-        .quick-action-btn:active {
-            transform: scale(0.96);
+        .detail-item-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
-        .quick-action-icon {
-            font-size: 32px;
-        }
-
-        .quick-action-label {
-            font-size: var(--font-sm);
-            font-weight: 600;
+        .detail-item-value {
+            font-size: 16px;
+            font-weight: 700;
             color: var(--text-primary);
-            text-align: center;
         }
 
-        /* Backdrop */
-        .backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(26, 58, 82, 0.5);
-            z-index: var(--z-modal-backdrop);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-        }
-
-        .backdrop.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        /* ========== PAGES ========== */
+        /* Páginas */
         .page {
             display: none;
-            animation: fadeIn 0.3s ease-out;
         }
 
         .page.active {
@@ -1915,175 +1946,38 @@
         }
 
         .page-header {
-            margin-bottom: var(--space-md);
+            margin-bottom: 24px;
         }
 
-        .page-title {
-            font-size: var(--font-2xl);
+        .page-header h2 {
+            font-size: 24px;
             font-weight: 800;
             color: var(--text-primary);
-            margin-bottom: var(--space-xs);
-            letter-spacing: -1px;
+            margin-bottom: 8px;
         }
 
-        .page-subtitle {
-            font-size: var(--font-base);
+        .page-header p {
+            font-size: 14px;
             color: var(--text-secondary);
-            font-weight: 500;
         }
 
-        /* ========== BUTTONS - Premium System ========== */
-        .btn {
-            padding: var(--space-sm) var(--space-md);
-            border-radius: var(--radius-md);
-            font-size: var(--font-base);
+        /* Filtros */
+        .filter-section {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .filter-select {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-xs);
-            min-height: 48px;
-        }
-
-        .btn:active {
-            transform: scale(0.96);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-turquoise) 0%, var(--primary-blue) 100%);
-            color: white;
-            box-shadow: 0 4px 12px var(--glow-turquoise);
-        }
-
-        .btn-success {
-            background: var(--primary-green);
-            color: white;
-            box-shadow: 0 4px 12px var(--glow-green);
-        }
-
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-light);
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-secondary);
-        }
-
-        .btn-full {
-            width: 100%;
-        }
-
-        /* ========== MODALS - Premium ========== */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: var(--z-modal);
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-            padding: 0;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-secondary);
-            border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
-            padding: var(--space-md);
-            padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 -8px 32px rgba(26, 58, 82, 0.2);
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--space-md);
-        }
-
-        .modal-title {
-            font-size: var(--font-lg);
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--bg-tertiary);
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .modal-close:active {
-            transform: scale(0.9);
-        }
-
-        /* ========== FORMS - Clean & Modern ========== */
-        .form-group {
-            margin-bottom: var(--space-md);
-        }
-
-        .form-label {
-            display: block;
-            font-size: var(--font-xs);
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: var(--space-xs);
-        }
-
-        .form-input,
-        .form-select,
-        .form-textarea {
-            width: 100%;
-            padding: var(--space-sm);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            font-size: var(--font-base);
-            font-weight: 500;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s;
-            min-height: 48px;
-        }
-
-        .form-input:focus,
-        .form-select:focus,
-        .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary-turquoise);
-            box-shadow: 0 0 0 3px var(--glow-turquoise);
-        }
-
-        .form-textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
             transition: all 0.3s;
         }
 
@@ -3798,232 +3692,125 @@
                 font-size: 14px;
             }
 
-        /* ========== UTILITY CLASSES ========== */
-        .text-center { text-align: center; }
-        .text-left { text-align: left; }
-        .text-right { text-align: right; }
-        
-        .mt-xs { margin-top: var(--space-xs); }
-        .mt-sm { margin-top: var(--space-sm); }
-        .mt-md { margin-top: var(--space-md); }
-        .mt-lg { margin-top: var(--space-lg); }
-        
-        .mb-xs { margin-bottom: var(--space-xs); }
-        .mb-sm { margin-bottom: var(--space-sm); }
-        .mb-md { margin-bottom: var(--space-md); }
-        .mb-lg { margin-bottom: var(--space-lg); }
-        
-        .p-xs { padding: var(--space-xs); }
-        .p-sm { padding: var(--space-sm); }
-        .p-md { padding: var(--space-md); }
-        .p-lg { padding: var(--space-lg); }
-        
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .items-center { align-items: center; }
-        .justify-center { justify-content: center; }
-        .justify-between { justify-content: space-between; }
-        .gap-xs { gap: var(--space-xs); }
-        .gap-sm { gap: var(--space-sm); }
-        .gap-md { gap: var(--space-md); }
-        
-        .hidden { display: none !important; }
-        .visible { display: block !important; }
-        
-        /* ========== RESPONSIVE DESIGN - Mobile-First ========== */
-        @media (max-width: 480px) {
-            .hero-value {
-                font-size: 40px;
+            .btn {
+                font-size: 11px;
+                padding: 10px 6px;
             }
-            
-            .quick-metrics {
-                grid-template-columns: repeat(3, 1fr);
-                gap: var(--space-xs);
+
+            .nav-item {
+                font-size: 8px;
             }
-            
-            .metric-card {
-                padding: var(--space-xs);
-            }
-            
-            .metric-value {
-                font-size: var(--font-lg);
+
+            .nav-icon {
+                font-size: 18px;
             }
         }
-        
-        @media (min-width: 481px) {
-            .container {
-                padding: var(--space-md);
-            }
-        }
-        
-        /* Touch Optimizations */
+
+        /* Otimizações para touch */
         @media (hover: none) and (pointer: coarse) {
-            .btn, .nav-item, .metric-card, .quick-action-btn {
+            .btn, .nav-item, .calendar-day, .transaction-item,
+            .export-option-btn, .achievement-badge, .goal-card,
+            .mini-stat-card, .circular-card {
                 -webkit-tap-highlight-color: transparent;
                 touch-action: manipulation;
             }
+
+            .btn:active, .nav-item:active {
+                transform: scale(0.95);
+            }
         }
         
-        /* PWA Display Modes */
+        /* Ocultar botão de instalação quando app está instalado */
         @media (display-mode: standalone) {
-            .header {
-                padding-top: max(var(--space-sm), env(safe-area-inset-top));
+            #installButton {
+                display: none !important;
+            }
+        }
+        
+        /* iOS standalone */
+        @media (display-mode: fullscreen) {
+            #installButton {
+                display: none !important;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header Premium - Minimalista -->
+    <!-- SVG Gradient Definitions - Cores do Logotipo -->
+    <svg width="0" height="0" style="position: absolute;">
+        <defs>
+            <linearGradient id="gradient-green" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#6BBF59;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="gradient-red" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#ef5350;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#e57373;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="gradient-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#1E88E5;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#42a5f5;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="gradient-turquoise" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#26A69A;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#4DB6AC;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+    </svg>
+
     <div class="header">
-        <div class="header-content">
-            <div>
-                <div class="header-title">Driver Finance</div>
-                <div class="header-subtitle">Hoje</div>
-            </div>
-            <button id="installButton" onclick="triggerInstallPrompt()" class="btn btn-ghost" style="display: none; padding: 8px 12px; min-height: auto;">
-                📲 Instalar
-            </button>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 4px;">
+            <img src="./img/logotipo.png" alt="Driver Finance Logo" style="height: 40px; width: auto; filter: drop-shadow(0 0 10px var(--glow-cyan));">
+            <h1 style="margin: 0;">DRIVER FINANCE</h1>
         </div>
+        <p>Gestão Financeira Inteligente</p>
+        <button id="installButton" onclick="triggerInstallPrompt()" style="
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        " onmouseover="this.style.background='rgba(255, 255, 255, 0.35)'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='scale(1)'">
+            📲 Instalar App
+        </button>
     </div>
 
     <div class="container">
-        <!-- ========== PÁGINA INÍCIO - Premium Mobile-First ========== -->
-        <div id="page-home" class="page active">
-            <!-- Hero Card - Lucro Líquido -->
-            <div class="hero-card">
-                <div class="hero-label">LUCRO LÍQUIDO HOJE</div>
-                <div class="hero-value" id="heroProfit">R$ 0,00</div>
-                <div class="hero-progress">
-                    <div class="hero-progress-fill" id="heroProgressBar" style="width: 0%"></div>
+        <!-- Página Dashboard -->
+        <div id="page-dashboard" class="page active">
+            <!-- Card Principal Destacado -->
+            <div class="featured-card">
+                <div class="featured-card-content">
+                    <div class="featured-card-label">💰 FATURAMENTO</div>
+                    <div class="featured-card-value">R$ 0,00</div>
+                    <div class="featured-card-subtitle">Atualizado em tempo real</div>
                 </div>
-                <div class="hero-subtitle" id="heroSubtitle">Comece a registrar suas corridas</div>
+                <div class="featured-card-icon">💎</div>
             </div>
 
-            <!-- Quick Metrics - 3 Cards -->
-            <div class="quick-metrics">
-                <div class="metric-card">
-                    <span class="metric-icon">�</span>
-                    <div class="metric-value" id="metricRevenue">R$ 0</div>
-                    <div class="metric-label">Ganhos</div>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-icon">⏱️</span>
-                    <div class="metric-value" id="metricTime">0h</div>
-                    <div class="metric-label">Tempo</div>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-icon">⛽</span>
-                    <div class="metric-value" id="metricFuel">R$ 0</div>
-                    <div class="metric-label">Gasto</div>
-                </div>
-            </div>
-
-            <!-- Chart Section - Minimalista -->
-            <div class="chart-section">
-                <div class="section-title">Últimos 7 Dias</div>
-                <div class="chart-container">
-                    <canvas id="weeklyChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Insights Card - Inteligente -->
-            <div class="insights-card" id="insightsCard" style="display: none;">
-                <div class="insights-icon">💡</div>
-                <div class="insights-title" id="insightsTitle">Insights</div>
-                <div class="insights-text" id="insightsText">Continue registrando para ver insights personalizados</div>
-            </div>
+        <!-- Seletor de Período -->
+        <div class="period-selector">
+            <button class="period-btn active" onclick="changePeriod('today')">HOJE</button>
+            <button class="period-btn" onclick="changePeriod('week')">SEMANA</button>
+            <button class="period-btn" onclick="changePeriod('month')">MÊS</button>
         </div>
 
-        <!-- ========== PÁGINA GANHOS ========== -->
-        <div id="page-earnings" class="page">
-            <div class="page-header">
-                <div class="page-title">Ganhos</div>
-                <div class="page-subtitle">Histórico de receitas</div>
-            </div>
-            
-            <!-- Filtros Simples -->
-            <div style="display: flex; gap: var(--space-xs); margin-bottom: var(--space-md);">
-                <button class="btn btn-secondary" style="flex: 1;" onclick="filterEarnings('today')">Hoje</button>
-                <button class="btn btn-secondary" style="flex: 1;" onclick="filterEarnings('week')">Semana</button>
-                <button class="btn btn-secondary" style="flex: 1;" onclick="filterEarnings('month')">Mês</button>
-            </div>
-
-            <!-- Lista de Receitas -->
-            <div id="earningsList"></div>
-        </div>
-
-        <!-- ========== PÁGINA VEÍCULO ========== -->
-        <div id="page-vehicle" class="page">
-            <div class="page-header">
-                <div class="page-title">Veículo</div>
-                <div class="page-subtitle">KM, Combustível e Manutenção</div>
-            </div>
-            
-            <!-- Tabs -->
-            <div style="display: flex; gap: var(--space-xs); margin-bottom: var(--space-md); background: var(--bg-secondary); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
-                <button class="btn btn-secondary" style="flex: 1;" onclick="switchVehicleTab('km')">KM</button>
-                <button class="btn btn-secondary" style="flex: 1;" onclick="switchVehicleTab('fuel')">Combustível</button>
-                <button class="btn btn-secondary" style="flex: 1;" onclick="switchVehicleTab('maintenance')">Manutenção</button>
-            </div>
-
-            <!-- Tab Content -->
-            <div id="vehicleTabContent">
-                <p style="text-align: center; color: var(--text-tertiary); padding: var(--space-lg);">
-                    Selecione uma aba acima
-                </p>
-            </div>
-        </div>
-
-        <!-- ========== PÁGINA PERFIL ========== -->
-        <div id="page-profile" class="page">
-            <div class="page-header">
-                <div class="page-title">Perfil</div>
-                <div class="page-subtitle">Metas, relatórios e configurações</div>
-            </div>
-
-            <!-- Menu de Opções -->
-            <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
-                <button class="btn btn-secondary btn-full" onclick="switchPage('goals')" style="justify-content: flex-start; padding: var(--space-md);">
-                    <span style="font-size: 24px;">🎯</span>
-                    <div style="flex: 1; text-align: left; margin-left: var(--space-sm);">
-                        <div style="font-weight: 700;">Metas</div>
-                        <div style="font-size: var(--font-xs); color: var(--text-tertiary); font-weight: 500;">Defina suas metas diárias e mensais</div>
-                    </div>
-                </button>
-                
-                <button class="btn btn-secondary btn-full" onclick="switchPage('reports')" style="justify-content: flex-start; padding: var(--space-md);">
-                    <span style="font-size: 24px;">📈</span>
-                    <div style="flex: 1; text-align: left; margin-left: var(--space-sm);">
-                        <div style="font-weight: 700;">Relatórios</div>
-                        <div style="font-size: var(--font-xs); color: var(--text-tertiary); font-weight: 500;">Exporte relatórios em PDF</div>
-                    </div>
-                </button>
-                
-                <button class="btn btn-secondary btn-full" onclick="switchPage('ai')" style="justify-content: flex-start; padding: var(--space-md);">
-                    <span style="font-size: 24px;">🤖</span>
-                    <div style="flex: 1; text-align: left; margin-left: var(--space-sm);">
-                        <div style="font-weight: 700;">Assistente IA</div>
-                        <div style="font-size: var(--font-xs); color: var(--text-tertiary); font-weight: 500;">Insights inteligentes personalizados</div>
-                    </div>
-                </button>
-                
-                <button class="btn btn-secondary btn-full" onclick="switchPage('apps')" style="justify-content: flex-start; padding: var(--space-md);">
-                    <span style="font-size: 24px;">📱</span>
-                    <div style="flex: 1; text-align: left; margin-left: var(--space-sm);">
-                        <div style="font-weight: 700;">Comparador de Apps</div>
-                        <div style="font-size: var(--font-xs); color: var(--text-tertiary); font-weight: 500;">Compare ganhos por aplicativo</div>
-                    </div>
-                </button>
-                
-                <button class="btn btn-secondary btn-full" onclick="switchPage('history')" style="justify-content: flex-start; padding: var(--space-md);">
-                    <span style="font-size: 24px;">📜</span>
-                    <div style="flex: 1; text-align: left; margin-left: var(--space-sm);">
-                        <div style="font-weight: 700;">Histórico Completo</div>
-                        <div style="font-size: var(--font-xs); color: var(--text-tertiary); font-weight: 500;">Todas as transações</div>
-                    </div>
-                </button>
-            </div>
-        </div>
+        <!-- Cards Circulares de Progresso -->
+        <div class="circular-cards">
+            <div class="circular-card">
+                <div class="circular-progress">
+                    <svg width="120" height="120">
+                        <circle class="circular-progress-bg" cx="60" cy="60" r="52"></circle>
                         <circle id="revenueCircle" class="circular-progress-fill green" cx="60" cy="60" r="52" 
                                 stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
                     </svg>
@@ -4956,65 +4743,43 @@
         </div>
     </div>
 
-    <!-- ========== BOTTOM NAVIGATION - Premium Mobile-First ========== -->
+    <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchPage('home')">
-            <div class="nav-icon">🏠</div>
-            <div>Início</div>
-        </div>
-        <div class="nav-item" onclick="switchPage('earnings')">
-            <div class="nav-icon">�</div>
-            <div>Ganhos</div>
-        </div>
-        <div class="fab-container">
-            <button class="fab" onclick="toggleFAB()" id="fabButton">
-                ➕
-            </button>
+        <div class="nav-item active" onclick="switchPage('dashboard')">
+            <div class="nav-icon">📊</div>
+            Dashboard
         </div>
         <div class="nav-item" onclick="switchPage('vehicle')">
-            <div class="nav-icon">�</div>
-            <div>Veículo</div>
+            <div class="nav-icon">🚗</div>
+            Veículo
         </div>
-        <div class="nav-item" onclick="switchPage('profile')">
-            <div class="nav-icon">👤</div>
-            <div>Perfil</div>
+        <div class="nav-item" onclick="switchPage('apps')">
+            <div class="nav-icon">📱</div>
+            Apps
         </div>
-    </div>
-
-    <!-- Backdrop -->
-    <div class="backdrop" id="backdrop" onclick="closeFAB()"></div>
-
-    <!-- Bottom Sheet - Ações Rápidas -->
-    <div class="bottom-sheet" id="bottomSheet">
-        <div class="bottom-sheet-handle"></div>
-        <div class="bottom-sheet-title">Ações Rápidas</div>
-        <div class="quick-actions">
-            <button class="quick-action-btn" onclick="openModal('revenue'); closeFAB();">
-                <span class="quick-action-icon">�</span>
-                <span class="quick-action-label">Adicionar Corrida</span>
-            </button>
-            <button class="quick-action-btn" onclick="openModal('fuel'); closeFAB();">
-                <span class="quick-action-icon">⛽</span>
-                <span class="quick-action-label">Abastecimento</span>
-            </button>
-            <button class="quick-action-btn" onclick="openModal('maintenance'); closeFAB();">
-                <span class="quick-action-icon">🔧</span>
-                <span class="quick-action-label">Manutenção</span>
-            </button>
-            <button class="quick-action-btn" onclick="openModal('expense'); closeFAB();">
-                <span class="quick-action-icon">�</span>
-                <span class="quick-action-label">Despesa</span>
-            </button>
+        <div class="nav-item" onclick="switchPage('ai')">
+            <div class="nav-icon">🤖</div>
+            IA
+        </div>
+        <div class="nav-item" onclick="switchPage('history')">
+            <div class="nav-icon">📜</div>
+            Histórico
+        </div>
+        <div class="nav-item" onclick="switchPage('goals')">
+            <div class="nav-icon">🎯</div>
+            Metas
+        </div>
+        <div class="nav-item" onclick="switchPage('reports')">
+            <div class="nav-icon">📈</div>
+            Relatórios
         </div>
     </div>
 
-    <!-- ========== MODALS - Premium ========== -->
-    <!-- Modal Receita -->
+    <!-- Modals -->
     <div id="revenueModal" class="modal" onclick="closeModalOnOutsideClick(event, 'revenue')">
-        <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">💵 Nova Receita</div>
-                <button class="modal-close" onclick="closeModal('revenue')">✕</button>
+                <span>💵</span> Nova Receita
             </div>
             <form onsubmit="addRevenue(event)">
                 <div class="form-group">
@@ -5023,78 +4788,14 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Quantidade de Corridas</label>
-                    <input type="number" class="form-input" id="revenueTrips" min="1" value="1" required>
+                    <input type="number" class="form-input" id="revenueTrips" min="1" value="1" required placeholder="1">
+                    <small style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px; display: block;">
+                        💡 Informe quantas corridas foram feitas neste valor
+                    </small>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm);">
-                    <div class="form-group">
-                        <label class="form-label">Início</label>
-                        <input type="time" class="form-input" id="revenueStartTime" onchange="calculateWorkTime()">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Fim</label>
-                        <input type="time" class="form-input" id="revenueEndTime" onchange="calculateWorkTime()">
-                    </div>
-                </div>
-                <div id="workTimeDisplay" style="display: none; padding: var(--space-sm); background: var(--bg-tertiary); border-radius: var(--radius-md); margin-bottom: var(--space-md);">
-                    <div style="font-size: var(--font-xs); color: var(--text-secondary); font-weight: 600; margin-bottom: 4px;">TEMPO TRABALHADO</div>
-                    <div id="workTimeValue" style="font-size: var(--font-lg); font-weight: 800; color: var(--primary-turquoise);"></div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Aplicativo</label>
-                    <select class="form-select" id="revenueApp" required>
-                        <option value="uber">Uber</option>
-                        <option value="99">99</option>
-                        <option value="indrive">InDrive</option>
-                        <option value="outros">Outros</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Descrição (Opcional)</label>
-                    <input type="text" class="form-input" id="revenueDesc" placeholder="Ex: Corridas da manhã">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Data</label>
-                    <input type="date" class="form-input" id="revenueDate" required>
-                </div>
-                <button type="submit" class="btn btn-success btn-full">Adicionar Receita</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Despesa -->
-    <div id="expenseModal" class="modal" onclick="closeModalOnOutsideClick(event, 'expense')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <div class="modal-title">💸 Nova Despesa</div>
-                <button class="modal-close" onclick="closeModal('expense')">✕</button>
-            </div>
-            <form onsubmit="addExpense(event)">
-                <div class="form-group">
-                    <label class="form-label">Valor</label>
-                    <input type="number" class="form-input" id="expenseValue" step="0.01" required placeholder="0,00">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Categoria</label>
-                    <select class="form-select" id="expenseCategory" required>
-                        <option value="gas">⛽ Combustível</option>
-                        <option value="maintenance">🔧 Manutenção</option>
-                        <option value="app">📱 Taxas de App</option>
-                        <option value="food">🍔 Alimentação</option>
-                        <option value="other">📦 Outros</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Descrição</label>
-                    <input type="text" class="form-input" id="expenseDesc" required placeholder="Ex: Gasolina posto X">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Data</label>
-                    <input type="date" class="form-input" id="expenseDate" required>
-                </div>
-                <button type="submit" class="btn btn-success btn-full">Adicionar Despesa</button>
-            </form>
-        </div>
-    </div>
+                
+                <!-- Horários de Trabalho -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div class="form-group">
                         <label class="form-label">⏰ Início</label>
                         <input type="time" class="form-input" id="revenueStartTime" onchange="calculateWorkTime()">

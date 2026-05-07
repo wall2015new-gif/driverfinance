@@ -3,17 +3,193 @@ let currentTheme = localStorage.getItem('theme') || 'light';
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 let weeklyChart = null;
 let currentPeriod = 'today'; // Período atual: today, week, month
+let goals = JSON.parse(localStorage.getItem('goals')) || {
+    daily: 200,
+    weekly: 1400,
+    monthly: 6000,
+    trips: 200
+};
 
 // Aplicar tema ao carregar
 document.addEventListener('DOMContentLoaded', function() {
     applyTheme(currentTheme);
-    updateCircularProgress();
+    updateHomePage();
     initializeForms();
     createWeeklyChart();
     renderTransactions();
     updateKmDisplay();
     updateAppComparator();
 });
+
+// ========== FAB & BOTTOM SHEET - Premium ========== 
+function toggleFAB() {
+    const fab = document.getElementById('fabButton');
+    const bottomSheet = document.getElementById('bottomSheet');
+    const backdrop = document.getElementById('backdrop');
+    
+    const isActive = fab.classList.contains('active');
+    
+    if (isActive) {
+        closeFAB();
+    } else {
+        fab.classList.add('active');
+        bottomSheet.classList.add('active');
+        backdrop.classList.add('active');
+    }
+}
+
+function closeFAB() {
+    const fab = document.getElementById('fabButton');
+    const bottomSheet = document.getElementById('bottomSheet');
+    const backdrop = document.getElementById('backdrop');
+    
+    fab.classList.remove('active');
+    bottomSheet.classList.remove('active');
+    backdrop.classList.remove('active');
+}
+
+// ========== HOME PAGE - Premium Update ==========
+function updateHomePage() {
+    console.log('🔄 Atualizando página inicial premium...');
+    
+    // Filtrar transações de hoje
+    const today = new Date().toISOString().split('T')[0];
+    const todayTransactions = transactions.filter(t => t.date === today);
+    
+    // Calcular totais
+    const revenues = todayTransactions.filter(t => t.type === 'revenue');
+    const expenses = todayTransactions.filter(t => t.type === 'expense');
+    
+    const totalRevenue = revenues.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const totalExpense = expenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const profit = totalRevenue - totalExpense;
+    
+    // Calcular tempo trabalhado
+    let totalMinutes = 0;
+    revenues.forEach(r => {
+        if (r.workTime && r.workTime.totalMinutes) {
+            totalMinutes += r.workTime.totalMinutes;
+        }
+    });
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    
+    // Combustível do dia
+    const fuelExpenses = expenses.filter(e => e.category === 'gas');
+    const totalFuel = fuelExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    
+    // Atualizar Hero Card
+    const heroProfit = document.getElementById('heroProfit');
+    const heroProgressBar = document.getElementById('heroProgressBar');
+    const heroSubtitle = document.getElementById('heroSubtitle');
+    
+    if (heroProfit) {
+        heroProfit.textContent = formatCurrency(profit);
+    }
+    
+    // Calcular progresso da meta
+    const dailyGoal = goals.daily || 200;
+    const progress = dailyGoal > 0 ? Math.min((profit / dailyGoal) * 100, 100) : 0;
+    
+    if (heroProgressBar) {
+        heroProgressBar.style.width = progress + '%';
+    }
+    
+    if (heroSubtitle) {
+        if (profit >= dailyGoal) {
+            heroSubtitle.textContent = '🎉 Parabéns! Você bateu sua meta!';
+        } else if (profit > 0) {
+            const remaining = dailyGoal - profit;
+            heroSubtitle.textContent = `Faltam ${formatCurrency(remaining)} para sua meta`;
+        } else {
+            heroSubtitle.textContent = 'Comece a registrar suas corridas';
+        }
+    }
+    
+    // Atualizar Quick Metrics
+    const metricRevenue = document.getElementById('metricRevenue');
+    const metricTime = document.getElementById('metricTime');
+    const metricFuel = document.getElementById('metricFuel');
+    
+    if (metricRevenue) {
+        metricRevenue.textContent = formatCurrency(totalRevenue);
+    }
+    
+    if (metricTime) {
+        if (totalMinutes > 0) {
+            metricTime.textContent = `${hours}h${minutes > 0 ? minutes + 'm' : ''}`;
+        } else {
+            metricTime.textContent = '0h';
+        }
+    }
+    
+    if (metricFuel) {
+        metricFuel.textContent = formatCurrency(totalFuel);
+    }
+    
+    // Atualizar Insights
+    updateInsights(totalRevenue, profit, dailyGoal, revenues.length);
+    
+    // Atualizar gráfico
+    createWeeklyChart();
+    
+    console.log('✅ Página inicial atualizada!');
+}
+
+function updateInsights(revenue, profit, goal, trips) {
+    const insightsCard = document.getElementById('insightsCard');
+    const insightsTitle = document.getElementById('insightsTitle');
+    const insightsText = document.getElementById('insightsText');
+    
+    if (!insightsCard || !insightsTitle || !insightsText) return;
+    
+    // Se não tem dados suficientes, esconder
+    if (transactions.length < 5) {
+        insightsCard.style.display = 'none';
+        return;
+    }
+    
+    insightsCard.style.display = 'block';
+    
+    // Calcular insights
+    const percentOfGoal = goal > 0 ? Math.round((profit / goal) * 100) : 0;
+    
+    // Calcular média dos últimos 7 dias
+    const last7Days = [];
+    for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const dayRevenues = transactions.filter(t => t.type === 'revenue' && t.date === dateStr);
+        const dayExpenses = transactions.filter(t => t.type === 'expense' && t.date === dateStr);
+        const dayProfit = dayRevenues.reduce((sum, t) => sum + parseFloat(t.amount), 0) - 
+                         dayExpenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        
+        if (dayProfit > 0) {
+            last7Days.push(dayProfit);
+        }
+    }
+    
+    const avgProfit = last7Days.length > 0 ? last7Days.reduce((a, b) => a + b, 0) / last7Days.length : 0;
+    
+    // Gerar insight
+    if (percentOfGoal >= 100) {
+        insightsTitle.textContent = '🎉 Meta Batida!';
+        insightsText.textContent = `Você já atingiu ${percentOfGoal}% da sua meta diária. Continue assim!`;
+    } else if (profit > avgProfit && avgProfit > 0) {
+        const percentAbove = Math.round(((profit - avgProfit) / avgProfit) * 100);
+        insightsTitle.textContent = '📈 Acima da Média';
+        insightsText.textContent = `Você está ${percentAbove}% acima da sua média dos últimos 7 dias!`;
+    } else if (trips > 0) {
+        const avgPerTrip = revenue / trips;
+        insightsTitle.textContent = '💡 Análise de Corridas';
+        insightsText.textContent = `Média de ${formatCurrency(avgPerTrip)} por corrida hoje. ${trips} corridas realizadas.`;
+    } else {
+        insightsTitle.textContent = '💪 Vamos Começar!';
+        insightsText.textContent = `Sua meta é ${formatCurrency(goal)}. Registre suas corridas para acompanhar o progresso.`;
+    }
+}
 
 // ========== TEMA ==========
 function toggleTheme() {
@@ -336,6 +512,9 @@ function createWeeklyChart() {
 function switchPage(pageName) {
     console.log('🔄 Mudando para página:', pageName);
     
+    // Fechar FAB se estiver aberto
+    closeFAB();
+    
     // Esconder todas as páginas
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
@@ -365,7 +544,19 @@ function switchPage(pageName) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Atualizar conteúdo específico da página
-    if (pageName === 'goals') {
+    if (pageName === 'home') {
+        console.log('🏠 Atualizando página inicial...');
+        updateHomePage();
+    } else if (pageName === 'earnings') {
+        console.log('💰 Atualizando ganhos...');
+        renderEarnings();
+    } else if (pageName === 'vehicle') {
+        console.log('🚗 Atualizando página do veículo...');
+        switchVehicleTab('km');
+    } else if (pageName === 'profile') {
+        console.log('👤 Página de perfil...');
+        // Perfil é apenas menu, não precisa atualizar
+    } else if (pageName === 'goals') {
         console.log('📊 Atualizando metas...');
         updateGoals();
         renderBills();
@@ -380,14 +571,97 @@ function switchPage(pageName) {
     } else if (pageName === 'history') {
         console.log('📜 Atualizando histórico...');
         renderTransactions();
-    } else if (pageName === 'vehicle') {
-        console.log('🚗 Atualizando página do veículo...');
-        updateKmDisplay();
-        updateFuelStats();
-        updateMaintenanceList();
     } else if (pageName === 'apps') {
         console.log('📱 Atualizando comparador de apps...');
         updateAppComparator();
+    }
+}
+
+// ========== EARNINGS PAGE ==========
+function renderEarnings() {
+    const earningsList = document.getElementById('earningsList');
+    if (!earningsList) return;
+    
+    const revenues = transactions.filter(t => t.type === 'revenue').sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    if (revenues.length === 0) {
+        earningsList.innerHTML = `
+            <div style="text-align: center; padding: var(--space-xl); color: var(--text-tertiary);">
+                <div style="font-size: 48px; margin-bottom: var(--space-sm);">💰</div>
+                <div style="font-size: var(--font-md); font-weight: 600; margin-bottom: var(--space-xs);">Nenhum ganho registrado</div>
+                <div style="font-size: var(--font-sm);">Adicione sua primeira corrida usando o botão +</div>
+            </div>
+        `;
+        return;
+    }
+    
+    earningsList.innerHTML = revenues.map(r => {
+        const appIcons = {
+            'uber': '🚗',
+            '99': '🟡',
+            'indrive': '🔵',
+            'outros': '📱'
+        };
+        
+        return `
+            <div style="background: var(--bg-secondary); border-radius: var(--radius-lg); padding: var(--space-md); margin-bottom: var(--space-sm); border: 1px solid var(--border-light);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-xs);">
+                    <div>
+                        <div style="font-size: var(--font-xs); color: var(--text-tertiary); font-weight: 600; margin-bottom: 4px;">
+                            ${formatDate(r.date)}
+                        </div>
+                        <div style="font-size: var(--font-xl); font-weight: 800; color: var(--primary-green);">
+                            ${formatCurrency(r.amount)}
+                        </div>
+                    </div>
+                    <div style="font-size: 32px;">
+                        ${appIcons[r.app] || '📱'}
+                    </div>
+                </div>
+                <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap; font-size: var(--font-xs); color: var(--text-secondary);">
+                    ${r.trips && r.trips > 1 ? `<span>🚗 ${r.trips} corridas</span>` : ''}
+                    ${r.workTime ? `<span>⏱️ ${r.workTime.hours}h ${r.workTime.minutes}m</span>` : ''}
+                    ${r.description ? `<span>📝 ${r.description}</span>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterEarnings(period) {
+    // TODO: Implementar filtro
+    console.log('Filtrar ganhos:', period);
+}
+
+// ========== VEHICLE TABS ==========
+function switchVehicleTab(tab) {
+    const content = document.getElementById('vehicleTabContent');
+    if (!content) return;
+    
+    if (tab === 'km') {
+        content.innerHTML = `
+            <div style="text-align: center; padding: var(--space-lg); color: var(--text-tertiary);">
+                <div style="font-size: 48px; margin-bottom: var(--space-sm);">🚗</div>
+                <div style="font-size: var(--font-md); font-weight: 600;">Controle de KM</div>
+                <div style="font-size: var(--font-sm); margin-top: var(--space-xs);">Em breve</div>
+            </div>
+        `;
+    } else if (tab === 'fuel') {
+        content.innerHTML = `
+            <div style="text-align: center; padding: var(--space-lg); color: var(--text-tertiary);">
+                <div style="font-size: 48px; margin-bottom: var(--space-sm);">⛽</div>
+                <div style="font-size: var(--font-md); font-weight: 600;">Controle de Combustível</div>
+                <div style="font-size: var(--font-sm); margin-top: var(--space-xs);">Em breve</div>
+            </div>
+        `;
+    } else if (tab === 'maintenance') {
+        content.innerHTML = `
+            <div style="text-align: center; padding: var(--space-lg); color: var(--text-tertiary);">
+                <div style="font-size: 48px; margin-bottom: var(--space-sm);">🔧</div>
+                <div style="font-size: var(--font-md); font-weight: 600;">Controle de Manutenção</div>
+                <div style="font-size: var(--font-sm); margin-top: var(--space-xs);">Em breve</div>
+            </div>
+        `;
     }
 }
 
@@ -474,9 +748,9 @@ function addRevenue(event) {
         id: Date.now(),
         type: 'revenue',
         amount: document.getElementById('revenueValue').value,
-        trips: trips, // Quantidade de corridas
-        startTime: startTime || null, // Horário de início
-        endTime: endTime || null, // Horário de fim
+        trips: trips,
+        startTime: startTime || null,
+        endTime: endTime || null,
         app: document.getElementById('revenueApp').value,
         description: document.getElementById('revenueDesc').value,
         date: document.getElementById('revenueDate').value,
@@ -500,10 +774,13 @@ function addRevenue(event) {
     initializeForms();
     
     // Esconder o display de tempo
-    document.getElementById('workTimeDisplay').style.display = 'none';
+    const workTimeDisplay = document.getElementById('workTimeDisplay');
+    if (workTimeDisplay) {
+        workTimeDisplay.style.display = 'none';
+    }
     
-    updateCircularProgress();
-    createWeeklyChart();
+    // Atualizar todas as visualizações
+    updateHomePage();
     renderTransactions();
     updateAppComparator();
     
@@ -531,8 +808,8 @@ function addExpense(event) {
     event.target.reset();
     initializeForms();
     
-    updateCircularProgress();
-    createWeeklyChart();
+    // Atualizar todas as visualizações
+    updateHomePage();
     renderTransactions();
     
     // Feedback visual

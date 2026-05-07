@@ -1723,8 +1723,8 @@ function deleteBill(id) {
 let selectedMonth = new Date().getMonth();
 let selectedYear = new Date().getFullYear();
 
-// Navegar para o mês anterior
-function previousMonth() {
+// Navegar para o mês anterior (contas)
+function previousBillsMonth() {
     selectedMonth--;
     if (selectedMonth < 0) {
         selectedMonth = 11;
@@ -1735,8 +1735,8 @@ function previousMonth() {
     updateSmartCalculator();
 }
 
-// Navegar para o próximo mês
-function nextMonth() {
+// Navegar para o próximo mês (contas)
+function nextBillsMonth() {
     selectedMonth++;
     if (selectedMonth > 11) {
         selectedMonth = 0;
@@ -1747,8 +1747,8 @@ function nextMonth() {
     updateSmartCalculator();
 }
 
-// Voltar para o mês atual
-function currentMonth() {
+// Voltar para o mês atual (contas)
+function currentBillsMonth() {
     selectedMonth = new Date().getMonth();
     selectedYear = new Date().getFullYear();
     updateMonthDisplay();

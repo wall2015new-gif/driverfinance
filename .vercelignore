@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Kiro
+.kiro
+
+# Backups
+*-backup*.html
+*-old-backup*.html
+index-backup*.html
+
+# Testes
+teste-*.html
+
+# Documentação de desenvolvimento
+*.md
+!README.md
+
+# Scripts de reorganização
+reorganize.*
+complete-reorganization.js
+
+# Logs
+*.log
+
+# Arquivos temporários
+.DS_Store
+Thumbs.db

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Filtro de Período de Ganhos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0EA5E9 0%, #14B8A6 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+
+        .hero-card {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            border-radius: 24px;
+            padding: 32px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.25);
+            color: white;
+        }
+
+        .period-filter-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1.5px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+        }
+
+        .period-filter-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-1px);
+        }
+
+        .period-filter-btn.active {
+            background: white;
+            color: #10B981;
+            border-color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .hero-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .hero-value {
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: -3px;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .hero-meta {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 999px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        .info-box {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+        }
+
+        .info-box h3 {
+            color: #0EA5E9;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .info-box p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Teste de Filtro de Período</h1>
+            <p>Sistema de visualização de ganhos por período</p>
+        </div>
+
+        <!-- CARD HERO - LUCRO LÍQUIDO -->
+        <div class="hero-card">
+            <!-- Filtro de Período -->
+            <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                <button class="period-filter-btn active" data-period="today" onclick="changePeriod('today')">
+                    Hoje
+                </button>
+                <button class="period-filter-btn" data-period="week" onclick="changePeriod('week')">
+                    Semana
+                </button>
+                <button class="period-filter-btn" data-period="month" onclick="changePeriod('month')">
+                    Mês
+                </button>
+            </div>
+            
+            <div class="hero-label" id="periodLabel">💰 LUCRO LÍQUIDO HOJE</div>
+            <div class="hero-value" id="profitValue">R$ 0,00</div>
+            
+            <div class="hero-meta">
+                <div class="meta-info">
+                    <span id="metaLabel">Meta diária:</span>
+                    <span id="metaValue">R$ 400,00</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>📊 Dados Simulados</h3>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="todayProfit">R$ 324</div>
+                    <div class="stat-label">Hoje</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="weekProfit">R$ 1.580</div>
+                    <div class="stat-label">Semana</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="monthProfit">R$ 6.420</div>
+                    <div class="stat-label">Mês</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>✅ Como Funciona</h3>
+            <p><strong>1.</strong> Clique nos botões acima (Hoje, Semana, Mês)</p>
+            <p><strong>2.</strong> O valor do lucro líquido muda conforme o período</p>
+            <p><strong>3.</strong> A meta e o progresso são ajustados automaticamente</p>
+            <p><strong>4.</strong> Label do card indica o período atual</p>
+        </div>
+
+        <div class="info-box">
+            <h3>🎨 Recursos Implementados</h3>
+            <p>✅ Botões de filtro com design premium</p>
+            <p>✅ Animações suaves de transição</p>
+            <p>✅ Labels dinâmicos por período</p>
+            <p>✅ Cálculo automático de progresso</p>
+            <p>✅ Metas adaptativas (diária/semanal/mensal)</p>
+        </div>
+    </div>
+
+    <script>
+        // Dados simulados
+        const data = {
+            today: { profit: 324, goal: 400 },
+            week: { profit: 1580, goal: 1400 },
+            month: { profit: 6420, goal: 6000 }
+        };
+
+        const labels = {
+            today: {
+                period: '💰 LUCRO LÍQUIDO HOJE',
+                meta: 'Meta diária:'
+            },
+            week: {
+                period: '💰 LUCRO LÍQUIDO DA SEMANA',
+                meta: 'Meta semanal:'
+            },
+            month: {
+                period: '💰 LUCRO LÍQUIDO DO MÊS',
+                meta: 'Meta mensal:'
+            }
+        };
+
+        function changePeriod(period) {
+            console.log('🔄 Mudando para:', period);
+
+            // Atualizar botões
+            document.querySelectorAll('.period-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-period="${period}"]`).classList.add('active');
+
+            // Pegar dados
+            const periodData = data[period];
+            const periodLabels = labels[period];
+
+            // Atualizar label
+            document.getElementById('periodLabel').textContent = periodLabels.period;
+            document.getElementById('metaLabel').textContent = periodLabels.meta;
+
+            // Atualizar valor
+            document.getElementById('profitValue').textContent = formatCurrency(periodData.profit);
+            document.getElementById('metaValue').textContent = formatCurrency(periodData.goal);
+
+            // Atualizar progresso
+            const progress = Math.min((periodData.profit / periodData.goal) * 100, 100);
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Log
+            console.log('✅ Atualizado:', {
+                período: period,
+                lucro: periodData.profit,
+                meta: periodData.goal,
+                progresso: progress.toFixed(1) + '%'
+            });
+        }
+
+        function formatCurrency(value) {
+            return 'R$ ' + value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        // Inicializar com período "hoje"
+        setTimeout(() => changePeriod('today'), 100);
+    </script>
+</body>
+</html>

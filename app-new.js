@@ -3,6 +3,7 @@ let currentTheme = localStorage.getItem('theme') || 'light';
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 let weeklyChart = null;
 let currentPeriod = 'today'; // Período atual: today, week, month
+let currentHomeViewPeriod = 'today'; // Período de visualização da home
 let goals = JSON.parse(localStorage.getItem('goals')) || {
     daily: 200,
     weekly: 1400,
@@ -54,19 +55,46 @@ function closeFAB() {
 }
 
 // ========== HOME PAGE - Premium Update ==========
-function updateHomePage() {
+function updateHomePage(period = null) {
     console.log('🔄 Atualizando página inicial premium...');
+    
+    // Se período não foi passado, usar o atual
+    if (period === null) {
+        period = currentHomeViewPeriod;
+    }
     
     // Atualizar saudação
     updateGreeting();
     
-    // Filtrar transações de hoje
+    // Filtrar transações baseado no período
+    let filteredTransactions = [];
     const today = new Date().toISOString().split('T')[0];
-    const todayTransactions = transactions.filter(t => t.date === today);
+    
+    if (period === 'today') {
+        filteredTransactions = transactions.filter(t => t.date === today);
+    } else if (period === 'week') {
+        const now = new Date();
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - now.getDay()); // Domingo
+        weekStart.setHours(0, 0, 0, 0);
+        
+        filteredTransactions = transactions.filter(t => {
+            const transDate = new Date(t.date + 'T00:00:00');
+            return transDate >= weekStart;
+        });
+    } else if (period === 'month') {
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        
+        filteredTransactions = transactions.filter(t => {
+            const transDate = new Date(t.date + 'T00:00:00');
+            return transDate >= monthStart;
+        });
+    }
     
     // Calcular totais
-    const revenues = todayTransactions.filter(t => t.type === 'revenue');
-    const expenses = todayTransactions.filter(t => t.type === 'expense');
+    const revenues = filteredTransactions.filter(t => t.type === 'revenue');
+    const expenses = filteredTransactions.filter(t => t.type === 'expense');
     
     const totalRevenue = revenues.reduce((sum, t) => sum + parseFloat(t.amount), 0);
     const totalExpense = expenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
@@ -82,15 +110,26 @@ function updateHomePage() {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     
-    // Combustível do dia
+    // Combustível do período
     const fuelExpenses = expenses.filter(e => e.category === 'gas');
     const totalFuel = fuelExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
     
-    // KM rodados (se houver registro)
+    // KM rodados (se houver registro) - sempre do dia
     const kmData = JSON.parse(localStorage.getItem('kmToday')) || null;
     let kmRodados = 0;
     if (kmData && kmData.kmInicial && kmData.kmFinal) {
         kmRodados = kmData.kmFinal - kmData.kmInicial;
+    }
+    
+    // Atualizar label do período
+    const heroPeriodLabel = document.getElementById('heroPeriodLabel');
+    if (heroPeriodLabel) {
+        const labels = {
+            'today': '💰 LUCRO LÍQUIDO HOJE',
+            'week': '💰 LUCRO LÍQUIDO DA SEMANA',
+            'month': '💰 LUCRO LÍQUIDO DO MÊS'
+        };
+        heroPeriodLabel.textContent = labels[period] || '💰 LUCRO LÍQUIDO';
     }
     
     // Atualizar Hero Card - Lucro Líquido
@@ -105,12 +144,23 @@ function updateHomePage() {
         heroProfit.textContent = formatCurrency(profit);
     }
     
-    // Calcular progresso da meta
-    const dailyGoal = goals.daily || 400;
-    const progress = dailyGoal > 0 ? Math.min((profit / dailyGoal) * 100, 100) : 0;
+    // Calcular progresso da meta baseado no período
+    let goalAmount = goals.daily || 400;
+    if (period === 'week') {
+        goalAmount = goals.weekly || 1400;
+    } else if (period === 'month') {
+        goalAmount = goals.monthly || 6000;
+    }
+    
+    const progress = goalAmount > 0 ? Math.min((profit / goalAmount) * 100, 100) : 0;
     
     if (metaValue) {
-        metaValue.textContent = formatCurrency(dailyGoal);
+        const metaLabels = {
+            'today': `Meta diária: ${formatCurrency(goalAmount)}`,
+            'week': `Meta semanal: ${formatCurrency(goalAmount)}`,
+            'month': `Meta mensal: ${formatCurrency(goalAmount)}`
+        };
+        metaValue.textContent = formatCurrency(goalAmount);
     }
     
     if (heroProgressFill) {
@@ -122,17 +172,17 @@ function updateHomePage() {
     }
     
     if (progressRemaining) {
-        if (profit >= dailyGoal) {
+        if (profit >= goalAmount) {
             progressRemaining.textContent = '🎉 Meta atingida!';
         } else {
-            const remaining = dailyGoal - profit;
+            const remaining = goalAmount - profit;
             progressRemaining.textContent = `Faltam ${formatCurrency(remaining)}`;
         }
     }
     
     // Adicionar animação quando meta é atingida
     if (heroCard) {
-        if (profit >= dailyGoal && dailyGoal > 0) {
+        if (profit >= goalAmount && goalAmount > 0) {
             heroCard.classList.add('goal-achieved');
         } else {
             heroCard.classList.remove('goal-achieved');
@@ -165,12 +215,32 @@ function updateHomePage() {
     }
     
     // Atualizar Insight
-    updateDailyInsight(totalRevenue, profit, dailyGoal, revenues.length);
+    updateDailyInsight(totalRevenue, profit, goalAmount, revenues.length);
     
     // Atualizar gráfico semanal
     createWeeklyChartSimple();
     
     console.log('✅ Página inicial atualizada!');
+}
+
+// Mudar visualização de período na home
+function changePeriodView(period) {
+    console.log('📅 Mudando visualização para:', period);
+    
+    currentHomeViewPeriod = period;
+    
+    // Atualizar botões
+    document.querySelectorAll('.period-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    const activeBtn = document.querySelector(`.period-filter-btn[data-period="${period}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+    
+    // Atualizar dashboard
+    updateHomePage(period);
 }
 
 // Atualizar saudação com hora do dia

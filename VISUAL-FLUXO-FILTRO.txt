@@ -1,0 +1,309 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    FILTRO DE PERÍODO DE GANHOS - FLUXO                        ║
+║                           Driver Finance v1.0                                 ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         1. USUÁRIO ABRE O APP                               │
+└────────────────────────────────┬────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    2. DASHBOARD CARREGA (Página Home)                       │
+│                                                                             │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  [Hoje ✓] [Semana] [Mês]                                            │  │
+│  │                                                                      │  │
+│  │          💰 LUCRO LÍQUIDO HOJE                                       │  │
+│  │                                                                      │  │
+│  │               R$ 0,00                                                │  │
+│  │                                                                      │  │
+│  │  ┌────────────────────────────────────────────────────────────────┐ │  │
+│  │  │ Meta diária:                            R$ 400,00              │ │  │
+│  │  │ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%                          │ │  │
+│  │  └────────────────────────────────────────────────────────────────┘ │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│                   Estado inicial: Período = HOJE                            │
+└────────────────────────────────┬────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                  3. USUÁRIO CLICA EM UM DOS BOTÕES                          │
+└────────────────┬────────────────┬─────────────────┬──────────────────────────┘
+                 │                │                 │
+        ┌────────▼────────┐  ┌───▼────────┐  ┌────▼─────────┐
+        │  Clica "Hoje"   │  │ Clica      │  │ Clica "Mês"  │
+        │                 │  │ "Semana"   │  │              │
+        └────────┬────────┘  └───┬────────┘  └────┬─────────┘
+                 │               │                 │
+                 ▼               ▼                 ▼
+        ┌─────────────────────────────────────────────────────┐
+        │   4. Função changePeriodView(period) é chamada      │
+        │                                                      │
+        │   • Atualiza variável: currentHomeViewPeriod        │
+        │   • Remove classe 'active' de todos botões          │
+        │   • Adiciona classe 'active' no botão clicado       │
+        │   • Chama updateHomePage(period)                    │
+        └───────────────────────┬──────────────────────────────┘
+                                │
+                                ▼
+        ┌─────────────────────────────────────────────────────┐
+        │   5. Função updateHomePage(period) processa         │
+        │                                                      │
+        │   A) Filtra transações por período:                 │
+        │      • HOJE: date === hoje                          │
+        │      • SEMANA: date >= domingo atual                │
+        │      • MÊS: date >= dia 1 do mês                    │
+        │                                                      │
+        │   B) Calcula totais:                                │
+        │      • totalRevenue = Σ receitas filtradas          │
+        │      • totalExpense = Σ despesas filtradas          │
+        │      • profit = totalRevenue - totalExpense         │
+        │                                                      │
+        │   C) Define meta baseada no período:                │
+        │      • HOJE: goals.daily (R$ 400)                   │
+        │      • SEMANA: goals.weekly (R$ 1.400)              │
+        │      • MÊS: goals.monthly (R$ 6.000)                │
+        │                                                      │
+        │   D) Calcula progresso:                             │
+        │      • progress = (profit / meta) * 100             │
+        └───────────────────────┬──────────────────────────────┘
+                                │
+                                ▼
+        ┌─────────────────────────────────────────────────────┐
+        │   6. Atualiza elementos da interface                │
+        │                                                      │
+        │   • heroPeriodLabel.text = "LUCRO... [PERÍODO]"     │
+        │   • heroProfit.text = formatCurrency(profit)        │
+        │   • metaValue.text = formatCurrency(meta)           │
+        │   • heroProgressFill.width = progress + '%'         │
+        │   • progressPercent.text = progress + '%'           │
+        │   • progressRemaining.text = "Faltam R$ X"          │
+        └───────────────────────┬──────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                   7. DASHBOARD ATUALIZADO VISUALMENTE                       │
+│                                                                             │
+│  ╔══════════════════════════════════════════════════════════════════════╗  │
+│  ║  [Hoje] [Semana ✓] [Mês]                                            ║  │
+│  ║                                                                      ║  │
+│  ║          💰 LUCRO LÍQUIDO DA SEMANA                                  ║  │
+│  ║                                                                      ║  │
+│  ║               R$ 1.580,00                                            ║  │
+│  ║                                                                      ║  │
+│  ║  ┌────────────────────────────────────────────────────────────────┐ ║  │
+│  ║  │ Meta semanal:                         R$ 1.400,00              │ ║  │
+│  ║  │ ████████████████████████████████░░  113%  🎉                   │ ║  │
+│  ║  │ 🎉 Meta atingida!                                              │ ║  │
+│  ║  └────────────────────────────────────────────────────────────────┘ ║  │
+│  ╚══════════════════════════════════════════════════════════════════════╝  │
+│                                                                             │
+│                  Transição suave com animações                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                            TABELA DE CÁLCULOS
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────┬───────────────┬────────────────────┬───────────┬──────────────┐
+│ PERÍODO  │ FILTRO        │ TRANSAÇÕES         │ META      │ PROGRESSO    │
+├──────────┼───────────────┼────────────────────┼───────────┼──────────────┤
+│ HOJE     │ date === hoje │ Apenas hoje        │ R$ 400    │ profit/400   │
+├──────────┼───────────────┼────────────────────┼───────────┼──────────────┤
+│ SEMANA   │ date >=       │ Domingo até hoje   │ R$ 1.400  │ profit/1400  │
+│          │ domingo       │                    │           │              │
+├──────────┼───────────────┼────────────────────┼───────────┼──────────────┤
+│ MÊS      │ date >=       │ Dia 1 até hoje     │ R$ 6.000  │ profit/6000  │
+│          │ 1º do mês     │                    │           │              │
+└──────────┴───────────────┴────────────────────┴───────────┴──────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                      EXEMPLO DE CÁLCULO - PASSO A PASSO
+═══════════════════════════════════════════════════════════════════════════════
+
+CENÁRIO: Usuário clica em "SEMANA"
+
+1️⃣  Filtrar transações da semana:
+    ┌─────────────────────────────────────────────────────────┐
+    │ transactions = [                                        │
+    │   { type: 'revenue', amount: 100, date: '2026-06-09' }, │
+    │   { type: 'expense', amount: 30,  date: '2026-06-09' }, │
+    │   { type: 'revenue', amount: 120, date: '2026-06-10' }, │
+    │   { type: 'expense', amount: 40,  date: '2026-06-10' }, │
+    │   ...                                                    │
+    │ ]                                                        │
+    └─────────────────────────────────────────────────────────┘
+    
+    Filtro: date >= '2026-06-08' (domingo)
+    
+    ┌─────────────────────────────────────────────────────────┐
+    │ filteredTransactions = [                                │
+    │   { type: 'revenue', amount: 100, date: '2026-06-09' }, │
+    │   { type: 'expense', amount: 30,  date: '2026-06-09' }, │
+    │   { type: 'revenue', amount: 120, date: '2026-06-10' }, │
+    │   { type: 'expense', amount: 40,  date: '2026-06-10' }, │
+    │ ]                                                        │
+    └─────────────────────────────────────────────────────────┘
+
+2️⃣  Separar receitas e despesas:
+    ┌──────────────────────────┐  ┌──────────────────────────┐
+    │ revenues = [             │  │ expenses = [             │
+    │   { amount: 100 },       │  │   { amount: 30 },        │
+    │   { amount: 120 }        │  │   { amount: 40 }         │
+    │ ]                        │  │ ]                        │
+    └──────────────────────────┘  └──────────────────────────┘
+
+3️⃣  Somar valores:
+    totalRevenue = 100 + 120 = 220
+    totalExpense = 30 + 40 = 70
+    
+4️⃣  Calcular lucro:
+    profit = 220 - 70 = 150
+
+5️⃣  Calcular progresso:
+    meta = 1400 (semanal)
+    progress = (150 / 1400) * 100 = 10,71%
+
+6️⃣  Atualizar interface:
+    ┌──────────────────────────────────────────────────┐
+    │ heroProfit.text = "R$ 150,00"                    │
+    │ metaValue.text = "R$ 1.400,00"                   │
+    │ heroProgressFill.width = "10.71%"                │
+    │ progressPercent.text = "11%"                     │
+    │ progressRemaining.text = "Faltam R$ 1.250,00"    │
+    └──────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                        ÁRVORE DE DEPENDÊNCIAS
+═══════════════════════════════════════════════════════════════════════════════
+
+changePeriodView(period)
+│
+├─► Atualizar botões (visual)
+│   └─► Remover 'active' de todos
+│       └─► Adicionar 'active' no clicado
+│
+└─► updateHomePage(period)
+    │
+    ├─► filterTransactionsByPeriod()
+    │   ├─► Se 'today': date === hoje
+    │   ├─► Se 'week': date >= domingo
+    │   └─► Se 'month': date >= dia 1
+    │
+    ├─► calcularTotais()
+    │   ├─► totalRevenue = Σ receitas
+    │   ├─► totalExpense = Σ despesas
+    │   └─► profit = totalRevenue - totalExpense
+    │
+    ├─► definirMeta(period)
+    │   ├─► Se 'today': goals.daily
+    │   ├─► Se 'week': goals.weekly
+    │   └─► Se 'month': goals.monthly
+    │
+    ├─► calcularProgresso()
+    │   └─► progress = (profit / meta) * 100
+    │
+    └─► atualizarInterface()
+        ├─► heroProfit.text = formatCurrency(profit)
+        ├─► metaValue.text = formatCurrency(meta)
+        ├─► heroProgressFill.width = progress + '%'
+        ├─► progressPercent.text = progress + '%'
+        └─► progressRemaining.text = calcular falta
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                            ESTADOS DO BOTÃO
+═══════════════════════════════════════════════════════════════════════════════
+
+INATIVO:
+┌──────────┐
+│   Hoje   │  Background: rgba(255,255,255,0.2)
+└──────────┘  Border: rgba(255,255,255,0.3)
+              Color: white
+              
+HOVER:
+┌──────────┐
+│   Hoje   │  Background: rgba(255,255,255,0.3) ↑ mais claro
+└──────────┘  Transform: translateY(-1px) ↑ levanta
+              Border: rgba(255,255,255,0.5)
+
+ATIVO:
+┌──────────┐
+│   Hoje   │  Background: white ✓
+└──────────┘  Color: #10B981 (verde) ✓
+              Box-shadow: 0 4px 12px rgba(0,0,0,0.15)
+
+CLIQUE:
+┌──────────┐
+│   Hoje   │  Transform: scale(0.97) ⤓ aperta
+└──────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                          CRONOGRAMA DE ANIMAÇÕES
+═══════════════════════════════════════════════════════════════════════════════
+
+  0ms ────────────────────────────────────────────────> 800ms
+   │                                                        │
+   ├─► Usuário clica botão
+   │   └─► Transform: scale(0.97)                    [50ms]
+   │
+   ├─► Botão volta ao normal
+   │   └─► Transform: scale(1)                       [100ms]
+   │
+   ├─► Remove 'active' dos outros
+   │   └─► Background fade out                       [200ms]
+   │
+   ├─► Adiciona 'active' no clicado
+   │   └─► Background fade in (branco)               [300ms]
+   │
+   ├─► Atualiza label do card
+   │   └─► Fade cross (saindo/entrando)              [400ms]
+   │
+   ├─► Atualiza valor do lucro
+   │   └─► Number counting animation                 [600ms]
+   │
+   └─► Anima barra de progresso
+       └─► Width transition                          [800ms]
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                              RESPONSIVIDADE
+═══════════════════════════════════════════════════════════════════════════════
+
+DESKTOP (> 768px):
+┌────────────────────────────────────────────────────────────┐
+│  [Hoje ✓] [Semana] [Mês]                                  │
+│                                                            │
+│         💰 LUCRO LÍQUIDO HOJE                              │
+│                 R$ 324,50                                  │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━  81%                        │
+└────────────────────────────────────────────────────────────┘
+
+MOBILE (< 768px):
+┌────────────────────────────┐
+│  [Hoje ✓] [Semana]  [Mês] │  ← Buttons wrap if needed
+│                            │
+│    💰 LUCRO LÍQUIDO        │
+│         HOJE               │
+│                            │
+│      R$ 324,50             │
+│                            │
+│  ━━━━━━━━━━━━━━  81%      │
+└────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                       FIM DO FLUXOGRAMA VISUAL
+═══════════════════════════════════════════════════════════════════════════════
+
+📅 Data: 10 de Junho de 2026
+✅ Status: Implementado e Funcional
+🚀 Versão: 1.0
+👨‍💻 Desenvolvedor: Kiro AI Assistant

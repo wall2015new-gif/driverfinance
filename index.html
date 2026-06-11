@@ -808,6 +808,38 @@
             opacity: 0.95;
         }
 
+        /* Botões de Filtro de Período */
+        .period-filter-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1.5px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+        }
+
+        .period-filter-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-1px);
+        }
+
+        .period-filter-btn.active {
+            background: white;
+            color: #10B981;
+            border-color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .period-filter-btn:active {
+            transform: scale(0.97);
+        }
+
         /* MINI CARDS - Métricas Secundárias */
         .mini-cards-grid {
             display: grid;
@@ -6286,7 +6318,20 @@
 
             <!-- CARD HERO - LUCRO LÍQUIDO -->
             <div class="hero-card">
-                <div class="hero-label">💰 LUCRO LÍQUIDO HOJE</div>
+                <!-- Filtro de Período -->
+                <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                    <button class="period-filter-btn active" data-period="today" onclick="changePeriodView('today')">
+                        Hoje
+                    </button>
+                    <button class="period-filter-btn" data-period="week" onclick="changePeriodView('week')">
+                        Semana
+                    </button>
+                    <button class="period-filter-btn" data-period="month" onclick="changePeriodView('month')">
+                        Mês
+                    </button>
+                </div>
+                
+                <div class="hero-label" id="heroPeriodLabel">💰 LUCRO LÍQUIDO HOJE</div>
                 <div class="hero-value" id="heroProfit">R$ 0,00</div>
                 <div class="hero-comparison" id="heroComparison">
                     <span class="comparison-icon">📊</span>

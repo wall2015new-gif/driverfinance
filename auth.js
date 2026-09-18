@@ -152,6 +152,48 @@
     location.reload();
   };
 
+  // ---------- Sincronizar agora (botão) ----------
+  window.dfSyncNow = async function () {
+    const btn = document.getElementById('syncNowBtn');
+    if (!window.DFDB) return;
+    if (btn) { btn.disabled = true; }
+    try {
+      await window.DFDB.syncNow();
+      if (typeof reloadStateFromStorage === 'function') reloadStateFromStorage();
+      if (typeof updateHomePage === 'function') updateHomePage();
+    } catch (e) {
+      console.warn('dfSyncNow', e);
+    } finally {
+      if (btn) { btn.disabled = false; }
+    }
+  };
+
+  // ---------- Indicador de status de sincronização ----------
+  function relTime(ts) {
+    if (!ts) return '';
+    const diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 10) return 'agora mesmo';
+    if (diff < 60) return `há ${diff}s`;
+    if (diff < 3600) return `há ${Math.floor(diff / 60)}min`;
+    if (diff < 86400) return `há ${Math.floor(diff / 3600)}h`;
+    return new Date(ts).toLocaleString('pt-BR');
+  }
+  const SYNC_LABELS = {
+    idle: 'Conectado', syncing: 'Sincronizando...', synced: 'Sincronizado',
+    error: 'Erro ao sincronizar', offline: 'Offline'
+  };
+  function renderSyncStatus(st) {
+    const chip = document.getElementById('syncChip');
+    const text = document.getElementById('syncChipText');
+    const last = document.getElementById('syncLast');
+    if (!chip || !text) return;
+    const cls = (st.state === 'idle') ? 'synced' : st.state; // idle mostra visual "ok"
+    chip.className = 'sync-chip ' + cls;
+    text.textContent = SYNC_LABELS[st.state] || 'Conectado';
+    if (last) last.textContent = st.lastSync ? `Última sincronização: ${relTime(st.lastSync)}` : '';
+  }
+  window.addEventListener('df-sync', (e) => renderSyncStatus(e.detail));
+
   // ---------- Refresh da UI após sincronizar ----------
   function refreshUI() {
     try {

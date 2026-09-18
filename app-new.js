@@ -457,15 +457,19 @@ function syncProfileField() {
     const preview = document.getElementById('profileAvatarPreview');
     if (preview) preview.textContent = getUserInitials();
 
-    // Mostrar e-mail da conta + botão Sair quando logado no Supabase
+    // Mostrar e-mail da conta + botão Sair + status de sync quando logado
     const accountSection = document.getElementById('accountSection');
     const accountEmail = document.getElementById('accountEmail');
     if (accountSection && window.supabaseClient) {
         window.supabaseClient.auth.getUser().then(({ data }) => {
             const email = data?.user?.email;
             if (email) {
-                accountSection.style.display = 'flex';
+                accountSection.style.display = 'block';
                 if (accountEmail) accountEmail.textContent = email;
+                // Refletir o status atual de sincronização ao abrir
+                if (window.DFDB && window.DFDB.getStatus) {
+                    try { window.dispatchEvent(new CustomEvent('df-sync', { detail: window.DFDB.getStatus() })); } catch (e) {}
+                }
             } else {
                 accountSection.style.display = 'none';
             }

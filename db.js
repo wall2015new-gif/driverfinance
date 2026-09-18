@@ -160,6 +160,25 @@
   function lsGet(key, def) { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch { return def; } }
   function lsSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 
+  // ---------- Estado de sincronização (observável pela UI) ----------
+  // state: 'offline' | 'idle' | 'syncing' | 'synced' | 'error'
+  const syncState = { state: 'offline', lastSync: Number(localStorage.getItem('df_last_sync')) || null, message: '' };
+  function setStatus(state, message) {
+    syncState.state = state;
+    if (message !== undefined) syncState.message = message;
+    if (state === 'synced') {
+      syncState.lastSync = Date.now();
+      try { localStorage.setItem('df_last_sync', String(syncState.lastSync)); } catch (e) {}
+    }
+    try { window.dispatchEvent(new CustomEvent('df-sync', { detail: Object.assign({}, syncState) })); } catch (e) {}
+  }
+  function getStatus() { return Object.assign({}, syncState); }
+  // marca offline quando perde conexão / online ao voltar
+  if (typeof window !== 'undefined') {
+    window.addEventListener('offline', () => setStatus('offline'));
+    window.addEventListener('online', () => setStatus('idle'));
+  }
+
   async function getUserId() {
     const c = getClient(); if (!c) return null;
     const { data } = await c.auth.getUser();
@@ -201,11 +220,19 @@
   }
 
   async function pushAll() {
-    for (const key of Object.keys(COLLECTIONS)) {
-      // eslint-disable-next-line no-await-in-loop
-      await pushCollection(key);
+    if (!getClient()) return;
+    setStatus('syncing', 'Enviando dados...');
+    try {
+      for (const key of Object.keys(COLLECTIONS)) {
+        // eslint-disable-next-line no-await-in-loop
+        await pushCollection(key);
+      }
+      setStatus('synced');
+      console.log('☁️ pushAll concluído');
+    } catch (e) {
+      setStatus('error', e.message || 'Erro ao enviar');
+      console.warn('pushAll', e);
     }
-    console.log('☁️ pushAll concluído');
   }
 
   // Debounce por coleção para não floodar a rede a cada clique
@@ -213,13 +240,19 @@
   function syncKey(key) {
     if (!getClient()) return;
     clearTimeout(pending[key]);
-    pending[key] = setTimeout(() => { pushCollection(key).catch(e => console.warn('syncKey', key, e)); }, 800);
+    setStatus('syncing', 'Salvando...');
+    pending[key] = setTimeout(() => {
+      pushCollection(key)
+        .then(() => setStatus('synced'))
+        .catch(e => { setStatus('error', e.message); console.warn('syncKey', key, e); });
+    }, 800);
   }
 
   // ---------- PULL: Supabase -> LocalStorage ----------
   async function pullAll() {
     const c = getClient(); if (!c) return false;
     const uid = await getUserId(); if (!uid) return false;
+    setStatus('syncing', 'Baixando dados...');
 
     for (const [key, cfg] of Object.entries(COLLECTIONS)) {
       // eslint-disable-next-line no-await-in-loop
@@ -236,7 +269,17 @@
       const map = FIELD_MAP[key];
       lsSet(key, (data || []).map(map.fromRow));
     }
+    setStatus('synced');
     console.log('☁️ pullAll concluído');
+    return true;
+  }
+
+  // Sincroniza manualmente: envia local -> nuvem e baixa nuvem -> local.
+  async function syncNow() {
+    if (!getClient()) { setStatus('offline'); return false; }
+    const uid = await getUserId();
+    if (!uid) { setStatus('offline', 'Não autenticado'); return false; }
+    await pushAll();
     return true;
   }
 
@@ -262,6 +305,9 @@
     }
   }
 
+  // Status inicial: se há cliente, estamos "idle" (pronto); senão offline.
+  setStatus(getClient() ? 'idle' : 'offline');
+
   // Expor API
-  window.DFDB = { pushAll, pullAll, syncKey, initialSync, getUserId, COLLECTIONS };
+  window.DFDB = { pushAll, pullAll, syncKey, syncNow, initialSync, getUserId, getStatus, COLLECTIONS };
 })();

@@ -6512,6 +6512,26 @@
         .profile-name-row .form-input { flex: 1; min-width: 0; margin: 0; }
         .profile-save-btn { flex-shrink: 0; padding: 10px 16px; }
 
+        /* ---------- STATUS DE SINCRONIZAÇÃO ---------- */
+        .sync-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+        .sync-chip {
+            display: inline-flex; align-items: center; gap: 7px;
+            font-size: 12px; font-weight: 700; color: var(--text-secondary);
+            background: var(--bg-tertiary); padding: 6px 12px; border-radius: 999px;
+        }
+        .sync-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-tertiary); flex-shrink: 0; }
+        .sync-chip.synced   { color: var(--success); }
+        .sync-chip.synced   .sync-dot { background: var(--success); }
+        .sync-chip.syncing  { color: var(--info); }
+        .sync-chip.syncing  .sync-dot { background: var(--info); animation: syncPulse 1s ease-in-out infinite; }
+        .sync-chip.error    { color: var(--error); }
+        .sync-chip.error    .sync-dot { background: var(--error); }
+        .sync-chip.offline  { color: var(--text-tertiary); }
+        .sync-chip.offline  .sync-dot { background: var(--text-tertiary); }
+        @keyframes syncPulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+        .sync-now-btn { padding: 8px 14px; font-size: 13px; }
+        .sync-last { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; }
+
         /* ---------- RESPONSIVO (redesign — sobrepõe regras antigas) ---------- */
         @media (min-width: 720px) {
             .quick-actions-grid { grid-template-columns: repeat(4, 1fr); }
@@ -8064,13 +8084,20 @@
             </div>
             
             
-            <!-- Conta / Sessão -->
-            <div id="accountSection" class="notification-item" style="display:none; align-items:center;">
-                <div class="notification-info">
-                    <div class="notification-title">Conta</div>
-                    <div class="notification-desc" id="accountEmail">—</div>
+            <!-- Conta / Sessão / Sincronização -->
+            <div id="accountSection" style="display:none;">
+                <div class="notification-item" style="align-items:center;">
+                    <div class="notification-info">
+                        <div class="notification-title">Conta</div>
+                        <div class="notification-desc" id="accountEmail">—</div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="dfLogout()">Sair</button>
                 </div>
-                <button type="button" class="btn btn-secondary" onclick="dfLogout()">Sair</button>
+                <div class="sync-row">
+                    <span class="sync-chip" id="syncChip"><span class="sync-dot"></span><span id="syncChipText">Conectado</span></span>
+                    <button type="button" class="btn btn-secondary sync-now-btn" id="syncNowBtn" onclick="dfSyncNow()">🔄 Sincronizar agora</button>
+                </div>
+                <div class="sync-last" id="syncLast"></div>
             </div>
 
             <div class="danger-zone">

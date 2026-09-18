@@ -126,5 +126,18 @@ try {
   ok('Resumo do mês: lucro real (R$ 220)', /220/.test(getEl('monthProfit')._text), `-> "${getEl('monthProfit')._text}"`);
 } catch (e) { ok('updateHomePage/Resumo do mês executa', false, '-> ' + e.message); }
 
+// (5) Perfil: saveUserName persiste o nome e atualiza saudação/avatar
+try {
+  getEl('profileNameInput').value = 'Maria Souza';
+  sandbox.saveUserName();
+  ok('saveUserName persiste no localStorage', store.userName === 'Maria Souza', `-> "${store.userName}"`);
+  ok('Saudação reflete novo nome', getEl('greetingTitle')._text.includes('Maria'), `-> "${getEl('greetingTitle')._text}"`);
+  ok('Avatar reflete novas iniciais (MS)', getEl('userAvatar')._text === 'MS', `-> "${getEl('userAvatar')._text}"`);
+  // Nome vazio remove a chave
+  getEl('profileNameInput').value = '   ';
+  sandbox.saveUserName();
+  ok('Nome vazio remove userName', !('userName' in store), `-> userName in store = ${'userName' in store}`);
+} catch (e) { ok('saveUserName executa', false, '-> ' + e.message); }
+
 console.log(`\n=== E2E: ${pass} PASS / ${fail} FAIL (TZ=${Intl.DateTimeFormat().resolvedOptions().timeZone}) ===`);
 process.exit(fail > 0 ? 1 : 0);

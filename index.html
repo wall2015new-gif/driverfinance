@@ -6495,6 +6495,23 @@
         /* FAB de notificações — reposicionar acima da nav */
         .fab { bottom: 86px !important; background: linear-gradient(135deg, var(--green-main), var(--green-turquoise)) !important; }
 
+        /* ---------- PERFIL (modal de configurações) ---------- */
+        .profile-section {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px; margin-bottom: 16px;
+            background: var(--bg-tertiary); border-radius: var(--r-md);
+        }
+        .profile-avatar-preview {
+            width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--green-main), var(--green-turquoise));
+            color: #fff; font-weight: 800; font-size: 18px; letter-spacing: 0.5px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .profile-fields { flex: 1; min-width: 0; }
+        .profile-name-row { display: flex; gap: 8px; align-items: stretch; }
+        .profile-name-row .form-input { flex: 1; min-width: 0; margin: 0; }
+        .profile-save-btn { flex-shrink: 0; padding: 10px 16px; }
+
         /* ---------- RESPONSIVO (redesign — sobrepõe regras antigas) ---------- */
         @media (min-width: 720px) {
             .quick-actions-grid { grid-template-columns: repeat(4, 1fr); }
@@ -7995,8 +8012,24 @@
     <div id="notificationsModal" class="modal" onclick="closeModalOnOutsideClick(event, 'notifications')">
         <div class="modal-content">
             <div class="modal-header">
-                <span>🔔</span> Configurar Notificações
+                <span>⚙️</span> Configurações
             </div>
+
+            <!-- Perfil do usuário -->
+            <div class="profile-section">
+                <div class="profile-avatar-preview" id="profileAvatarPreview">DF</div>
+                <div class="profile-fields">
+                    <label class="form-label" for="profileNameInput">Seu nome</label>
+                    <div class="profile-name-row">
+                        <input type="text" class="form-input" id="profileNameInput" placeholder="Ex: Wallace" maxlength="40" autocomplete="name" onkeydown="if(event.key==='Enter'){event.preventDefault();saveUserName();}">
+                        <button type="button" class="btn btn-primary profile-save-btn" onclick="saveUserName()">Salvar</button>
+                    </div>
+                    <small style="font-size:11px;color:var(--text-tertiary);display:block;margin-top:4px;">
+                        Usado na saudação da tela inicial e no seu avatar.
+                    </small>
+                </div>
+            </div>
+
             <div class="notification-settings">
                 <div class="notification-item">
                     <div class="notification-info">

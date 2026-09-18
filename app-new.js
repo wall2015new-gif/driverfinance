@@ -411,9 +411,38 @@ function changePeriodView(period) {
     updateHomePage(period);
 }
 
-// Nome do usuário (persistido; pode ser definido pelo usuário no futuro)
+// Nome do usuário (persistido; definido pelo usuário nas Configurações)
 function getUserName() {
     return (localStorage.getItem('userName') || '').trim();
+}
+
+// Salvar o nome do usuário (a partir do campo de Perfil nas Configurações)
+function saveUserName() {
+    const input = document.getElementById('profileNameInput');
+    if (!input) return;
+    const name = input.value.trim().replace(/\s+/g, ' ');
+
+    if (name) {
+        localStorage.setItem('userName', name);
+    } else {
+        localStorage.removeItem('userName');
+    }
+
+    // Atualizar saudação, avatar do cabeçalho e preview do modal
+    updateGreeting();
+    const preview = document.getElementById('profileAvatarPreview');
+    if (preview) preview.textContent = getUserInitials();
+
+    showNotification(name ? '✅ Nome salvo com sucesso!' : 'ℹ️ Nome removido', 'success');
+    closeModal('notifications');
+}
+
+// Preencher o campo de perfil ao abrir as Configurações
+function syncProfileField() {
+    const input = document.getElementById('profileNameInput');
+    if (input) input.value = getUserName();
+    const preview = document.getElementById('profileAvatarPreview');
+    if (preview) preview.textContent = getUserInitials();
 }
 
 // Iniciais para o avatar do cabeçalho
@@ -1110,6 +1139,11 @@ function openModal(type, preset) {
     const modal = document.getElementById(type + 'Modal');
     if (modal) {
         modal.classList.add('active');
+
+        // Ao abrir Configurações, preencher o campo de Perfil
+        if (type === 'notifications' && typeof syncProfileField === 'function') {
+            syncProfileField();
+        }
 
         // Definir data de hoje
         const today = new Date().toISOString().split('T')[0];

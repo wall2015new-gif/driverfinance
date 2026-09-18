@@ -11,6 +11,19 @@ let goals = JSON.parse(localStorage.getItem('goals')) || {
     trips: 200
 };
 
+// Recarrega o estado em memória a partir do LocalStorage.
+// Usado após a sincronização com o Supabase (pull) para refletir os dados da
+// nuvem sem recarregar a página. Reatribui as variáveis globais do app.
+function reloadStateFromStorage() {
+    transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    goals = JSON.parse(localStorage.getItem('goals')) || { daily: 200, weekly: 1400, monthly: 6000, trips: 200 };
+    if (typeof bills !== 'undefined') bills = JSON.parse(localStorage.getItem('bills')) || [];
+    if (typeof kmData !== 'undefined') kmData = JSON.parse(localStorage.getItem('kmData')) || [];
+    if (typeof fuelData !== 'undefined') fuelData = JSON.parse(localStorage.getItem('fuelData')) || [];
+    if (typeof maintenanceData !== 'undefined') maintenanceData = JSON.parse(localStorage.getItem('maintenanceData')) || [];
+    console.log('🔄 Estado recarregado do LocalStorage após sync');
+}
+
 // Aplicar tema ao carregar
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Driver Finance carregando...');
@@ -443,6 +456,21 @@ function syncProfileField() {
     if (input) input.value = getUserName();
     const preview = document.getElementById('profileAvatarPreview');
     if (preview) preview.textContent = getUserInitials();
+
+    // Mostrar e-mail da conta + botão Sair quando logado no Supabase
+    const accountSection = document.getElementById('accountSection');
+    const accountEmail = document.getElementById('accountEmail');
+    if (accountSection && window.supabaseClient) {
+        window.supabaseClient.auth.getUser().then(({ data }) => {
+            const email = data?.user?.email;
+            if (email) {
+                accountSection.style.display = 'flex';
+                if (accountEmail) accountEmail.textContent = email;
+            } else {
+                accountSection.style.display = 'none';
+            }
+        }).catch(() => { accountSection.style.display = 'none'; });
+    }
 }
 
 // Iniciais para o avatar do cabeçalho

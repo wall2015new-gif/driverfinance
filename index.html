@@ -8064,6 +8064,15 @@
             </div>
             
             
+            <!-- Conta / Sessão -->
+            <div id="accountSection" class="notification-item" style="display:none; align-items:center;">
+                <div class="notification-info">
+                    <div class="notification-title">Conta</div>
+                    <div class="notification-desc" id="accountEmail">—</div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="dfLogout()">Sair</button>
+            </div>
+
             <div class="danger-zone">
                 <div class="danger-zone-header">⚠️ Zona de Perigo</div>
                 <button class="btn-danger-action" onclick="resetAllData()">
@@ -8138,6 +8147,11 @@
         });
     </script>
 
+    <!-- Supabase SDK (v2) + configuração/camada de dados/auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="db.js"></script>
     <script src="app-new.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>

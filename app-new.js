@@ -27,31 +27,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ========== FAB & BOTTOM SHEET - Premium ========== 
+// ========== FAB & BOTTOM SHEET ==========
 function toggleFAB() {
-    const fab = document.getElementById('fabButton');
-    const bottomSheet = document.getElementById('bottomSheet');
-    const backdrop = document.getElementById('backdrop');
-    
-    const isActive = fab.classList.contains('active');
-    
-    if (isActive) {
-        closeFAB();
-    } else {
-        fab.classList.add('active');
-        bottomSheet.classList.add('active');
-        backdrop.classList.add('active');
-    }
+    // FAB atual abre modal de notificações — função mantida por compatibilidade
+    openModal('notifications');
 }
 
 function closeFAB() {
-    const fab = document.getElementById('fabButton');
-    const bottomSheet = document.getElementById('bottomSheet');
-    const backdrop = document.getElementById('backdrop');
-    
-    if (fab) fab.classList.remove('active');
-    if (bottomSheet) bottomSheet.classList.remove('active');
-    if (backdrop) backdrop.classList.remove('active');
+    // Função mantida por compatibilidade com chamadas internas (switchPage)
+    // O FAB real usa openModal diretamente
 }
 
 // ========== HOME PAGE - Premium Update ==========
@@ -114,11 +98,17 @@ function updateHomePage(period = null) {
     const fuelExpenses = expenses.filter(e => e.category === 'gas');
     const totalFuel = fuelExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
     
-    // KM rodados (se houver registro) - sempre do dia
-    const kmData = JSON.parse(localStorage.getItem('kmToday')) || null;
+    // KM rodados — soma os registros do período selecionado (dia/semana/mês)
+    const kmDataArray = JSON.parse(localStorage.getItem('kmData')) || [];
     let kmRodados = 0;
-    if (kmData && kmData.kmInicial && kmData.kmFinal) {
-        kmRodados = kmData.kmFinal - kmData.kmInicial;
+    if (period === 'today') {
+        const todayKmRecord = kmDataArray.find(item => item.date === today);
+        if (todayKmRecord && todayKmRecord.kmRodado) kmRodados = todayKmRecord.kmRodado;
+    } else {
+        const kmRange = getPeriodRange(period, 0);
+        kmRodados = kmDataArray
+            .filter(k => { const d = parseLocalDate(k.date); return d >= kmRange.start && d < kmRange.end; })
+            .reduce((s, k) => s + (parseFloat(k.kmRodado) || 0), 0);
     }
     
     // Atualizar label do período
@@ -130,6 +120,17 @@ function updateHomePage(period = null) {
             'month': '💰 LUCRO LÍQUIDO DO MÊS'
         };
         heroPeriodLabel.textContent = labels[period] || '💰 LUCRO LÍQUIDO';
+    }
+
+    // Atualizar texto de comparação dinâmico
+    const comparisonText = document.querySelector('.comparison-text');
+    if (comparisonText) {
+        const compTexts = {
+            'today': 'Comparado com ontem',
+            'week': 'Comparado com semana passada',
+            'month': 'Comparado com mês passado'
+        };
+        comparisonText.textContent = compTexts[period] || 'Comparado com período anterior';
     }
     
     // Atualizar Hero Card - Lucro Líquido
@@ -145,7 +146,8 @@ function updateHomePage(period = null) {
     }
     
     // Calcular progresso da meta baseado no período
-    let goalAmount = goals.daily || 400;
+    // Fallback alinhado com o restante do app e com o HTML (200/1400/6000).
+    let goalAmount = goals.daily || 200;
     if (period === 'week') {
         goalAmount = goals.weekly || 1400;
     } else if (period === 'month') {
@@ -156,10 +158,13 @@ function updateHomePage(period = null) {
     
     if (metaValue) {
         const metaLabels = {
-            'today': `Meta diária: ${formatCurrency(goalAmount)}`,
-            'week': `Meta semanal: ${formatCurrency(goalAmount)}`,
-            'month': `Meta mensal: ${formatCurrency(goalAmount)}`
+            'today': 'Meta diária',
+            'week': 'Meta semanal',
+            'month': 'Meta mensal'
         };
+        // Atualizar o label da meta
+        const metaLabelEl = document.querySelector('.meta-label');
+        if (metaLabelEl) metaLabelEl.textContent = metaLabels[period] || 'Meta';
         metaValue.textContent = formatCurrency(goalAmount);
     }
     
@@ -214,13 +219,176 @@ function updateHomePage(period = null) {
         miniFuel.textContent = formatCurrency(totalFuel);
     }
     
+    // Atualizar comparações (hero % e deltas dos mini cards) com dados reais
+    updatePeriodComparisons(period, { profit, totalMinutes, kmRodados, totalFuel });
+
     // Atualizar Insight
     updateDailyInsight(totalRevenue, profit, goalAmount, revenues.length);
     
-    // Atualizar gráfico semanal
+    // Atualizar gráfico semanal + total/variação
     createWeeklyChartSimple();
+    updateWeeklySummary();
+
+    // Atualizar card Resumo do Mês
+    updateMonthSummary();
     
     console.log('✅ Página inicial atualizada!');
+}
+
+// ===== Helpers de período (comparações reais) =====
+
+// Retorna [inicio, fim) do período atual e do anterior, em Date locais.
+function getPeriodRange(period, offset = 0) {
+    const now = new Date();
+    if (period === 'today') {
+        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+        const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset + 1);
+        return { start, end };
+    }
+    if (period === 'week') {
+        const s = new Date(now);
+        s.setDate(now.getDate() - now.getDay() + offset * 7);
+        s.setHours(0, 0, 0, 0);
+        const e = new Date(s); e.setDate(s.getDate() + 7);
+        return { start: s, end: e };
+    }
+    // month
+    const start = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + offset + 1, 1);
+    return { start, end };
+}
+
+function txInRange(t, range) {
+    const d = parseLocalDate(t.date);
+    return d >= range.start && d < range.end;
+}
+
+// Soma métricas (lucro, minutos, km, combustível) de um período
+function computePeriodMetrics(range) {
+    const inRange = transactions.filter(t => txInRange(t, range));
+    const rev = inRange.filter(t => t.type === 'revenue');
+    const exp = inRange.filter(t => t.type === 'expense');
+    const totalRevenue = rev.reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+    const totalExpense = exp.reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+    let minutes = 0;
+    rev.forEach(r => { if (r.workTime && r.workTime.totalMinutes) minutes += r.workTime.totalMinutes; });
+    const fuel = exp.filter(e => e.category === 'gas').reduce((s, e) => s + parseFloat(e.amount || 0), 0);
+    const kmArr = JSON.parse(localStorage.getItem('kmData')) || [];
+    const km = kmArr.filter(k => { const d = parseLocalDate(k.date); return d >= range.start && d < range.end; })
+                    .reduce((s, k) => s + (parseFloat(k.kmRodado) || 0), 0);
+    return { profit: totalRevenue - totalExpense, minutes, km, fuel };
+}
+
+// Formata um delta e aplica classe up/down/flat
+function applyDelta(el, current, previous, formatter, invertGood = false) {
+    if (!el) return;
+    if (!isFinite(previous) || previous === 0) {
+        el.textContent = current > 0 ? 'sem base anterior' : '';
+        el.className = 'mini-card-delta flat';
+        return;
+    }
+    const diff = current - previous;
+    const pct = (diff / Math.abs(previous)) * 100;
+    const up = diff >= 0;
+    const arrow = up ? '▲' : '▼';
+    const goodClass = invertGood ? (up ? 'down' : 'up') : (up ? 'up' : 'down');
+    el.className = 'mini-card-delta ' + (Math.abs(pct) < 0.5 ? 'flat' : goodClass);
+    el.textContent = `${arrow} ${formatter(Math.abs(diff))} vs. anterior`;
+}
+
+// Atualiza a comparação percentual do hero e os deltas dos mini cards
+function updatePeriodComparisons(period, current) {
+    const prev = computePeriodMetrics(getPeriodRange(period, -1));
+
+    // Hero: variação de lucro
+    const heroComparison = document.getElementById('heroComparison');
+    const comparisonText = document.querySelector('.comparison-text');
+    const comparisonIcon = heroComparison ? heroComparison.querySelector('.comparison-icon') : null;
+    const prevLabel = { today: 'ontem', week: 'semana passada', month: 'mês passado' }[period] || 'período anterior';
+
+    if (heroComparison && comparisonText) {
+        if (!isFinite(prev.profit) || prev.profit === 0) {
+            heroComparison.classList.remove('negative');
+            if (comparisonIcon) comparisonIcon.textContent = '📊';
+            comparisonText.textContent = `Sem comparação com ${prevLabel}`;
+        } else {
+            const diff = current.profit - prev.profit;
+            const pct = (diff / Math.abs(prev.profit)) * 100;
+            const up = diff >= 0;
+            heroComparison.classList.toggle('negative', !up);
+            if (comparisonIcon) comparisonIcon.textContent = up ? '▲' : '▼';
+            comparisonText.textContent = `${up ? '+' : ''}${pct.toFixed(0)}% vs. ${prevLabel} (${formatCurrency(prev.profit)})`;
+        }
+    }
+
+    // Mini cards: horas, km, combustível
+    applyDelta(document.getElementById('miniHoursDelta'), current.totalMinutes, prev.minutes,
+        v => { const h = Math.floor(v / 60), m = Math.round(v % 60); return h > 0 ? `${h}h${m > 0 ? m + 'm' : ''}` : `${m}m`; });
+    applyDelta(document.getElementById('miniKmDelta'), current.kmRodados, prev.km,
+        v => `${v.toFixed(0)} km`);
+    // Combustível: gastar mais é "ruim" -> invertGood
+    applyDelta(document.getElementById('miniFuelDelta'), current.totalFuel, prev.fuel,
+        v => formatCurrency(v), true);
+}
+
+// Total e variação do bloco "Evolução da semana" (lucro dos últimos 7 dias)
+function updateWeeklySummary() {
+    const totalEl = document.getElementById('weeklyTotal');
+    const deltaEl = document.getElementById('weeklyDelta');
+    if (!totalEl) return;
+
+    const profitOfLastNDays = (startOffset) => {
+        // soma o lucro de 7 dias terminando em 'hoje - startOffset'
+        let sum = 0;
+        for (let i = 0; i < 7; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() - startOffset - i);
+            const ds = d.toISOString().split('T')[0];
+            const r = transactions.filter(t => t.type === 'revenue' && t.date === ds).reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+            const e = transactions.filter(t => t.type === 'expense' && t.date === ds).reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+            sum += r - e;
+        }
+        return sum;
+    };
+
+    const thisWeek = profitOfLastNDays(0);
+    const lastWeek = profitOfLastNDays(7);
+    totalEl.textContent = formatCurrency(thisWeek);
+
+    if (deltaEl) {
+        if (!isFinite(lastWeek) || lastWeek === 0) {
+            deltaEl.textContent = '';
+            deltaEl.className = 'weekly-delta flat';
+        } else {
+            const pct = ((thisWeek - lastWeek) / Math.abs(lastWeek)) * 100;
+            const up = pct >= 0;
+            deltaEl.textContent = `${up ? '+' : ''}${pct.toFixed(0)}% vs. semana anterior`;
+            deltaEl.className = 'weekly-delta ' + (Math.abs(pct) < 0.5 ? 'flat' : (up ? 'up' : 'down'));
+        }
+    }
+}
+
+// Card Resumo do Mês (dados reais do mês corrente)
+function updateMonthSummary() {
+    const now = new Date();
+    const range = { start: new Date(now.getFullYear(), now.getMonth(), 1), end: new Date(now.getFullYear(), now.getMonth() + 1, 1) };
+    const inRange = transactions.filter(t => txInRange(t, range));
+    const totalRevenue = inRange.filter(t => t.type === 'revenue').reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+    const totalExpense = inRange.filter(t => t.type === 'expense').reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+    const profit = totalRevenue - totalExpense;
+    const goal = goals.monthly || 6000;
+    const pct = goal > 0 ? Math.min((profit / goal) * 100, 100) : 0;
+
+    const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set('monthSummarySub', `${months[now.getMonth()]} · dia ${now.getDate()}`);
+    set('monthRevenue', formatCurrency(totalRevenue));
+    set('monthExpense', formatCurrency(totalExpense));
+    set('monthProfit', formatCurrency(profit));
+    set('monthGoalTarget', formatCurrency(goal));
+    set('monthGoalPercent', Math.round(pct < 0 ? 0 : pct) + '%');
+    const fill = document.getElementById('monthGoalFill');
+    if (fill) fill.style.width = Math.max(0, pct) + '%';
 }
 
 // Mudar visualização de período na home
@@ -243,7 +411,39 @@ function changePeriodView(period) {
     updateHomePage(period);
 }
 
-// Atualizar saudação com hora do dia
+// Nome do usuário (persistido; pode ser definido pelo usuário no futuro)
+function getUserName() {
+    return (localStorage.getItem('userName') || '').trim();
+}
+
+// Iniciais para o avatar do cabeçalho
+function getUserInitials() {
+    const name = getUserName();
+    if (!name) return 'DF';
+    const parts = name.split(/\s+/).filter(Boolean);
+    const initials = (parts[0]?.[0] || '') + (parts.length > 1 ? parts[parts.length - 1][0] : '');
+    return (initials || 'DF').toUpperCase();
+}
+
+// Mensagem motivacional determinística por dia (não fica fixa no HTML)
+function getDailyMotivation() {
+    const messages = [
+        'Disciplina hoje, liberdade amanhã! 🚀',
+        'Cada corrida te aproxima da sua meta. 💪',
+        'Foco no lucro, não só no faturamento. 📈',
+        'Constância vence intensidade. Bora! 🔥',
+        'Rode com estratégia, ganhe com inteligência. 🧠',
+        'Pequenos ganhos diários viram grandes resultados. 🌱',
+        'Hoje é um ótimo dia para bater a meta! 🎯'
+    ];
+    // Índice baseado no dia do ano — muda a cada dia, estável no mesmo dia
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const dayOfYear = Math.floor((now - start) / 86400000);
+    return messages[dayOfYear % messages.length];
+}
+
+// Atualizar saudação com hora do dia, nome, data e mensagem
 function updateGreeting() {
     const greetingTitle = document.getElementById('greetingTitle');
     const greetingDate = document.getElementById('greetingDate');
@@ -254,16 +454,32 @@ function updateGreeting() {
     const hour = now.getHours();
     
     let greeting = 'Bom dia';
+    let emoji = '☀️';
     if (hour >= 12 && hour < 18) {
         greeting = 'Boa tarde';
-    } else if (hour >= 18) {
+        emoji = '🌤️';
+    } else if (hour >= 18 || hour < 5) {
         greeting = 'Boa noite';
+        emoji = '🌙';
     }
-    
-    greetingTitle.textContent = greeting;
+
+    const name = getUserName();
+    greetingTitle.textContent = name ? `${greeting}, ${name}!` : `${greeting}!`;
+
+    // Emoji do período
+    const emojiEl = document.getElementById('greetingEmoji');
+    if (emojiEl) emojiEl.textContent = emoji;
+
+    // Avatar (iniciais)
+    const avatarEl = document.getElementById('userAvatar');
+    if (avatarEl) avatarEl.textContent = getUserInitials();
+
+    // Mensagem motivacional dinâmica
+    const motivationEl = document.getElementById('greetingMotivation');
+    if (motivationEl) motivationEl.textContent = getDailyMotivation();
     
     // Formatar data
-    const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
     const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
                     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     
@@ -271,7 +487,7 @@ function updateGreeting() {
     const day = now.getDate();
     const month = months[now.getMonth()];
     
-    greetingDate.textContent = `${dayName}, ${day} de ${month}`;
+    greetingDate.textContent = `${dayName}, ${day} de ${month} de ${now.getFullYear()}`;
 }
 
 // Atualizar insight diário
@@ -615,20 +831,24 @@ function filterTransactionsByPeriod(transactions, period) {
     return transactions;
 }
 
-// Mudar período
-function changePeriod(period) {
+// Mudar período (dashboard circular — mantido por compatibilidade)
+function changePeriod(period, btnElement) {
     currentPeriod = period;
-    
+
     // Atualizar botões ativos
     document.querySelectorAll('.period-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    
-    event.target.classList.add('active');
-    
+
+    // Marcar botão ativo — aceita elemento ou evento
+    const activeBtn = btnElement instanceof HTMLElement
+        ? btnElement
+        : (btnElement && btnElement.target ? btnElement.target : null);
+    if (activeBtn) activeBtn.classList.add('active');
+
     // Atualizar dashboard
     updateCircularProgress();
-    
+
     console.log('📅 Período alterado para:', period);
 }
 
@@ -819,28 +1039,28 @@ function switchPage(pageName) {
         item.classList.remove('active');
     });
     
-    // Marcar o item clicado como ativo
-    const clickedItem = document.querySelector(`.nav-item[onclick*="${pageName}"]`);
-    if (clickedItem) {
-        clickedItem.classList.add('active');
+    // Marcar o item ativo (novo menu usa data-page; fallback para onclick)
+    let activeNavItem = document.querySelector(`.nav-item[data-page="${pageName}"]`);
+    if (!activeNavItem) {
+        activeNavItem = document.querySelector(`.nav-item[onclick*="${pageName}"]`);
+    }
+    if (activeNavItem) {
+        activeNavItem.classList.add('active');
     }
     
     // Scroll para o topo
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Atualizar conteúdo específico da página
-    if (pageName === 'home') {
+    if (pageName === 'dashboard') {
         console.log('🏠 Atualizando página inicial...');
         updateHomePage();
-    } else if (pageName === 'earnings') {
-        console.log('💰 Atualizando ganhos...');
-        renderEarnings();
     } else if (pageName === 'vehicle') {
         console.log('🚗 Atualizando página do veículo...');
-        switchVehicleTab('km');
-    } else if (pageName === 'profile') {
-        console.log('👤 Página de perfil...');
-        // Perfil é apenas menu, não precisa atualizar
+        updateKmInterface();
+        updateKmDisplay();
+        updateFuelStats();
+        updateMaintenanceDisplay();
     } else if (pageName === 'goals') {
         console.log('📊 Atualizando metas...');
         updateGoals();
@@ -863,105 +1083,56 @@ function switchPage(pageName) {
     }
 }
 
-// ========== EARNINGS PAGE ==========
+// ========== EARNINGS PAGE (legada — página não existe mais no HTML) ==========
 function renderEarnings() {
-    const earningsList = document.getElementById('earningsList');
-    if (!earningsList) return;
-    
-    const revenues = transactions.filter(t => t.type === 'revenue').sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    if (revenues.length === 0) {
-        earningsList.innerHTML = `
-            <div style="text-align: center; padding: var(--space-xl); color: var(--text-tertiary);">
-                <div style="font-size: 48px; margin-bottom: var(--space-sm);">💰</div>
-                <div style="font-size: var(--font-md); font-weight: 600; margin-bottom: var(--space-xs);">Nenhum ganho registrado</div>
-                <div style="font-size: var(--font-sm);">Adicione sua primeira corrida usando o botão +</div>
-            </div>
-        `;
-        return;
-    }
-    
-    earningsList.innerHTML = revenues.map(r => {
-        const appIcons = {
-            'uber': '🚗',
-            '99': '🟡',
-            'indrive': '🔵',
-            'outros': '📱'
-        };
-        
-        return `
-            <div style="background: var(--bg-secondary); border-radius: var(--radius-lg); padding: var(--space-md); margin-bottom: var(--space-sm); border: 1px solid var(--border-light);">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-xs);">
-                    <div>
-                        <div style="font-size: var(--font-xs); color: var(--text-tertiary); font-weight: 600; margin-bottom: 4px;">
-                            ${formatDate(r.date)}
-                        </div>
-                        <div style="font-size: var(--font-xl); font-weight: 800; color: var(--primary-green);">
-                            ${formatCurrency(r.amount)}
-                        </div>
-                    </div>
-                    <div style="font-size: 32px;">
-                        ${appIcons[r.app] || '📱'}
-                    </div>
-                </div>
-                <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap; font-size: var(--font-xs); color: var(--text-secondary);">
-                    ${r.trips && r.trips > 1 ? `<span>🚗 ${r.trips} corridas</span>` : ''}
-                    ${r.workTime ? `<span>⏱️ ${r.workTime.hours}h ${r.workTime.minutes}m</span>` : ''}
-                    ${r.description ? `<span>📝 ${r.description}</span>` : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
+    // Esta função é mantida por compatibilidade mas a página earningsList não existe no HTML atual.
+    // A lista de transações é renderizada pela renderTransactions() em page-history.
+    console.log('renderEarnings: página legada, sem elemento earningsList.');
 }
 
 function filterEarnings(period) {
-    // TODO: Implementar filtro
-    console.log('Filtrar ganhos:', period);
+    // Legado — sem implementação necessária
+    console.log('filterEarnings chamada (legado):', period);
 }
 
 // ========== VEHICLE TABS ==========
+// A página de veículo usa seções HTML diretamente (km-control-section,
+// fuel-control-section, maintenance-control-section). Esta função existe
+// apenas por compatibilidade com chamadas antigas.
 function switchVehicleTab(tab) {
-    const content = document.getElementById('vehicleTabContent');
-    if (!content) return;
-    
-    if (tab === 'km') {
-        content.innerHTML = `
-            <div style="text-align: center; padding: var(--space-lg); color: var(--text-tertiary);">
-                <div style="font-size: 48px; margin-bottom: var(--space-sm);">🚗</div>
-                <div style="font-size: var(--font-md); font-weight: 600;">Controle de KM</div>
-                <div style="font-size: var(--font-sm); margin-top: var(--space-xs);">Em breve</div>
-            </div>
-        `;
-    } else if (tab === 'fuel') {
-        content.innerHTML = `
-            <div style="text-align: center; padding: var(--space-lg); color: var(--text-tertiary);">
-                <div style="font-size: 48px; margin-bottom: var(--space-sm);">⛽</div>
-                <div style="font-size: var(--font-md); font-weight: 600;">Controle de Combustível</div>
-                <div style="font-size: var(--font-sm); margin-top: var(--space-xs);">Em breve</div>
-            </div>
-        `;
-    } else if (tab === 'maintenance') {
-        content.innerHTML = `
-            <div style="text-align: center; padding: var(--space-lg); color: var(--text-tertiary);">
-                <div style="font-size: 48px; margin-bottom: var(--space-sm);">🔧</div>
-                <div style="font-size: var(--font-md); font-weight: 600;">Controle de Manutenção</div>
-                <div style="font-size: var(--font-sm); margin-top: var(--space-xs);">Em breve</div>
-            </div>
-        `;
-    }
+    // Não faz nada — a página de veículo renderiza via updateKmInterface,
+    // updateFuelStats e updateMaintenanceDisplay chamados em switchPage
+    console.log('📍 switchVehicleTab chamada (no-op):', tab);
 }
 
 // ========== MODALS ==========
-function openModal(type) {
+function openModal(type, preset) {
     const modal = document.getElementById(type + 'Modal');
     if (modal) {
         modal.classList.add('active');
-        
+
         // Definir data de hoje
         const today = new Date().toISOString().split('T')[0];
         const dateInput = document.getElementById(type + 'Date');
         if (dateInput) {
             dateInput.value = today;
+        }
+
+        // Pré-selecionar categoria se informada (ex: 'gas' para Abasteci)
+        if (type === 'expense' && preset) {
+            const categorySelect = document.getElementById('expenseCategory');
+            if (categorySelect) {
+                categorySelect.value = preset;
+            }
+        }
+
+        // Pré-preencher descrição para "Corrida"
+        if (type === 'revenue' && preset === 'corrida') {
+            const descInput = document.getElementById('revenueDesc');
+            if (descInput && !descInput.value) {
+                const now = new Date();
+                descInput.value = `Corrida ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+            }
         }
     }
 }
@@ -1073,7 +1244,8 @@ function addRevenue(event) {
     updateHomePage();
     renderTransactions();
     updateAppComparator();
-    
+    if (typeof updateGoals === 'function') updateGoals();
+
     // Feedback visual
     showNotification('✅ Receita adicionada com sucesso!', 'success');
 }
@@ -1101,7 +1273,8 @@ function addExpense(event) {
     // Atualizar todas as visualizações
     updateHomePage();
     renderTransactions();
-    
+    if (typeof updateGoals === 'function') updateGoals();
+
     showNotification('✅ Despesa adicionada com sucesso!', 'success');
 }
 
@@ -1235,12 +1408,13 @@ function deleteTransaction(id) {
     if (confirm('Tem certeza que deseja excluir esta transação?')) {
         transactions = transactions.filter(t => t.id !== id);
         localStorage.setItem('transactions', JSON.stringify(transactions));
-        
-        updateCircularProgress();
-        createWeeklyChart();
+
+        // Atualizar dashboard e listas
+        updateHomePage();
+        createWeeklyChartSimple();
         renderTransactions();
         updateAppComparator();
-        
+
         showNotification('✅ Transação excluída com sucesso!', 'success');
     }
 }
@@ -1248,10 +1422,78 @@ function deleteTransaction(id) {
 function filterTransactions() {
     const typeFilter = document.getElementById('filterType').value;
     const periodFilter = document.getElementById('filterPeriod').value;
-    
-    // Implementar filtros aqui
-    console.log('Filtros:', typeFilter, periodFilter);
-    renderTransactions();
+    const container = document.getElementById('transactionsList');
+    if (!container) return;
+
+    const now = new Date();
+    let filtered = [...transactions];
+
+    // Filtrar por tipo
+    if (typeFilter === 'revenue') {
+        filtered = filtered.filter(t => t.type === 'revenue');
+    } else if (typeFilter === 'expense') {
+        filtered = filtered.filter(t => t.type === 'expense');
+    }
+
+    // Filtrar por período
+    if (periodFilter === 'week') {
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - now.getDay());
+        weekStart.setHours(0, 0, 0, 0);
+        filtered = filtered.filter(t => new Date(t.date + 'T00:00:00') >= weekStart);
+    } else if (periodFilter === 'month') {
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        filtered = filtered.filter(t => new Date(t.date + 'T00:00:00') >= monthStart);
+    } else if (periodFilter === 'year') {
+        const yearStart = new Date(now.getFullYear(), 0, 1);
+        filtered = filtered.filter(t => new Date(t.date + 'T00:00:00') >= yearStart);
+    }
+    // 'all' — sem filtro de período
+
+    // Renderizar resultado
+    if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state">📭 Nenhuma transação encontrada para este filtro</div>';
+        return;
+    }
+
+    const categoryIcons = {
+        revenue: '💵', gas: '⛽', maintenance: '🔧', app: '📱', food: '🍔', other: '📦'
+    };
+    const categoryNames = {
+        revenue: 'Receita', gas: 'Combustível', maintenance: 'Manutenção',
+        app: 'Taxas de App', food: 'Alimentação', other: 'Outros'
+    };
+
+    container.innerHTML = filtered.map(transaction => {
+        let additionalInfo = '';
+        if (transaction.type === 'revenue') {
+            const details = [];
+            if (transaction.trips && transaction.trips > 1) details.push(`${transaction.trips} corridas`);
+            if (transaction.startTime && transaction.endTime) {
+                details.push(`⏱️ ${transaction.startTime} - ${transaction.endTime}`);
+                if (transaction.workTime) details.push(`(${transaction.workTime.hours}h ${transaction.workTime.minutes}min)`);
+            }
+            if (details.length > 0) {
+                additionalInfo = `<div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">${details.join(' • ')}</div>`;
+            }
+        }
+        return `
+            <div class="transaction-item">
+                <div class="transaction-info">
+                    <div class="transaction-date">${formatDate(transaction.date)}</div>
+                    <div class="transaction-desc">${categoryIcons[transaction.category] || '💰'} ${transaction.description}</div>
+                    <div class="transaction-category">${categoryNames[transaction.category] || 'Outros'}</div>
+                    ${additionalInfo}
+                </div>
+                <div class="transaction-value ${transaction.type}">
+                    ${transaction.type === 'revenue' ? '+' : '-'} ${formatCurrency(transaction.amount)}
+                </div>
+                <div class="transaction-actions">
+                    <button class="btn-icon" onclick="deleteTransaction(${transaction.id})">🗑️</button>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 // ========== FORMATAÇÃO ==========
@@ -1267,15 +1509,33 @@ function formatDate(dateString) {
     return date.toLocaleDateString('pt-BR');
 }
 
+// Converte uma string de data 'YYYY-MM-DD' em Date no fuso LOCAL.
+// Sem isto, new Date('YYYY-MM-DD') é interpretada como meia-noite UTC e, em
+// fusos negativos (ex.: Brasil UTC-3), "volta" um dia — jogando registros do
+// dia 1 para o mês anterior nas comparações de getMonth()/getFullYear().
+function parseLocalDate(dateStr) {
+    if (!dateStr) return new Date(NaN);
+    // Já tem componente de hora? Usa direto. Senão, ancora em meia-noite local.
+    return String(dateStr).includes('T')
+        ? new Date(dateStr)
+        : new Date(dateStr + 'T00:00:00');
+}
+
 // ========== NOTIFICAÇÕES ==========
 function showNotification(message, type = 'info') {
-    // Criar elemento de notificação
+    const colors = {
+        success: '#00c853',
+        error: '#f44336',
+        info: '#4267f5',
+        warning: '#ff9800'
+    };
+
     const notification = document.createElement('div');
     notification.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: ${type === 'success' ? '#00c853' : '#4267f5'};
+        background: ${colors[type] || colors.info};
         color: white;
         padding: 16px 24px;
         border-radius: 12px;
@@ -1284,12 +1544,13 @@ function showNotification(message, type = 'info') {
         z-index: 10000;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         animation: slideInRight 0.3s ease-out;
+        max-width: 320px;
+        word-break: break-word;
     `;
     notification.textContent = message;
-    
+
     document.body.appendChild(notification);
-    
-    // Remover após 3 segundos
+
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease-out';
         setTimeout(() => notification.remove(), 300);
@@ -1418,33 +1679,33 @@ function saveGoal(event) {
 function updateGoals() {
     // Calcular valores atuais
     const today = new Date().toISOString().split('T')[0];
-    const weekStart = new Date();
-    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-    const monthStart = new Date();
-    monthStart.setDate(1);
-    
+    const now = new Date();
+
+    // Início da semana (domingo) — usando T00:00:00 para evitar problema de timezone
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+
+    // Início do mês
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
     const dailyRevenue = transactions
         .filter(t => t.type === 'revenue' && t.date === today)
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    
+
     const weeklyRevenue = transactions
-        .filter(t => t.type === 'revenue' && new Date(t.date) >= weekStart)
+        .filter(t => t.type === 'revenue' && new Date(t.date + 'T00:00:00') >= weekStart)
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    
+
     const monthlyRevenue = transactions
-        .filter(t => t.type === 'revenue' && new Date(t.date) >= monthStart)
+        .filter(t => t.type === 'revenue' && new Date(t.date + 'T00:00:00') >= monthStart)
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    
-    // Somar a quantidade de corridas de cada receita do mês
-    const monthlyTrips = transactions
-        .filter(t => t.type === 'revenue' && new Date(t.date) >= monthStart)
-        .reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
-    
-    // Atualizar metas
+
+    // Atualizar cards de meta
     updateGoalCard('Daily', goals.daily, dailyRevenue, true);
     updateGoalCard('Weekly', goals.weekly, weeklyRevenue, true);
     updateGoalCard('Monthly', goals.monthly, monthlyRevenue, true);
-    
+
     // Atualizar conquistas
     renderAchievements();
 }
@@ -1490,30 +1751,61 @@ function updateGoalCard(type, target, current, isCurrency) {
 }
 
 // ========== CONQUISTAS ==========
+
+// Verifica se o usuário trabalhou N dias consecutivos
+function checkConsecutiveDays(days) {
+    if (transactions.length === 0) return false;
+
+    // Coletar datas únicas com receita, ordenadas desc
+    const workDays = [...new Set(
+        transactions
+            .filter(t => t.type === 'revenue')
+            .map(t => t.date)
+    )].sort((a, b) => b.localeCompare(a));
+
+    if (workDays.length < days) return false;
+
+    let streak = 1;
+    for (let i = 0; i < workDays.length - 1; i++) {
+        const current = new Date(workDays[i] + 'T00:00:00');
+        const next    = new Date(workDays[i + 1] + 'T00:00:00');
+        const diffDays = Math.round((current - next) / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) {
+            streak++;
+            if (streak >= days) return true;
+        } else {
+            streak = 1;
+        }
+    }
+    return false;
+}
+
 function renderAchievements() {
     const container = document.getElementById('achievementsList');
     if (!container) return;
-    
+
     const totalRevenue = transactions
         .filter(t => t.type === 'revenue')
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    
-    // Somar a quantidade de corridas de todas as receitas
+
     const totalTrips = transactions
         .filter(t => t.type === 'revenue')
         .reduce((sum, t) => sum + (parseInt(t.trips) || 1), 0);
-    
+
+    const has7DayStreak = checkConsecutiveDays(7);
+
     const achievements = [
-        { icon: '🎯', name: 'Primeira Corrida', desc: 'Complete sua primeira corrida', unlocked: totalTrips >= 1 },
-        { icon: '💯', name: '100 Corridas', desc: 'Complete 100 corridas', unlocked: totalTrips >= 100 },
-        { icon: '💰', name: 'Primeiro Mil', desc: 'Ganhe R$ 1.000', unlocked: totalRevenue >= 1000 },
-        { icon: '🏆', name: 'Cinco Mil', desc: 'Ganhe R$ 5.000', unlocked: totalRevenue >= 5000 },
-        { icon: '⭐', name: 'Dez Mil', desc: 'Ganhe R$ 10.000', unlocked: totalRevenue >= 10000 },
-        { icon: '🔥', name: 'Sequência 7 Dias', desc: 'Trabalhe 7 dias seguidos', unlocked: false }
+        { icon: '🎯', name: 'Primeira Corrida',    desc: 'Complete sua primeira corrida',  unlocked: totalTrips >= 1 },
+        { icon: '💯', name: '100 Corridas',         desc: 'Complete 100 corridas',           unlocked: totalTrips >= 100 },
+        { icon: '💰', name: 'Primeiro Mil',         desc: 'Ganhe R$ 1.000',                  unlocked: totalRevenue >= 1000 },
+        { icon: '🏆', name: 'Cinco Mil',            desc: 'Ganhe R$ 5.000',                  unlocked: totalRevenue >= 5000 },
+        { icon: '⭐', name: 'Dez Mil',              desc: 'Ganhe R$ 10.000',                 unlocked: totalRevenue >= 10000 },
+        { icon: '🔥', name: 'Sequência 7 Dias',     desc: 'Trabalhe 7 dias seguidos',        unlocked: has7DayStreak }
     ];
-    
+
     container.innerHTML = achievements.map(achievement => `
-        <div class="achievement-badge ${achievement.unlocked ? 'unlocked' : 'locked'}">
+        <div class="achievement-badge ${achievement.unlocked ? 'unlocked' : 'locked'}" title="${achievement.desc}">
             <div class="achievement-icon">${achievement.icon}</div>
             <div class="achievement-name">${achievement.name}</div>
             <div class="achievement-desc">${achievement.desc}</div>
@@ -2042,7 +2334,7 @@ function renderBills() {
     
     // Filtrar contas do mês selecionado
     const monthBills = bills.filter(bill => {
-        const billDate = new Date(bill.dueDate);
+        const billDate = parseLocalDate(bill.dueDate);
         return billDate.getMonth() === selectedMonth && billDate.getFullYear() === selectedYear;
     });
     
@@ -2125,7 +2417,7 @@ function updateSmartCalculator() {
     
     // Total de contas não pagas do mês atual E MESES FUTUROS
     const currentAndFutureBills = bills.filter(bill => {
-        const billDate = new Date(bill.dueDate);
+        const billDate = parseLocalDate(bill.dueDate);
         const billYear = billDate.getFullYear();
         const billMonth = billDate.getMonth();
         
@@ -2140,12 +2432,12 @@ function updateSmartCalculator() {
     
     // Separar contas do mês atual e meses futuros para exibição
     const currentMonthBills = currentAndFutureBills.filter(bill => {
-        const billDate = new Date(bill.dueDate);
+        const billDate = parseLocalDate(bill.dueDate);
         return billDate.getMonth() === currentMonth && billDate.getFullYear() === currentYear;
     });
     
     const futureMonthsBills = currentAndFutureBills.filter(bill => {
-        const billDate = new Date(bill.dueDate);
+        const billDate = parseLocalDate(bill.dueDate);
         return billDate.getFullYear() > currentYear || 
                (billDate.getFullYear() === currentYear && billDate.getMonth() > currentMonth);
     });
@@ -2156,7 +2448,7 @@ function updateSmartCalculator() {
     // Calcular gasto médio com combustível por dia
     const monthStart = new Date(currentYear, currentMonth, 1);
     const fuelExpenses = transactions.filter(t => {
-        const transDate = new Date(t.date);
+        const transDate = parseLocalDate(t.date);
         return t.type === 'expense' && 
                t.category === 'gas' && 
                transDate >= monthStart;
@@ -2224,6 +2516,7 @@ function updateSmartCalculator() {
 
 // Inicializar contas ao carregar a página de metas
 document.addEventListener('DOMContentLoaded', function() {
+    updateBillsMonthDisplay();
     renderBills();
     updateSmartCalculator();
 });
@@ -2243,7 +2536,7 @@ const AIAssistant = {
         // Dados do mês
         const monthStart = new Date(currentYear, currentMonth, 1);
         const monthTransactions = transactions.filter(t => {
-            const transDate = new Date(t.date);
+            const transDate = parseLocalDate(t.date);
             return transDate >= monthStart;
         });
         
@@ -2266,7 +2559,7 @@ const AIAssistant = {
         
         // KM rodado
         const monthKm = kmData.filter(item => {
-            const itemDate = new Date(item.date);
+            const itemDate = parseLocalDate(item.date);
             return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
         });
         const totalKm = monthKm.reduce((sum, item) => sum + item.kmRodado, 0);
@@ -2281,7 +2574,7 @@ const AIAssistant = {
         
         // Contas
         const monthBills = bills.filter(bill => {
-            const billDate = new Date(bill.dueDate);
+            const billDate = parseLocalDate(bill.dueDate);
             return billDate.getMonth() === currentMonth && 
                    billDate.getFullYear() === currentYear &&
                    !bill.paid;
@@ -2610,7 +2903,7 @@ const AIAssistant = {
         
         // Análise de custos de manutenção
         const monthMaintenances = maintenanceData.filter(m => {
-            const mDate = new Date(m.date);
+            const mDate = parseLocalDate(m.date);
             return mDate.getMonth() === data.currentMonth && 
                    mDate.getFullYear() === data.currentYear &&
                    m.cost > 0;
@@ -3673,8 +3966,8 @@ function importBackup(event) {
                 }
                 
                 // Atualizar interface
-                updateCircularProgress();
-                createWeeklyChart();
+                updateHomePage();
+                createWeeklyChartSimple();
                 renderTransactions();
                 updateGoals();
                 
@@ -3832,40 +4125,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-// Atualizar showNotification para suportar tipo error
-const originalShowNotification = showNotification;
-showNotification = function(message, type = 'info') {
-    const notification = document.createElement('div');
-    const colors = {
-        success: '#00c853',
-        error: '#f44336',
-        info: '#4267f5'
-    };
-    
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${colors[type] || colors.info};
-        color: white;
-        padding: 16px 24px;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 14px;
-        z-index: 10000;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        animation: slideInRight 0.3s ease-out;
-        max-width: 300px;
-    `;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-};
+// showNotification já suporta todos os tipos na definição original — bloco duplicado removido
 
 console.log('📤 Exportação, Backup e Notificações carregados!');
 
@@ -4001,7 +4261,7 @@ function checkAutoBackup() {
         return;
     }
     
-    const lastBackupDate = new Date(lastBackup);
+    const lastBackupDate = parseLocalDate(lastBackup);
     const daysSinceBackup = Math.floor((new Date() - lastBackupDate) / (1000 * 60 * 60 * 24));
     
     // Se passou 7 dias, sugerir backup
@@ -4027,7 +4287,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function showBackupStatus() {
     const lastBackup = localStorage.getItem('last_backup_date');
     if (lastBackup) {
-        const date = new Date(lastBackup);
+        const date = parseLocalDate(lastBackup);
         const days = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24));
         console.log(`💾 Último backup: há ${days} dia(s)`);
         
@@ -4436,11 +4696,13 @@ function addQuickRevenue(amount) {
     // Fechar modal
     closeModal('quickAdd');
     
-    // Atualizar interface
-    updateCircularProgress();
-    createWeeklyChart();
+    // Atualizar interface (usa as funções da home atual — o antigo
+    // updateCircularProgress/createWeeklyChart apontava para elementos legados
+    // que não existem mais no HTML, então a home não era atualizada).
+    updateHomePage();
     renderTransactions();
     updateAppComparator();
+    if (typeof updateGoals === 'function') updateGoals();
     
     // Verificar metas
     setTimeout(checkGoalsAndNotify, 500);
@@ -4814,7 +5076,7 @@ function updateKmDisplay() {
     const currentYear = new Date().getFullYear();
     
     const monthData = kmData.filter(item => {
-        const itemDate = new Date(item.date);
+        const itemDate = parseLocalDate(item.date);
         return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
     });
     
@@ -5107,7 +5369,7 @@ function updateFuelStats() {
     const currentYear = new Date().getFullYear();
     
     const monthData = fuelData.filter(item => {
-        const itemDate = new Date(item.date);
+        const itemDate = parseLocalDate(item.date);
         return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
     });
     
@@ -5551,9 +5813,13 @@ document.addEventListener('DOMContentLoaded', function() {
     updateMaintenanceDisplay();
 });
 
-// Atualizar manutenção quando KM mudar
-const originalSaveKmDay = saveKmDay;
+// Atualizar manutenção quando o KM mudar.
+// Obs.: as funções que salvam KM (endDay e saveKmRecord) já chamam
+// updateMaintenanceDisplay() diretamente. O antigo wrapper referenciava uma
+// função 'saveKmDay' que não existe e lançava ReferenceError no carregamento
+// do script (quebrando tudo abaixo, incluindo o Comparador de Apps).
 if (typeof saveKmDay === 'function') {
+    const originalSaveKmDay = saveKmDay;
     saveKmDay = function() {
         originalSaveKmDay();
         setTimeout(() => {
@@ -5578,7 +5844,7 @@ function updateAppComparator() {
     
     const monthRevenues = transactions.filter(t => {
         if (t.type !== 'revenue') return false;
-        const transDate = new Date(t.date);
+        const transDate = parseLocalDate(t.date);
         return transDate.getMonth() === currentMonth && transDate.getFullYear() === currentYear;
     });
     

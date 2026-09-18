@@ -30,64 +30,74 @@
         }
 
         :root {
-            /* Cores Principais - Paleta Premium */
-            --primary: #0EA5E9;        /* Sky Blue - Principal */
-            --primary-dark: #0284C7;   /* Sky Blue Dark */
-            --primary-light: #38BDF8;  /* Sky Blue Light */
+            /* ===== Paleta Driver Finance (redesign 2025) ===== */
+            /* Verdes da marca */
+            --green-petrol: #006B5B;   /* Verde petróleo escuro */
+            --green-main: #009B7A;     /* Verde principal */
+            --green-emerald: #00B894;  /* Verde esmeralda */
+            --green-turquoise: #00D6B5;/* Verde turquesa */
+            /* Azuis da marca */
+            --navy: #0B1F3A;           /* Azul-marinho */
+            --navy-2: #123456;         /* Azul secundário */
+
+            /* Cores Principais (mapeadas para a nova identidade) */
+            --primary: #009B7A;        /* Verde principal */
+            --primary-dark: #006B5B;   /* Verde petróleo */
+            --primary-light: #00B894;  /* Verde esmeralda */
             
-            --secondary: #10B981;      /* Emerald - Sucesso */
-            --secondary-dark: #059669;
-            --secondary-light: #34D399;
+            --secondary: #00B894;      /* Emerald - Sucesso */
+            --secondary-dark: #009B7A;
+            --secondary-light: #00D6B5;
             
-            --accent: #8B5CF6;         /* Violet - Destaque */
-            --accent-dark: #7C3AED;
-            --accent-light: #A78BFA;
+            --accent: #6D5AE6;         /* Violet - Destaque (abastecimento) */
+            --accent-dark: #5A46D6;
+            --accent-light: #8B7CF0;
             
             /* Cores do Logotipo (mantidas para compatibilidade) */
-            --logo-green-light: #34D399;
-            --logo-green: #10B981;
-            --logo-turquoise: #14B8A6;
-            --logo-blue: #0EA5E9;
-            --logo-blue-dark: #0F172A;
+            --logo-green-light: #00D6B5;
+            --logo-green: #00B894;
+            --logo-turquoise: #00D6B5;
+            --logo-blue: #0B1F3A;
+            --logo-blue-dark: #0B1F3A;
             
-            /* Backgrounds - Tema Claro Premium */
-            --bg-primary: #F8FAFC;     /* Slate 50 */
+            /* Backgrounds */
+            --bg-primary: #F4F7FB;     /* Cinza de fundo */
             --bg-secondary: #FFFFFF;   /* White */
-            --bg-tertiary: #F1F5F9;    /* Slate 100 */
+            --bg-tertiary: #EAF0F6;    /* Cinza de superfície */
             --bg-card: #FFFFFF;
-            --bg-hover: #F8FAFC;
+            --bg-hover: #EAF0F6;
             
-            /* Borders - Mais sutis */
-            --border: #E2E8F0;         /* Slate 200 */
-            --border-light: #F1F5F9;   /* Slate 100 */
-            --border-dark: #CBD5E1;    /* Slate 300 */
+            /* Borders */
+            --border: #E2E8F0;
+            --border-light: #EAF0F6;
+            --border-dark: #CBD5E1;
             
-            /* Textos - Melhor contraste */
-            --text-primary: #0F172A;   /* Slate 900 */
-            --text-secondary: #475569; /* Slate 600 */
-            --text-tertiary: #94A3B8;  /* Slate 400 */
-            --text-light: #CBD5E1;     /* Slate 300 */
+            /* Textos */
+            --text-primary: #0B1F3A;   /* Azul-marinho (títulos/valores) */
+            --text-secondary: #64748B; /* Cinza texto secundário */
+            --text-tertiary: #94A3B8;
+            --text-light: #CBD5E1;
             
             /* Cores Semânticas */
-            --success: #10B981;        /* Emerald 500 */
-            --success-light: #D1FAE5;  /* Emerald 100 */
-            --warning: #F59E0B;        /* Amber 500 */
-            --warning-light: #FEF3C7;  /* Amber 100 */
-            --error: #EF4444;          /* Red 500 */
-            --error-light: #FEE2E2;    /* Red 100 */
-            --info: #0EA5E9;           /* Sky 500 */
-            --info-light: #E0F2FE;     /* Sky 100 */
+            --success: #00A878;
+            --success-light: #D1FAE5;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --error: #EF4444;
+            --error-light: #FEE2E2;
+            --info: #2583E8;
+            --info-light: #E0F2FE;
             
-            /* Cores de Destaque - Modernas */
-            --accent-blue: #0EA5E9;
-            --accent-blue-light: #38BDF8;
-            --accent-green: #10B981;
-            --accent-green-light: #34D399;
-            --accent-turquoise: #14B8A6;
+            /* Cores de Destaque */
+            --accent-blue: #2583E8;
+            --accent-blue-light: #4B9BF0;
+            --accent-green: #00B894;
+            --accent-green-light: #00D6B5;
+            --accent-turquoise: #00D6B5;
             --accent-red: #EF4444;
             --accent-yellow: #F59E0B;
-            --accent-purple: #8B5CF6;
-            --accent-orange: #F97316;
+            --accent-purple: #6D5AE6;
+            --accent-orange: #F59E0B;
             --accent-pink: #EC4899;
             
             /* Sombras - Mais suaves e naturais */
@@ -99,12 +109,16 @@
             --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -4px rgba(0, 0, 0, 0.15);
             
-            /* Glows - Mais vibrantes */
-            --glow-blue: rgba(14, 165, 233, 0.3);
-            --glow-green: rgba(16, 185, 129, 0.3);
-            --glow-turquoise: rgba(20, 184, 166, 0.3);
-            --glow-purple: rgba(139, 92, 246, 0.3);
+            /* Glows */
+            --glow-blue: rgba(37, 131, 232, 0.3);
+            --glow-green: rgba(0, 184, 148, 0.3);
+            --glow-turquoise: rgba(0, 214, 181, 0.35);
+            --glow-purple: rgba(109, 90, 230, 0.3);
             --glow-pink: rgba(236, 72, 153, 0.3);
+            --glow-cyan: rgba(0, 214, 181, 0.35);
+
+            /* Raios e espaçamentos (escala 4px) */
+            --r-sm: 12px; --r-md: 16px; --r-lg: 20px; --r-xl: 24px;
         }
 
         body {
@@ -6237,6 +6251,288 @@
                 border: 1px solid #ddd;
             }
         }
+
+        /* ==========================================================
+           REDESIGN 2025 — Camada de estilo (mobile-first)
+           Sobrescreve componentes da home seguindo a referência visual.
+           Mantém todos os IDs/estruturas de dados existentes.
+           ========================================================== */
+
+        body { background: var(--bg-primary); }
+        .container { padding: 16px; max-width: 640px; }
+        @media (min-width: 900px) { .container { max-width: 1100px; padding: 24px; } }
+
+        /* ---------- HEADER (navy, premium) ---------- */
+        .header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+            box-shadow: 0 4px 20px rgba(11, 31, 58, 0.25);
+            padding: 14px 16px;
+            text-align: left;
+        }
+        .app-header-bar {
+            display: flex; align-items: center; gap: 12px;
+            max-width: 1100px; margin: 0 auto;
+        }
+        .app-header-brand { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+        .app-header-brand img { height: 34px; width: auto; flex-shrink: 0; }
+        .app-header-titles { min-width: 0; }
+        .app-header-titles h1 {
+            font-size: 18px; font-weight: 800; margin: 0; color: #fff;
+            letter-spacing: 0.5px; line-height: 1.1; text-shadow: none;
+        }
+        .app-header-titles p {
+            font-size: 11px; margin: 2px 0 0; color: var(--green-turquoise);
+            font-weight: 600;
+        }
+        .app-header-actions { display: flex; align-items: center; gap: 8px; }
+        .app-icon-btn {
+            width: 40px; height: 40px; border-radius: 12px; border: none;
+            background: rgba(255,255,255,0.10); color: #fff; font-size: 18px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            position: relative; transition: background .2s, transform .1s;
+        }
+        .app-icon-btn:hover { background: rgba(255,255,255,0.18); }
+        .app-icon-btn:active { transform: scale(0.94); }
+        .app-icon-btn .badge-dot {
+            position: absolute; top: 8px; right: 9px; width: 8px; height: 8px;
+            background: var(--error); border-radius: 50%; border: 2px solid var(--navy);
+        }
+        .app-avatar {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--green-main), var(--green-turquoise));
+            color: #fff; font-weight: 800; font-size: 13px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+        /* Botão antigo de instalar não é mais necessário no cabeçalho novo */
+        #installButton { display: none !important; }
+
+        /* ---------- GREETING ---------- */
+        .greeting-section {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            gap: 12px; margin: 18px 0 16px;
+        }
+        .greeting-left { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+        .greeting-emoji { font-size: 22px; line-height: 1.4; }
+        .greeting-title { font-size: 20px; font-weight: 800; color: var(--text-primary); }
+        .greeting-date { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+        .greeting-motivation {
+            font-size: 12px; color: var(--text-secondary); font-weight: 600;
+            text-align: right; max-width: 42%; line-height: 1.35;
+        }
+
+        /* ---------- HERO CARD (gradiente verde) ---------- */
+        .hero-card {
+            background: linear-gradient(135deg, var(--green-petrol) 0%, var(--green-main) 55%, var(--green-emerald) 100%);
+            border-radius: var(--r-xl);
+            padding: 20px;
+            box-shadow: 0 16px 34px rgba(0, 107, 91, 0.30);
+            min-height: 0;
+            gap: 4px;
+        }
+        .hero-top-row {
+            display: flex; align-items: stretch; gap: 20px;
+        }
+        .hero-left { flex: 1.2; min-width: 0; }
+        .hero-divider { width: 1px; background: rgba(255,255,255,0.18); }
+        .hero-right { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+        .hero-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+            text-transform: uppercase; color: rgba(255,255,255,0.85);
+            display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+        }
+        .hero-value { font-size: 40px; font-weight: 900; letter-spacing: -1.5px; line-height: 1; margin-bottom: 8px; }
+        .hero-comparison {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; font-weight: 700; color: #fff;
+            background: rgba(255,255,255,0.14); padding: 4px 10px; border-radius: 999px;
+        }
+        .hero-comparison.negative { background: rgba(239,68,68,0.28); }
+        .hero-meta { margin-top: 0; }
+        .hero-right .meta-label { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: rgba(255,255,255,0.85); }
+        .hero-right .meta-value { font-size: 22px; font-weight: 900; display: block; margin: 2px 0 10px; }
+        .hero-progress-track { background: rgba(255,255,255,0.22); height: 8px; border-radius: 999px; overflow: hidden; }
+        .hero-progress-track .progress-fill,
+        #heroProgressFill { background: #fff; height: 100%; border-radius: 999px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+        .hero-progress-meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.92); }
+        .hero-progress-meta #progressRemaining { text-align: right; }
+
+        /* Filtro de período dentro do hero (compacto) */
+        .hero-card .period-filter-btn {
+            padding: 6px 14px; font-size: 12px; border-radius: 999px;
+            background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.25); color:#fff;
+        }
+        .hero-card .period-filter-btn.active { background:#fff; color: var(--green-petrol); border-color:#fff; }
+
+        /* ---------- MINI CARDS (indicadores) ---------- */
+        .mini-cards-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; }
+        .mini-card-new {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--r-md); padding: 14px 12px; text-align: left;
+            box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px;
+            transition: transform .15s, box-shadow .2s; min-width: 0; overflow: hidden;
+        }
+        .mini-card-value, .mini-card-label, .mini-card-delta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mini-card-new:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .mini-card-icon {
+            width: 34px; height: 34px; border-radius: 10px; font-size: 17px;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 2px;
+            background: var(--info-light); color: var(--info);
+        }
+        .mini-card-new:nth-child(2) .mini-card-icon { background: rgba(0,184,148,0.12); color: var(--green-main); }
+        .mini-card-new:nth-child(3) .mini-card-icon { background: rgba(0,184,148,0.12); color: var(--green-main); }
+        .mini-card-value { font-size: 18px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; }
+        .mini-card-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+        .mini-card-delta { font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 3px; }
+        .mini-card-delta.up { color: var(--success); }
+        .mini-card-delta.down { color: var(--error); }
+        .mini-card-delta.flat { color: var(--text-tertiary); }
+
+        /* ---------- SEÇÕES / TÍTULOS ---------- */
+        .section-title-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+        .section-title-row .section-title { font-size: 17px; font-weight: 800; color: var(--text-primary); margin: 0; }
+        .section-link { font-size: 12px; font-weight: 700; color: var(--green-main); background: none; border: none; cursor: pointer; }
+
+        /* ---------- AÇÕES RÁPIDAS (4 cards coloridos) ---------- */
+        .quick-actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .quick-action-btn {
+            border: none; border-radius: var(--r-md); padding: 16px; text-align: left;
+            color: #fff; display: flex; flex-direction: column; gap: 6px; cursor: pointer;
+            min-height: 92px; min-width: 0; position: relative; overflow: hidden;
+            box-shadow: 0 8px 20px rgba(11,31,58,0.10); transition: transform .12s, box-shadow .2s;
+        }
+        .quick-action-btn .quick-action-text, .quick-action-btn .quick-action-desc { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+        .quick-action-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(11,31,58,0.16); background: none; }
+        .quick-action-btn:active { transform: scale(0.98); }
+        .quick-action-btn .quick-action-icon { font-size: 24px; }
+        .quick-action-btn .quick-action-text { font-size: 15px; font-weight: 800; }
+        .quick-action-btn .quick-action-desc { font-size: 11px; font-weight: 500; opacity: 0.92; }
+        .qa-corrida { background: linear-gradient(135deg, var(--green-petrol), var(--green-main)); }
+        .qa-ganho { background: linear-gradient(135deg, #1E6FD6, var(--info)); }
+        .qa-gasto { background: linear-gradient(135deg, #F59E0B, #F97316); }
+        .qa-abastecer { background: linear-gradient(135deg, #6D5AE6, #8B7CF0); }
+
+        /* ---------- INSIGHT DO DIA ---------- */
+        .insight-card-new {
+            background: linear-gradient(135deg, #E6FBF4 0%, #D6F7EC 100%);
+            border: 1px solid rgba(0,184,148,0.25); border-radius: var(--r-md);
+            padding: 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 22px;
+        }
+        .insight-card-new::before { display: none; }
+        .insight-icon {
+            width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+            background: var(--green-emerald); color: #fff; font-size: 20px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .insight-body { flex: 1; min-width: 0; }
+        .insight-title { font-size: 13px; font-weight: 800; color: var(--green-petrol); margin-bottom: 2px; }
+        .insight-text { font-size: 12px; color: #1e5f52; font-weight: 500; line-height: 1.4; }
+        .insight-chevron { color: var(--green-main); font-size: 18px; flex-shrink: 0; }
+
+        /* ---------- EVOLUÇÃO DA SEMANA ---------- */
+        .weekly-chart-simple { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 18px; box-shadow: var(--shadow-sm); margin-bottom: 22px; }
+        .chart-header-simple { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+        .chart-title { font-size: 15px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
+        .weekly-value-row { display: flex; align-items: baseline; gap: 10px; margin: 2px 0 10px; }
+        .weekly-total { font-size: 24px; font-weight: 900; color: var(--text-primary); letter-spacing: -1px; }
+        .weekly-delta { font-size: 12px; font-weight: 700; }
+        .weekly-delta.up { color: var(--success); }
+        .weekly-delta.down { color: var(--error); }
+        .weekly-subtext { font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
+        .chart-best { font-size: 11px; color: var(--text-secondary); font-weight: 600; }
+        .chart-wrapper-simple { height: 150px; position: relative; }
+
+        /* ---------- RESUMO DO MÊS (navy) ---------- */
+        .month-summary-card {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+            border-radius: var(--r-lg); padding: 18px; color: #fff; margin-bottom: 24px;
+            box-shadow: 0 12px 28px rgba(11,31,58,0.28);
+        }
+        .month-summary-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .month-summary-title { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .month-summary-sub { font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; }
+        .month-summary-rows { display: flex; flex-direction: column; gap: 10px; }
+        .ms-row { display: flex; align-items: center; gap: 10px; }
+        .ms-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+        .ms-dot.rev { background: var(--green-turquoise); }
+        .ms-dot.exp { background: var(--error); }
+        .ms-dot.profit { background: var(--green-emerald); }
+        .ms-label { flex: 1; font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 500; }
+        .ms-value { font-size: 15px; font-weight: 800; }
+        .ms-value.rev { color: var(--green-turquoise); }
+        .ms-value.exp { color: #FCA5A5; }
+        .ms-value.profit { color: var(--green-emerald); }
+        .month-summary-goal { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.12); }
+        .msg-top { display: flex; align-items: center; justify-content: space-between; font-size: 12px; margin-bottom: 8px; }
+        .msg-top .msg-label { color: rgba(255,255,255,0.75); font-weight: 600; }
+        .msg-top .msg-target { font-weight: 800; }
+        .msg-track { height: 8px; background: rgba(255,255,255,0.15); border-radius: 999px; overflow: hidden; }
+        .msg-fill { height: 100%; background: linear-gradient(90deg, var(--green-main), var(--green-turquoise)); border-radius: 999px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+        .msg-percent { text-align: right; font-size: 11px; font-weight: 700; color: var(--green-turquoise); margin-top: 6px; }
+
+        /* ---------- BOTTOM NAV (5 itens fixos) ---------- */
+        .bottom-nav {
+            background: linear-gradient(180deg, var(--navy-2) 0%, var(--navy) 100%) !important;
+            box-shadow: 0 -4px 20px rgba(11,31,58,0.25) !important;
+            padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+            border-top: none !important;
+            display: flex !important; align-items: stretch !important;
+        }
+        .bottom-nav .nav-category { flex: 1 1 0 !important; }
+        .bottom-nav .nav-item {
+            flex-direction: column !important; gap: 3px !important; height: 58px !important;
+            color: #7C93B4 !important; background: transparent !important; border-radius: 12px !important;
+        }
+        .bottom-nav .nav-item .nav-icon { font-size: 20px !important; }
+        .bottom-nav .nav-item .nav-label { font-size: 10px !important; font-weight: 600 !important; }
+        .bottom-nav .nav-item.active { color: var(--green-turquoise) !important; background: transparent !important; }
+        .bottom-nav .nav-item.active::before {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 28px; height: 3px; border-radius: 0 0 4px 4px; background: var(--green-turquoise);
+        }
+        .bottom-nav .nav-item.active .nav-icon { filter: drop-shadow(0 2px 8px var(--glow-turquoise)); transform: scale(1.08); }
+
+        /* FAB de notificações — reposicionar acima da nav */
+        .fab { bottom: 86px !important; background: linear-gradient(135deg, var(--green-main), var(--green-turquoise)) !important; }
+
+        /* ---------- RESPONSIVO (redesign — sobrepõe regras antigas) ---------- */
+        @media (min-width: 720px) {
+            .quick-actions-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        /* Neutraliza regras antigas de hero/mini-card em telas <=480px */
+        @media (max-width: 480px) {
+            .hero-card { min-height: 0 !important; padding: 18px !important; border-radius: var(--r-xl) !important; margin-bottom: 20px; }
+            .hero-value { font-size: 36px !important; letter-spacing: -1.5px !important; margin-bottom: 8px !important; }
+            .hero-label { font-size: 11px !important; margin-bottom: 6px !important; }
+            .hero-comparison { font-size: 12px !important; margin-bottom: 0 !important; }
+            .hero-meta { padding: 0 !important; }
+            .hero-right .meta-value { font-size: 20px !important; }
+            .greeting-title { font-size: 19px !important; }
+            .mini-card-new { padding: 14px 12px !important; border-radius: var(--r-md) !important; }
+            .mini-card-icon { font-size: 17px !important; margin-bottom: 2px !important; }
+            .mini-card-value { font-size: 17px !important; margin-bottom: 0 !important; }
+        }
+        @media (max-width: 400px) {
+            .hero-value { font-size: 32px !important; }
+            .greeting-motivation { max-width: 46%; font-size: 11px; }
+            .quick-action-btn { min-height: 84px; padding: 14px; }
+            .weekly-total { font-size: 21px; }
+        }
+        /* Telas muito estreitas (320px): empilha o hero */
+        @media (max-width: 360px) {
+            .container { padding: 12px; }
+            .hero-top-row { flex-direction: column; gap: 14px; }
+            .hero-divider { width: 100%; height: 1px; }
+            .hero-value { font-size: 30px !important; }
+            .hero-right { justify-content: flex-start; }
+            .mini-cards-grid { gap: 8px; }
+            .mini-card-value { font-size: 15px !important; }
+            .greeting-motivation { max-width: 44%; }
+            .app-header-titles h1 { font-size: 16px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+        }
     </style>
 </head>
 <body>
@@ -6278,30 +6574,24 @@
     </svg>
 
     <div class="header">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 4px;">
-            <img src="./img/logotipo.png" alt="Driver Finance Logo" style="height: 40px; width: auto; filter: drop-shadow(0 0 10px var(--glow-cyan));">
-            <h1 style="margin: 0;">DRIVER FINANCE</h1>
+        <div class="app-header-bar">
+            <button class="app-icon-btn" onclick="openModal('notifications')" aria-label="Menu" title="Menu">☰</button>
+            <div class="app-header-brand">
+                <img src="./img/logotipo.png" alt="Driver Finance">
+                <div class="app-header-titles">
+                    <h1>DRIVER FINANCE</h1>
+                    <p>Mais controle. Mais lucro.</p>
+                </div>
+            </div>
+            <div class="app-header-actions">
+                <button class="app-icon-btn" onclick="openModal('notifications')" aria-label="Notificações" title="Notificações">
+                    🔔<span class="badge-dot" id="headerNotifDot"></span>
+                </button>
+                <div class="app-avatar" id="userAvatar" onclick="switchPage('goals')" title="Perfil" role="button" tabindex="0">WS</div>
+            </div>
         </div>
-        <p>Gestão Financeira Inteligente</p>
-        <button id="installButton" onclick="triggerInstallPrompt()" style="
-            display: none;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        " onmouseover="this.style.background='rgba(255, 255, 255, 0.35)'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='scale(1)'">
-            📲 Instalar App
-        </button>
+        <!-- Botão de instalação mantido para compatibilidade (oculto pelo CSS do redesign) -->
+        <button id="installButton" onclick="triggerInstallPrompt()">📲 Instalar App</button>
     </div>
 
     <div class="container">
@@ -6310,46 +6600,50 @@
             
             <!-- Saudação -->
             <div class="greeting-section">
-                <div class="greeting-text">
-                    <div class="greeting-title" id="greetingTitle">Bom dia</div>
-                    <div class="greeting-date" id="greetingDate">Quinta, 7 de Maio</div>
+                <div class="greeting-left">
+                    <span class="greeting-emoji" id="greetingEmoji">🌙</span>
+                    <div class="greeting-text">
+                        <div class="greeting-title" id="greetingTitle">Bom dia</div>
+                        <div class="greeting-date" id="greetingDate">Quinta, 7 de Maio</div>
+                    </div>
                 </div>
+                <div class="greeting-motivation" id="greetingMotivation">Disciplina hoje, liberdade amanhã! 🚀</div>
             </div>
 
             <!-- CARD HERO - LUCRO LÍQUIDO -->
             <div class="hero-card">
                 <!-- Filtro de Período -->
                 <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
-                    <button class="period-filter-btn active" data-period="today" onclick="changePeriodView('today')">
-                        Hoje
-                    </button>
-                    <button class="period-filter-btn" data-period="week" onclick="changePeriodView('week')">
-                        Semana
-                    </button>
-                    <button class="period-filter-btn" data-period="month" onclick="changePeriodView('month')">
-                        Mês
-                    </button>
+                    <button class="period-filter-btn active" data-period="today" onclick="changePeriodView('today')">Hoje</button>
+                    <button class="period-filter-btn" data-period="week" onclick="changePeriodView('week')">Semana</button>
+                    <button class="period-filter-btn" data-period="month" onclick="changePeriodView('month')">Mês</button>
                 </div>
-                
-                <div class="hero-label" id="heroPeriodLabel">💰 LUCRO LÍQUIDO HOJE</div>
-                <div class="hero-value" id="heroProfit">R$ 0,00</div>
-                <div class="hero-comparison" id="heroComparison">
-                    <span class="comparison-icon">📊</span>
-                    <span class="comparison-text">Comparado com ontem</span>
-                </div>
-                
-                <div class="hero-meta">
-                    <div class="meta-info">
-                        <span class="meta-label">Meta diária:</span>
-                        <span class="meta-value" id="metaValue">R$ 400,00</span>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="heroProgressFill" style="width: 0%"></div>
+
+                <div class="hero-top-row">
+                    <!-- Área esquerda: lucro -->
+                    <div class="hero-left">
+                        <div class="hero-label" id="heroPeriodLabel">💰 LUCRO LÍQUIDO HOJE</div>
+                        <div class="hero-value" id="heroProfit">R$ 0,00</div>
+                        <div class="hero-comparison" id="heroComparison">
+                            <span class="comparison-icon">📊</span>
+                            <span class="comparison-text">Comparado com ontem</span>
                         </div>
-                        <div class="progress-text">
-                            <span id="progressPercent">0%</span>
-                            <span id="progressRemaining">Faltam R$ 400,00</span>
+                    </div>
+
+                    <div class="hero-divider"></div>
+
+                    <!-- Área direita: meta -->
+                    <div class="hero-right">
+                        <div class="hero-meta">
+                            <span class="meta-label">Meta diária</span>
+                            <span class="meta-value" id="metaValue">R$ 400,00</span>
+                            <div class="hero-progress-track">
+                                <div class="progress-fill" id="heroProgressFill" style="width: 0%"></div>
+                            </div>
+                            <div class="hero-progress-meta">
+                                <span id="progressPercent">0%</span>
+                                <span id="progressRemaining">Faltam R$ 400,00</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -6358,61 +6652,113 @@
             <!-- MINI CARDS - MÉTRICAS SECUNDÁRIAS -->
             <div class="mini-cards-grid">
                 <div class="mini-card-new">
-                    <div class="mini-card-icon">⏱️</div>
+                    <div class="mini-card-icon">🕐</div>
                     <div class="mini-card-value" id="miniHours">0h</div>
-                    <div class="mini-card-label">Horas</div>
+                    <div class="mini-card-label">Horas trabalhadas</div>
+                    <div class="mini-card-delta flat" id="miniHoursDelta"></div>
                 </div>
                 <div class="mini-card-new">
-                    <div class="mini-card-icon">🚗</div>
+                    <div class="mini-card-icon">�️</div>
                     <div class="mini-card-value" id="miniKm">0 km</div>
-                    <div class="mini-card-label">Rodados</div>
+                    <div class="mini-card-label">Quilômetros rodados</div>
+                    <div class="mini-card-delta flat" id="miniKmDelta"></div>
                 </div>
                 <div class="mini-card-new">
                     <div class="mini-card-icon">⛽</div>
                     <div class="mini-card-value" id="miniFuel">R$ 0</div>
                     <div class="mini-card-label">Combustível</div>
+                    <div class="mini-card-delta flat" id="miniFuelDelta"></div>
                 </div>
             </div>
 
             <!-- AÇÕES RÁPIDAS -->
             <div class="quick-actions-section">
-                <div class="section-title">Ações Rápidas</div>
+                <div class="section-title-row">
+                    <div class="section-title">Ações rápidas</div>
+                    <button class="section-link" onclick="switchPage('history')">Ver todas</button>
+                </div>
                 <div class="quick-actions-grid">
-                    <button class="quick-action-btn" onclick="openModal('revenue')">
-                        <span class="quick-action-icon">💵</span>
-                        <span class="quick-action-text">Corrida</span>
+                    <button class="quick-action-btn qa-corrida" onclick="openModal('revenue', 'corrida')">
+                        <span class="quick-action-icon">�</span>
+                        <span class="quick-action-text">+ Corrida</span>
+                        <span class="quick-action-desc">Registrar corrida</span>
                     </button>
-                    <button class="quick-action-btn" onclick="openModal('revenue')">
+                    <button class="quick-action-btn qa-ganho" onclick="openModal('revenue', 'ganho')">
                         <span class="quick-action-icon">💰</span>
-                        <span class="quick-action-text">Ganho</span>
+                        <span class="quick-action-text">+ Ganho</span>
+                        <span class="quick-action-desc">Adicionar ganho</span>
                     </button>
-                    <button class="quick-action-btn" onclick="openModal('expense')">
+                    <button class="quick-action-btn qa-gasto" onclick="openModal('expense', '')">
+                        <span class="quick-action-icon">🧾</span>
+                        <span class="quick-action-text">+ Gasto</span>
+                        <span class="quick-action-desc">Registrar gasto</span>
+                    </button>
+                    <button class="quick-action-btn qa-abastecer" onclick="openModal('expense', 'gas')">
                         <span class="quick-action-icon">⛽</span>
-                        <span class="quick-action-text">Abasteci</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="openModal('expense')">
-                        <span class="quick-action-icon">💸</span>
-                        <span class="quick-action-text">Gasto</span>
+                        <span class="quick-action-text">+ Abastecimento</span>
+                        <span class="quick-action-desc">Registrar combustível</span>
                     </button>
                 </div>
             </div>
 
-            <!-- INSIGHT ÚNICO -->
-            <div class="insight-card-new">
+            <!-- INSIGHT DO DIA -->
+            <div class="insight-card-new" onclick="switchPage('ai')" role="button" tabindex="0">
                 <div class="insight-icon">💡</div>
-                <div class="insight-text" id="dailyInsight">
-                    Seu melhor horário começa às 18h. Considere trabalhar agora.
+                <div class="insight-body">
+                    <div class="insight-title">Insight do dia</div>
+                    <div class="insight-text" id="dailyInsight">
+                        Registre suas corridas para receber insights personalizados.
+                    </div>
                 </div>
+                <div class="insight-chevron">›</div>
             </div>
 
-            <!-- GRÁFICO SEMANAL SIMPLES -->
+            <!-- EVOLUÇÃO DA SEMANA -->
             <div class="weekly-chart-simple">
                 <div class="chart-header-simple">
-                    <span class="chart-title">📊 Semana</span>
-                    <span class="chart-best" id="chartBest">Melhor: Quinta (R$ 450)</span>
+                    <span class="chart-title">📊 Evolução da semana</span>
+                    <span class="chart-best" id="chartBest">Sem dados ainda</span>
                 </div>
+                <div class="weekly-value-row">
+                    <span class="weekly-total" id="weeklyTotal">R$ 0,00</span>
+                    <span class="weekly-delta flat" id="weeklyDelta"></span>
+                </div>
+                <div class="weekly-subtext" id="weeklySubtext">Lucro dos últimos 7 dias</div>
                 <div class="chart-wrapper-simple">
                     <canvas id="weeklyChartSimple"></canvas>
+                </div>
+            </div>
+
+            <!-- RESUMO DO MÊS -->
+            <div class="month-summary-card">
+                <div class="month-summary-header">
+                    <div class="month-summary-title">📅 Resumo do mês</div>
+                    <div class="month-summary-sub" id="monthSummarySub">—</div>
+                </div>
+                <div class="month-summary-rows">
+                    <div class="ms-row">
+                        <span class="ms-dot rev"></span>
+                        <span class="ms-label">Ganhos</span>
+                        <span class="ms-value rev" id="monthRevenue">R$ 0,00</span>
+                    </div>
+                    <div class="ms-row">
+                        <span class="ms-dot exp"></span>
+                        <span class="ms-label">Gastos</span>
+                        <span class="ms-value exp" id="monthExpense">R$ 0,00</span>
+                    </div>
+                    <div class="ms-row">
+                        <span class="ms-dot profit"></span>
+                        <span class="ms-label">Lucro líquido</span>
+                        <span class="ms-value profit" id="monthProfit">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="month-summary-goal">
+                    <div class="msg-top">
+                        <span class="msg-label">Meta do mês</span>
+                        <span class="msg-target" id="monthGoalTarget">R$ 0,00</span>
+                    </div>
+                    <div class="msg-track"><div class="msg-fill" id="monthGoalFill" style="width:0%"></div></div>
+                    <div class="msg-percent" id="monthGoalPercent">0%</div>
                 </div>
             </div>
 
@@ -6968,42 +7314,7 @@
 
         <!-- Lista de Transações -->
         <div class="transactions-list" id="transactionsList">
-            <!-- Exemplo de transações -->
-            <div class="transaction-item">
-                <div class="transaction-info">
-                    <div class="transaction-date">12/05/2024</div>
-                    <div class="transaction-desc">Corrida Uber</div>
-                    <div class="transaction-category">Receita</div>
-                </div>
-                <div class="transaction-value revenue">+ R$ 45,80</div>
-                <div class="transaction-actions">
-                    <button class="btn-icon" onclick="deleteTransaction(1)">🗑️</button>
-                </div>
-            </div>
-
-            <div class="transaction-item">
-                <div class="transaction-info">
-                    <div class="transaction-date">12/05/2024</div>
-                    <div class="transaction-desc">Gasolina</div>
-                    <div class="transaction-category">Combustível</div>
-                </div>
-                <div class="transaction-value expense">- R$ 150,00</div>
-                <div class="transaction-actions">
-                    <button class="btn-icon" onclick="deleteTransaction(2)">🗑️</button>
-                </div>
-            </div>
-
-            <div class="transaction-item">
-                <div class="transaction-info">
-                    <div class="transaction-date">11/05/2024</div>
-                    <div class="transaction-desc">Corrida 99</div>
-                    <div class="transaction-category">Receita</div>
-                </div>
-                <div class="transaction-value revenue">+ R$ 38,50</div>
-                <div class="transaction-actions">
-                    <button class="btn-icon" onclick="deleteTransaction(3)">🗑️</button>
-                </div>
-            </div>
+            <!-- Transações reais carregadas via JavaScript -->
         </div>
     </div>
 
@@ -7323,68 +7634,41 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation - Menu com Categorias Expansíveis -->
+    <!-- Bottom Navigation - 5 itens fixos (redesign) -->
     <div class="bottom-nav" id="bottomNav">
-        <!-- Categoria: Visão Geral -->
-        <div class="nav-category" data-category="overview">
-            <div class="nav-item active" onclick="switchPage('dashboard')">
-                <div class="nav-icon">📊</div>
-                <span class="nav-label">Visão</span>
+        <div class="nav-category">
+            <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')">
+                <div class="nav-icon">🏠</div>
+                <span class="nav-label">Home</span>
             </div>
         </div>
-
-        <!-- Categoria: Gestão (Expansível) -->
-        <div class="nav-category" data-category="management">
-            <div class="nav-item" onclick="toggleNavCategory('management', event)">
-                <div class="nav-icon">🚗</div>
-                <span class="nav-label">Gestão</span>
-                <span class="nav-arrow">▼</span>
-            </div>
-            <div class="nav-submenu" id="submenu-management">
-                <div class="nav-subitem" onclick="switchPage('vehicle')">
-                    <span class="nav-subicon">🚗</span>
-                    <span>Veículo</span>
-                </div>
-                <div class="nav-subitem" onclick="switchPage('apps')">
-                    <span class="nav-subicon">📱</span>
-                    <span>Apps</span>
-                </div>
-                <div class="nav-subitem" onclick="switchPage('history')">
-                    <span class="nav-subicon">📜</span>
-                    <span>Histórico</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Categoria: IA -->
-        <div class="nav-category" data-category="ai">
-            <div class="nav-item" onclick="switchPage('ai')">
-                <div class="nav-icon">🤖</div>
-                <span class="nav-label">IA</span>
-            </div>
-        </div>
-
-        <!-- Categoria: Análise (Expansível) -->
-        <div class="nav-category" data-category="analysis">
-            <div class="nav-item" onclick="toggleNavCategory('analysis', event)">
+        <div class="nav-category">
+            <div class="nav-item" data-page="history" onclick="switchPage('history')">
                 <div class="nav-icon">�</div>
-                <span class="nav-label">Análise</span>
-                <span class="nav-arrow">▼</span>
+                <span class="nav-label">Financeiro</span>
             </div>
-            <div class="nav-submenu" id="submenu-analysis">
-                <div class="nav-subitem" onclick="switchPage('goals')">
-                    <span class="nav-subicon">🎯</span>
-                    <span>Metas</span>
-                </div>
-                <div class="nav-subitem" onclick="switchPage('reports')">
-                    <span class="nav-subicon">📈</span>
-                    <span>Relatórios</span>
-                </div>
+        </div>
+        <div class="nav-category">
+            <div class="nav-item" data-page="vehicle" onclick="switchPage('vehicle')">
+                <div class="nav-icon">🚗</div>
+                <span class="nav-label">Veículo</span>
+            </div>
+        </div>
+        <div class="nav-category">
+            <div class="nav-item" data-page="ai" onclick="switchPage('ai')">
+                <div class="nav-icon">📈</div>
+                <span class="nav-label">Insights</span>
+            </div>
+        </div>
+        <div class="nav-category">
+            <div class="nav-item" data-page="goals" onclick="switchPage('goals')">
+                <div class="nav-icon">👤</div>
+                <span class="nav-label">Perfil</span>
             </div>
         </div>
     </div>
 
-    <!-- Backdrop para fechar submenu -->
+    <!-- Backdrop mantido por compatibilidade (não mais usado no menu de 5 itens) -->
     <div class="nav-backdrop" id="navBackdrop" onclick="closeAllSubmenus()"></div>
 
     <!-- Modals -->

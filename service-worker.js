@@ -1,4 +1,4 @@
-const CACHE_NAME = 'driver-finance-v5';
+const CACHE_NAME = 'driver-finance-v6';
 const urlsToCache = [
   './',
   './index.html',
